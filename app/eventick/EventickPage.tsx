@@ -9,7 +9,7 @@ import { Newsletter } from './components/Newsletter';
 import { Sponsors } from './components/sponsors';
 import { Categories } from './components/Categories';
 import { Footer } from './components/Footer';
-
+import { LoginAlert } from '@/app/auth/_components/loginAlert';
 const navLinks = [
   { label: 'Schedule' },
   { label: 'Speakers' },
@@ -83,6 +83,7 @@ const blogPosts = [
 
 export default function EventickPage() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [showLoginDialog, setShowLoginDialog] = React.useState(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -97,9 +98,7 @@ export default function EventickPage() {
   return (
     <div>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-        ${isScrolled 
-          ? 'bg-white shadow-md' 
-          : 'bg-transparent'}`}>
+        ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
@@ -111,6 +110,7 @@ export default function EventickPage() {
                   key={link.label} 
                   {...link} 
                   isScrolled={isScrolled}
+                  onLoginClick={() => setShowLoginDialog(true)}
                 />
               ))}
             </div>
@@ -122,6 +122,11 @@ export default function EventickPage() {
           </div>
         </div>
       </nav>
+
+      <LoginAlert 
+        open={showLoginDialog} 
+        onClose={() => setShowLoginDialog(false)} 
+      />
 
       {/* Hero Banner with Search */}
       <div className="relative h-[600px] -mt-[88px]">

@@ -1,25 +1,32 @@
 import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export const Newsletter: React.FC = () => {
   return (
-    <form className="flex flex-col sm:flex-row gap-4 sm:gap-10 p-4 sm:py-2 sm:pr-2 sm:pl-7 
-      mt-5 w-full text-sm sm:text-base bg-white border-2 border-solid border-zinc-100 
-      rounded-[46px] shadow-[8px_15px_38px_rgba(0,0,0,0.15)]">
-      <input
+    <form 
+      className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 
+        bg-white rounded-full border-2 border-zinc-100 
+        p-3 sm:p-2 sm:pl-6 mt-5 w-full
+        shadow-lg transition-shadow hover:shadow-xl"
+      onSubmit={(e) => e.preventDefault()}
+    >
+      <Input
         type="email"
-        id="email"
-        placeholder="Enter your email address.."
-        className="grow shrink my-auto text-neutral-400 w-full border-none bg-transparent"
+        id="newsletter-email"
+        name="email"
+        required
+        aria-label="Email address for newsletter"
+        placeholder="Enter your email address..."
+        className="border-none bg-transparent flex-1 focus:ring-0"
       />
-      <button
+      <Button
         type="submit"
-        className="w-full sm:w-auto gap-2 px-6 sm:px-8 py-3 sm:py-4 tracking-wider 
-          text-white bg-pink-600 border-white rounded-[50px] 
-          shadow-[0px_10px_50px_rgba(61,55,241,0.25)] hover:bg-pink-700 
-          transition-colors"
+        className="w-full sm:w-auto px-8 font-medium
+          bg-pink-600 hover:bg-pink-700 transition-colors"
       >
-        Subscribe Now
-      </button>
+        Subscribe
+      </Button>
     </form>
   );
 };
