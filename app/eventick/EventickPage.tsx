@@ -10,13 +10,13 @@ import { Sponsors } from './components/sponsors';
 import { Categories } from './components/Categories';
 import { Footer } from './components/Footer';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
+import { usePathname } from 'next/navigation';
+import { AuthenticatedNav } from '@/app/(dashboard)/home/_components/authNavbar';
 const navLinks = [
   { label: 'Schedule' },
   { label: 'Speakers' },
   { label: 'Ticket' },
-  { label: 'Contact' },
-  { label: 'Create Event', isCreate: true },
-  { label: 'Login', isButton: true }
+  { label: 'Contact' }
 ];
 
 const events = [
@@ -55,6 +55,34 @@ const events = [
     description: 'Experience the legends of rock music live on stage.',
     image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
   },
+  {
+    month: 'NOV',
+    day: '25',
+    title: 'Rock & Roll Hall of Fame Concert',
+    description: 'Experience the legends of rock music live on stage.',
+    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+  },
+  {
+    month: 'NOV',
+    day: '25',
+    title: 'Rock & Roll Hall of Fame Concert',
+    description: 'Experience the legends of rock music live on stage.',
+    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+  },
+  {
+    month: 'NOV',
+    day: '25',
+    title: 'Rock & Roll Hall of Fame Concert',
+    description: 'Experience the legends of rock music live on stage.',
+    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+  },
+  {
+    month: 'NOV',
+    day: '25',
+    title: 'Rock & Roll Hall of Fame Concert',
+    description: 'Experience the legends of rock music live on stage.',
+    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+  },
 ];
 
 const blogPosts = [
@@ -84,44 +112,86 @@ const blogPosts = [
 export default function EventickPage() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
+  const [showSearchInNav, setShowSearchInNav] = React.useState(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 50);
+      
+      const searchSection = document.getElementById('hero-section');
+      if (searchSection) {
+        const searchSectionBottom = searchSection.offsetTop + searchSection.offsetHeight - 200;
+        setShowSearchInNav(scrollPosition > searchSectionBottom);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const pathname = usePathname();
+  const isAuthenticated = pathname === '/home';
+
   return (
     <div>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-        ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
-              Eventick
-            </div>
-            <div className="hidden md:flex items-center gap-4 lg:gap-8">
-              {navLinks.map((link) => (
+      {isAuthenticated ? (
+        <AuthenticatedNav 
+          isScrolled={isScrolled} 
+          showSearchInNav={showSearchInNav} 
+        />
+      ) : (
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+          ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between py-4">
+              <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
+                Eventick
+              </div>
+              
+              <div className={`absolute left-1/2 transform -translate-x-1/2 w-full 
+                transition-all duration-300 px-4 md:px-0 hidden lg:block
+                ${showSearchInNav 
+                  ? 'opacity-100 visible top-1/2 -translate-y-1/2 max-w-xl' 
+                  : 'opacity-0 invisible -translate-y-full'}`}>
+                <SearchBar isCompact />
+              </div>
+
+              <div className={`hidden md:flex items-center gap-4 lg:gap-8 transition-all duration-300
+                ${showSearchInNav ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+                {navLinks.map((link) => (
+                  <NavLink 
+                    key={link.label} 
+                    {...link} 
+                    isScrolled={isScrolled}
+                    onLoginClick={() => setShowLoginDialog(true)}
+                  />
+                ))}
+              </div>
+
+              <div className={`hidden md:flex items-center gap-4 ${showSearchInNav ? 'ml-auto' : ''}`}>
                 <NavLink 
-                  key={link.label} 
-                  {...link} 
+                  label="Create Event"
+                  isCreate={true}
+                  isScrolled={isScrolled}
+                />
+                <NavLink 
+                  label="Login"
+                  isButton={true}
                   isScrolled={isScrolled}
                   onLoginClick={() => setShowLoginDialog(true)}
                 />
-              ))}
+              </div>
+
+              <button className="md:hidden p-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
             </div>
-            <button className="md:hidden p-2 text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       <LoginAlert 
         open={showLoginDialog} 
@@ -129,7 +199,7 @@ export default function EventickPage() {
       />
 
       {/* Hero Banner with Search */}
-      <div className="relative h-[600px] -mt-[88px]">
+      <div id="hero-section" className="relative h-[600px] -mt-[88px]">
         {/* Background Video */}
         <div className="absolute inset-0 overflow-hidden">
           <video
@@ -180,14 +250,14 @@ export default function EventickPage() {
       {/* Rest of the content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section className="mt-16">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Upcoming Events</h2>
+          <div className="flex flex-col mb-8">
+            <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
             
-            <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+            <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
               <select 
-                className="px-3 py-1.5 text-sm rounded-full bg-indigo-50 
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
                   text-indigo-600 border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200"
+                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
               >
                 <option value="any">Any Category</option>
                 <option value="weekend">Weekend Events</option>
@@ -195,9 +265,9 @@ export default function EventickPage() {
               </select>
 
               <select 
-                className="px-3 py-1.5 text-sm rounded-full bg-indigo-50 
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
                   text-indigo-600 border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200"
+                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
               >
                 <option value="any">Event Type</option>
                 <option value="concert">Concerts</option>
@@ -206,9 +276,9 @@ export default function EventickPage() {
               </select>
 
               <select 
-                className="px-3 py-1.5 text-sm rounded-full bg-indigo-50 
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
                   text-indigo-600 border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200"
+                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
               >
                 <option value="any">Any Time</option>
                 <option value="today">Today</option>
@@ -218,7 +288,7 @@ export default function EventickPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {events.map((event, index) => (
               <EventCard 
                 key={`${event.month}-${event.day}-${index}`} 

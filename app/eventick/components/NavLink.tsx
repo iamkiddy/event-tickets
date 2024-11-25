@@ -4,17 +4,19 @@ import { NavLinkProps } from '../types';
 export const NavLink: React.FC<NavLinkProps & { 
   isScrolled?: boolean;
   onLoginClick?: () => void;
+  isAuthenticated?: boolean;
 }> = ({ 
   label, 
   isButton,
   isCreate,
   isScrolled,
-  onLoginClick 
+  onLoginClick,
+  isAuthenticated
 }) => {
   if (isCreate) {
     return (
       <Link
-        href="/auth"
+        href={isAuthenticated ? "/create" : "/auth"}
         className="px-4 sm:px-6 py-2 bg-pink-600 text-white rounded-full 
           hover:bg-pink-700 transition-colors font-medium text-sm sm:text-base"
       >
@@ -31,7 +33,7 @@ export const NavLink: React.FC<NavLinkProps & {
           hover:bg-indigo-700 transition-colors font-medium whitespace-nowrap
           text-sm sm:text-base"
       >
-        Login / Sign up
+        {isAuthenticated ? 'Logout' : 'Login / Sign up'}
       </button>
     );
   }
