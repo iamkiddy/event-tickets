@@ -33,11 +33,11 @@ const footerSections = {
 };
 
 const socialLinks = [
-  { label: 'X', href: 'https://twitter.com/eventick' },
-  { label: 'Facebook', href: 'https://facebook.com/eventick' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/company/eventick' },
-  { label: 'Instagram', href: 'https://instagram.com/eventick' },
-  { label: 'TikTok', href: 'https://tiktok.com/@eventick' },
+  { label: 'X', href: 'https://twitter.com' },
+  { label: 'Facebook', href: 'https://facebook.com' },
+  { label: 'LinkedIn', href: 'https://linkedin.com' },
+  { label: 'Instagram', href: 'https://instagram.com' },
+  { label: 'TikTok', href: 'https://tiktok.com' },
 ];
 
 export const Footer = () => {

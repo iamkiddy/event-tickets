@@ -4,8 +4,8 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "Eventick",
-  description: "Eventick",
+  title: "CodePass",
+  description: "CodePass",
 };
 
 export default function RootLayout({
