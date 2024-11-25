@@ -5,9 +5,7 @@ const footerSections = {
     { label: 'Create Events', href: '/create-events' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Event Marketing Platform', href: '/marketing' },
-    { label: 'Eventick Mobile Ticket App', href: '/mobile-app' },
-    { label: 'Eventick Check-In App', href: '/check-in-app' },
-    { label: 'Event Registration Software', href: '/registration' },
+
   ],
   planEvents: [
     { label: 'Business & Professional', href: '/category/business' },
@@ -26,7 +24,6 @@ const footerSections = {
     { label: 'Uganda', href: '/location/uganda' },
   ],
   support: [
-    { label: 'Community Guidelines', href: '/guidelines' },
     { label: 'FAQs', href: '/faqs' },
     { label: 'Refund Policy', href: '/refund' },
     { label: 'Privacy Policy', href: '/privacy' },
@@ -49,7 +46,7 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white font-semibold mb-4">Use Eventick</h3>
+            <h3 className="text-white font-semibold mb-4">Use CodePass</h3>
             <ul className="space-y-2">
               {footerSections.useEventick.map((item) => (
                 <li key={item.label}>

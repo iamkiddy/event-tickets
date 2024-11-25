@@ -17,7 +17,7 @@ export const AuthenticatedNav = ({ isScrolled, showSearchInNav }: AuthenticatedN
           <Link href="/home" className={`text-lg sm:text-xl font-bold ${
             isScrolled ? 'text-indigo-600' : 'text-white'
           }`}>
-            Eventick
+            CodePass
           </Link>
 
           <div className={`absolute left-1/2 transform -translate-x-1/2 w-full 

@@ -62,7 +62,7 @@ export default function BlogPage() {
                 isScrolled ? 'text-indigo-600' : 'text-white'
               }`}
             >
-              Eventick Blog
+              CodePass Blog
             </Link>
             <div className="hidden md:flex items-center gap-4 lg:gap-8">
               {navLinks.map((link) => (

@@ -146,7 +146,7 @@ export default function EventickPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between py-4">
               <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
-                Eventick
+                CodePass
               </div>
               
               <div className={`absolute left-1/2 transform -translate-x-1/2 w-full 
