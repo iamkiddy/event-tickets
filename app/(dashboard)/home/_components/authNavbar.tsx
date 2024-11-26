@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { NavLink } from '@/app/eventick/components/NavLink';
 import { SearchBar } from '@/app/eventick/components/SearchBar';
@@ -9,6 +12,16 @@ interface AuthenticatedNavProps {
 }
 
 export const AuthenticatedNav = ({ isScrolled, showSearchInNav }: AuthenticatedNavProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
       ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>

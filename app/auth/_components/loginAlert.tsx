@@ -1,15 +1,57 @@
-import * as React from "react";
+'use client';
+
+import { useState } from 'react';
+import { loginEmail } from '@/lib/actions/auth';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
+import { VerifyCodeAlert } from './verifyCodeAlert';
 
 interface LoginAlertProps {
   open: boolean;
   onClose: () => void;
+  onLoginSuccess: (status: 'New' | 'Old') => void;
 }
 
-export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose }) => {
+export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose, onLoginSuccess }) => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showVerifyCode, setShowVerifyCode] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await loginEmail({ email });
+      setShowVerifyCode(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifySuccess = (status: 'New' | 'Old') => {
+    onLoginSuccess(status);
+  };
+
+  if (showVerifyCode) {
+    return (
+      <VerifyCodeAlert 
+        open={true}
+        onClose={() => {
+          setShowVerifyCode(false);
+          onClose();
+        }}
+        onSuccess={handleVerifySuccess}
+      />
+    );
+  }
+
   return (
     <AlertDialog open={open}>
       <AlertDialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
@@ -35,39 +77,42 @@ export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose }) => {
 
         <div className="space-y-6">
           <Button
-            className="w-full bg-white text-gray-700 border hover:bg-gray-50 
-              flex items-center justify-center gap-3"
+            type="button"
             variant="outline"
+            className="w-full"
           >
-            <img
-              src="https://www.google.com/favicon.ico"
-              alt="Google"
-              className="w-5 h-5"
-            />
+            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+              <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+            </svg>
             Continue with Google
           </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <span className="w-full border-t" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
-                Or continue with
-              </span>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or continue with</span>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               className="w-full"
             />
-            <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
-              Continue with Email
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <Button 
+              type="submit" 
+              className="w-full bg-indigo-600 hover:bg-indigo-700"
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Continue with Email'}
             </Button>
-          </div>
+          </form>
         </div>
       </AlertDialogContent>
     </AlertDialog>

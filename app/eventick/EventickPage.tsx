@@ -10,8 +10,9 @@ import { Sponsors } from './components/sponsors';
 import { Categories } from './components/Categories';
 import { Footer } from './components/Footer';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
-import { usePathname } from 'next/navigation';
 import { AuthenticatedNav } from '@/app/(dashboard)/home/_components/authNavbar';
+import { useAuth } from '@/lib/context/AuthContext';
+
 const navLinks = [
   { label: 'Schedule' },
   { label: 'Speakers' },
@@ -110,37 +111,20 @@ const blogPosts = [
 ];
 
 export default function EventickPage() {
+  const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [showSearchInNav, setShowSearchInNav] = React.useState(false);
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 50);
-      
-      const searchSection = document.getElementById('hero-section');
-      if (searchSection) {
-        const searchSectionBottom = searchSection.offsetTop + searchSection.offsetHeight - 200;
-        setShowSearchInNav(scrollPosition > searchSectionBottom);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const pathname = usePathname();
-  const isAuthenticated = pathname === '/home';
+    if (isAuthenticated) {
+      setShowLoginDialog(false);
+    }
+  }, [isAuthenticated]);
 
   return (
     <div>
-      {isAuthenticated ? (
-        <AuthenticatedNav 
-          isScrolled={isScrolled} 
-          showSearchInNav={showSearchInNav} 
-        />
-      ) : (
+      {!isAuthenticated && (
         <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
           ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,7 +179,8 @@ export default function EventickPage() {
 
       <LoginAlert 
         open={showLoginDialog} 
-        onClose={() => setShowLoginDialog(false)} 
+        onClose={() => setShowLoginDialog(false)}
+        onLoginSuccess={() => setShowLoginDialog(false)}
       />
 
       {/* Hero Banner with Search */}

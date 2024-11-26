@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
-
+import { AuthProvider } from '@/lib/context/AuthContext';
+import AuthenticatedLayout from "./components/AuthenticatedLayout";
 
 export const metadata: Metadata = {
   title: "CodePass",
@@ -15,10 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        
-      >
-        {children}
+      <body>
+        <AuthProvider>
+          <AuthenticatedLayout>
+            {children}
+          </AuthenticatedLayout>
+        </AuthProvider>
       </body>
     </html>
   );

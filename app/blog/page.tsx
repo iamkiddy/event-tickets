@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { NavLink } from '../eventick/components/NavLink';
 import { LoginAlert } from '../auth/_components/loginAlert';
+import { useAuth } from '@/lib/context/AuthContext';
+import { AuthenticatedNav } from '../(dashboard)/home/_components/authNavbar';
 
 const navLinks = [
-  { label: 'Featured' },
-  { label: 'Categories' },
-  { label: 'Authors' },
+  { label: 'Schedule' },
+  { label: 'Speakers' },
+  { label: 'Ticket' },
   { label: 'Contact' },
   { label: 'Create Event', isCreate: true },
   { label: 'Login', isButton: true }
@@ -31,6 +33,7 @@ const blogPosts = [
 const categories = ['All', 'Event Planning', 'Marketing', 'Technology', 'Tips & Tricks'];
 
 export default function BlogPage() {
+  const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState('All');
@@ -47,41 +50,37 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {!isAuthenticated ? (
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+          ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between py-4">
+              <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
+                CodePass
+              </div>
+              
+              <div className="hidden md:flex items-center gap-4 lg:gap-8">
+                {navLinks.map((link) => (
+                  <NavLink 
+                    key={link.label}
+                    {...link} 
+                    isScrolled={isScrolled}
+                    onLoginClick={() => setShowLoginDialog(true)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </nav>
+      ) : (
+        <AuthenticatedNav isScrolled={isScrolled} showSearchInNav={false} />
+      )}
+
       <LoginAlert 
         open={showLoginDialog} 
-        onClose={() => setShowLoginDialog(false)} 
+        onClose={() => setShowLoginDialog(false)}
+        onLoginSuccess={() => setShowLoginDialog(false)}
       />
-
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-        ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <Link 
-              href="/" 
-              className={`text-lg sm:text-xl font-bold ${
-                isScrolled ? 'text-indigo-600' : 'text-white'
-              }`}
-            >
-              CodePass Blog
-            </Link>
-            <div className="hidden md:flex items-center gap-4 lg:gap-8">
-              {navLinks.map((link) => (
-                <NavLink 
-                  key={link.label} 
-                  {...link} 
-                  isScrolled={isScrolled}
-                  onLoginClick={() => setShowLoginDialog(true)}
-                />
-              ))}
-            </div>
-            <button className="md:hidden p-2 text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
 
       <div className="relative h-[600px] mb-16">
         <div className="absolute inset-0">
