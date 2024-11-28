@@ -1,4 +1,4 @@
-import { AuthenticatedNav } from './home/_components/authNavbar';
+import { AuthenticatedNav } from '../../components/ui/authNavbar';
 
 export default function DashboardLayout({
   children,

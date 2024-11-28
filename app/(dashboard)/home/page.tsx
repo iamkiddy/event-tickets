@@ -1,4 +1,4 @@
-import EventickPage from "@/app/eventick/EventickPage";
+import EventickPage from "@/app/codepass/EventickPage";
 
 export default function Home(){
     return(

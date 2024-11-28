@@ -1,7 +1,21 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { LoginAlert } from './_components/loginAlert';
+import { useRouter } from 'next/navigation';
+import { initiateGoogleLogin } from '@/lib/actions/auth';
 
 export default function Page() {
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const router = useRouter();
+
+  const handleLoginSuccess = (status: 'New' | 'Old') => {
+    if (status === 'Old') {
+      router.push('/home');
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left side - Event Image */}
@@ -27,15 +41,14 @@ export default function Page() {
           <div className="mt-8 space-y-6">
             <div className="space-y-4">
               <Button
-                className="w-full bg-white text-gray-700 border hover:bg-gray-50 
-                  flex items-center justify-center gap-3"
+                type="button"
                 variant="outline"
+                className="w-full"
+                onClick={() => initiateGoogleLogin()}
               >
-                <img
-                  src="https://www.google.com/favicon.ico"
-                  alt="Google"
-                  className="w-5 h-5"
-                />
+                <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                  <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+                </svg>
                 Continue with Google
               </Button>
 
@@ -51,14 +64,10 @@ export default function Page() {
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full"
-                  />
-                </div>
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                <Button 
+                  className="w-full bg-primaryColor hover:bg-indigo-700 text-white"
+                  onClick={() => setShowLoginDialog(true)}
+                >
                   Continue with Email
                 </Button>
               </div>
@@ -66,6 +75,12 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      <LoginAlert
+        open={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }
