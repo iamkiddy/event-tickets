@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { NavLink } from '@/app/codepass/components/NavLink';
 import { SearchBar } from '@/app/codepass/components/SearchBar';
-import { UserRoundCheck, Tag } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { UserDropdown } from '@/components/userDropdown';
 interface AuthenticatedNavProps {
   isScrolled: boolean;
@@ -13,7 +13,6 @@ interface AuthenticatedNavProps {
 
 export const AuthenticatedNav = ({ isScrolled, showSearchInNav }: AuthenticatedNavProps) => {
   const [mounted, setMounted] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);

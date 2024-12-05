@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from '@/lib/context/AuthContext';
 import  AuthenticatedLayout  from "@/lib/context/AuthenticatedLayout"
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 export const metadata: Metadata = {
   title: "CodePass",
   description: "CodePass",
@@ -15,11 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <AuthenticatedLayout>
-            {children}
-          </AuthenticatedLayout>
-        </AuthProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+          <AuthProvider>
+            <AuthenticatedLayout>
+              {children}
+            </AuthenticatedLayout>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

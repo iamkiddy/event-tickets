@@ -1,4 +1,6 @@
-import { AuthenticatedNav } from '../../components/ui/authNavbar';
+
+import { DashboardNav } from '@/components/ui/dashboardNav';
+import { SideNav } from '@/components/ui/sideNav';
 
 export default function DashboardLayout({
   children,
@@ -6,10 +8,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <AuthenticatedNav isScrolled={false} showSearchInNav={false} />
-      <div>
-        <main>
+    <div className="min-h-screen bg-gray-50">
+      <DashboardNav />
+      <SideNav />
+
+      {/* Main Content */}
+      <div className="pl-16 pt-16">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </main>
       </div>

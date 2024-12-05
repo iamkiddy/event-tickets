@@ -1,8 +1,12 @@
 import { LoginEmail, LoginEmailResponse, SignupCompleteData, VerifyCode, VerifyCodeResponse, LoginWithGmailResponse } from "../models/_auth_models";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
+import Cookies from 'js-cookie';
 
-const token = localStorage.getItem('token') || undefined;
+interface ApiError extends Error {
+    message: string;
+    status?: number;
+}
 
 export interface SignupResponse {
   success: boolean;
@@ -24,8 +28,9 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
         }
         
         return response;
-    } catch (error: any) {
-        const errorMessage = error.message || "An unexpected error occurred";
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
         throw new Error(errorMessage);
     }
 }
@@ -49,15 +54,15 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
         }
         
         return response;
-    } catch (error: any) {
-        const errorMessage = error.message || "An unexpected error occurred";
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
         throw new Error(errorMessage);
     }
 }
 
 export const logout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
 };
 
 export const checkAuth = (): boolean => {
@@ -75,8 +80,9 @@ export const initiateGoogleLogin = async () => {
         if (response.message) {
             window.location.href = response.message; // The message contains the Google OAuth URL
         }
-    } catch (error: any) {
-        console.error('Failed to initiate Google login:', error);
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        console.error('Failed to initiate Google login:', apiError);
     }
 };
 
@@ -99,8 +105,9 @@ export const completeSignup = async (data: SignupCompleteData): Promise<SignupRe
         }
 
         return response;
-    } catch (error: any) {
-        const errorMessage = error.message || "An unexpected error occurred";
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
         throw new Error(errorMessage);
     }
 }  
@@ -113,29 +120,34 @@ export const loginWithGmail = async (): Promise<LoginWithGmailResponse> => {
             url: APIUrls.loginWithGmail,
         });
         return response;
-    } catch (error: any) {
-        const errorMessage = error.message || "An unexpected error occurred";
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
         throw new Error(errorMessage);
     }
 }
 
-export const loginWithGmailPost = async (code: string): Promise<LoginWithGmailResponse> => {
+export const loginWithGmailPost = async (accessToken: string): Promise<LoginWithGmailResponse> => {
     try {
         const response = await apiController<LoginWithGmailResponse>({
             method: 'POST',
-            url: APIUrls.loginWithGmail,
-            data: { code, redirect_uri: `${window.location.origin}/auth/google` },
+            url: `${APIUrls.loginWithGmail}?accessToken=${accessToken}`,
             contentType: 'application/json',
         });
         
         if (response.token) {
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('verified', 'true');
+            Cookies.set('token', response.token, {
+                expires: 7,
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
         }
         
         return response;
-    } catch (error: any) {
-        const errorMessage = error.message || "An unexpected error occurred";
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
         throw new Error(errorMessage);
     }
 }

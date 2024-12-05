@@ -31,14 +31,22 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
     setError('');
 
     try {
+      if (!fullname.trim() || !phone.trim()) {
+        throw new Error('Please fill in all required fields');
+      }
+
       if (verificationToken) {
         localStorage.setItem('signup_token', verificationToken);
       }
       
       await completeSignup({ fullname, phone, isAgree });
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }

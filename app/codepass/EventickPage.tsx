@@ -10,7 +10,6 @@ import { Sponsors } from './components/sponsors';
 import { Categories } from './components/Categories';
 import { Footer } from './components/Footer';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
-import { AuthenticatedNav } from '@/components/ui/authNavbar';
 import { useAuth } from '@/lib/context/AuthContext';
 import { EventsBanner } from './components/EventsBanner';
 
