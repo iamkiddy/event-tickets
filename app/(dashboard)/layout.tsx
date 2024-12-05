@@ -2,6 +2,8 @@
 import { DashboardNav } from '@/components/ui/dashboardNav';
 import { SideNav } from '@/components/ui/sideNav';
 
+// Dashboard Layout
+
 export default function DashboardLayout({
   children,
 }: {
