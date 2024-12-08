@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, Sparkles, LucideIcon } from 'lucide-react';
+import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardHome() {
@@ -32,7 +32,7 @@ export default function DashboardHome() {
             </p>
             <div className="flex gap-4 mt-4">
               <Link 
-                href="/create" 
+                href="/events/create" 
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primaryColor text-white rounded-lg 
                   hover:bg-indigo-700 transition-colors text-sm font-medium"
               >
@@ -53,7 +53,7 @@ export default function DashboardHome() {
               icon={PlusCircle}
               title="Create event"
               description="Publish an event to reach millions of people on CodePass."
-              href="/create"
+              href="/events/create"
             />
             <ChecklistItem
               icon={UserCircle2}

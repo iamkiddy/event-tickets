@@ -20,8 +20,9 @@ export default class APIUrls {
     // complete signup
     static readonly completeSignup = `${APIUrls.BASE_URL}/api/v1/auth/sign-up-update`;
 
-    // get user profile
-    static readonly getUserProfile = `${APIUrls.BASE_URL}/api/v1/auth/profile`;
+    // get and update user profile
+    static readonly userProfile = `${APIUrls.BASE_URL}/api/v1/auth/profile`;
+
 
     /*
 

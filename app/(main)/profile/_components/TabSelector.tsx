@@ -1,5 +1,5 @@
 'use client'
-import { cn } from '@/lib/utils';
+import LineTabSelectorCard from '@/components/custom/LineTabSelectorCard';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
 
@@ -33,13 +33,13 @@ export default function TabSelector({ activeTab }: TabSelectorProps) {
 
   return (
     <div className='w-full flex flex-row gap-4 border-b-2'>
-        <TabSelectorCard 
+        <LineTabSelectorCard 
             title='My Profile'
             active={tab === 'profile'}
             tab='profile'
             onSelect={handleTabChange}
         />
-        <TabSelectorCard 
+        <LineTabSelectorCard 
             title='All Tickets'
             active={tab === 'tickets'}
             tab='tickets'
@@ -50,23 +50,3 @@ export default function TabSelector({ activeTab }: TabSelectorProps) {
 }
 
 
-interface TabSelectorCardProps {
-    title: string;
-    active: boolean;
-    onSelect: (tab: string) => void;
-    tab: string;
-}
-
-
-const TabSelectorCard = ({title, active, onSelect, tab}: TabSelectorCardProps) => {
-    
-  return (
-    <div onClick={()=>onSelect(tab)} className='w-fit px-3 h-14 flex items-center justify-center relative'>
-        <span className={cn(
-            'cursor-pointer text-sm md:text-lg text-gray-700 font-semibold',
-            active && 'text-primaryColor'
-        )}>{title}</span>
-        <div className={`absolute bottom-0 left-0 w-full h-1 bg-primaryColor ${active ? 'block' : 'hidden'}`}/>
-    </div>
-  )
-}
