@@ -1,6 +1,12 @@
 export default class APIUrls {
     static readonly BASE_URL = process.env.NEXT_PUBLIC_API_URL;
     static readonly BASE_URL_ORG = process.env.NEXT_PUBLIC_API_URL_ORG;
+
+    /*
+
+        USER API URLS
+    
+    */
     
     // login with email
     static readonly login = `${APIUrls.BASE_URL}/api/v1/auth/email`;
@@ -14,6 +20,15 @@ export default class APIUrls {
     // complete signup
     static readonly completeSignup = `${APIUrls.BASE_URL}/api/v1/auth/sign-up-update`;
 
+    // get user profile
+    static readonly getUserProfile = `${APIUrls.BASE_URL}/api/v1/auth/profile`;
+
+    /*
+
+        Utils API URLS
+    
+    */
+
     // get Utils Categories 
     static readonly utilsCategories = `${APIUrls.BASE_URL}/api/v1/utils/categories`;
 
@@ -22,10 +37,10 @@ export default class APIUrls {
 
     /*
 
-    ORGANIZATION API URLS
+        ORGANIZATION API URLS
     
     */
-   
+
     // GET All Events
     static readonly getAllEvents = `${APIUrls.BASE_URL_ORG}/api/v1/org/events`;
 

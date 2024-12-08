@@ -32,3 +32,14 @@ export interface LoginWithGmailResponse {
     message: string;
     token: string;
 }
+
+
+export interface UserProfileModel {
+    id:          string;
+    fullname:    string;
+    email:       string;
+    phone:       string;
+    country:     string;
+    messageType: string;
+    provider:    string;
+}
