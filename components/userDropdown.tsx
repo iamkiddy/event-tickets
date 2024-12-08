@@ -16,8 +16,20 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
   const { logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const isDashboardRoute = pathname.startsWith('/home') || pathname.startsWith('/events');
-  const isAttendingRoute = pathname === '/';
+  
+  // Check if current route is a dashboard route
+  const isDashboardRoute = pathname.startsWith('/dashboard') || 
+    pathname.startsWith('/home') || 
+    pathname.startsWith('/events') ||
+    pathname.startsWith('/orders') ||
+    pathname.startsWith('/finance') ||
+    pathname.startsWith('/settings');
+  
+  // Check if current route is in the main group (attending view)
+  const isMainRoute = pathname === '/' || 
+    pathname.startsWith('/blog') || 
+    pathname.startsWith('/tickets') || 
+    pathname === '/codepass';
 
   const handleLogout = () => {
     logout();
@@ -39,19 +51,18 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
             <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
               <Link href="/profile" className="flex items-center">
                 <User className="w-4 h-4 mr-2" />
-                  My Profile
+                My Profile
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
               <Link href="/home" className="flex items-center">
                 <ArrowRight className="w-4 h-4 mr-2" />
-                  Switch to organizer
+                Switch to organizer
               </Link>
             </DropdownMenuItem>
-            
           </>
         )}
-        {!isAttendingRoute && (
+        {isDashboardRoute && (
           <DropdownMenuItem 
             onClick={handleSwitchToAttending}
             className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer"

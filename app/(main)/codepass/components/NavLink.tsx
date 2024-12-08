@@ -26,12 +26,14 @@ export const NavLink: React.FC<NavLinkProps> = ({
       if (isAuthenticated) {
         router.push('/events/create');
       } else {
+        sessionStorage.setItem('previousPath', window.location.pathname);
         router.push('/auth');
       }
       return;
     }
 
     if (isButton) {
+      sessionStorage.setItem('previousPath', window.location.pathname);
       onLoginClick?.();
     }
   };

@@ -24,7 +24,9 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onSuccess 
         
         if (response.token) {
           login(response.token);
-          router.push('/');
+          const previousPath = sessionStorage.getItem('previousPath') || '/';
+          sessionStorage.removeItem('previousPath');
+          router.push(previousPath);
           onSuccess?.();
         }
       } catch (error) {
