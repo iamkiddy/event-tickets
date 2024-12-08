@@ -194,7 +194,9 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
           <TabsContent value="promotions" className="space-y-6">
             <PromotionsSection
               promotions={promotions}
-              onCreatePromotion={() => {/* Add promotion handler */}}
+              tickets={tickets}
+              eventId={eventId}
+              onCreatePromotion={fetchPromotions}
               onEditPromotion={(id) => {/* Add edit handler */}}
               onDeletePromotion={(id) => {/* Add delete handler */}}
             />

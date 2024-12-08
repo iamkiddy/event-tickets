@@ -50,7 +50,7 @@ export default function EditEventPage() {
   const eventId = params.id as string;
   const [event, setEvent] = useState<GetEventByIdResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeForm, setActiveForm] = useState<ActiveForm>('basic');
+  const [activeForm, setActiveForm] = useState<ActiveForm>('tickets');
 
   useEffect(() => {
     const fetchEvent = async () => {
