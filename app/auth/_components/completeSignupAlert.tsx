@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { completeSignup } from '@/lib/actions/auth';
 import { Button } from "@/components/ui/button";
+import { completeSignup } from '@/lib/actions/auth';
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";

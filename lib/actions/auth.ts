@@ -43,11 +43,7 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
 
 export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> => {
     try {
-        const emailToken = Cookies.get('temp_email_token') || localStorage.getItem('temp_email_token');
-        
-        if (!emailToken) {
-            throw new Error('No temporary token found');
-        }
+        const emailToken = Cookies.get('temp_email_token') || localStorage.getItem('temp_email_token') || undefined;
         
         const response = await apiController<VerifyCodeResponse, VerifyCode>({
             method: 'POST',
@@ -58,23 +54,13 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
         });
         
         if (response.token) {
-            // Clear temporary token
             Cookies.remove('temp_email_token', { path: '/' });
             localStorage.removeItem('temp_email_token');
-            
-            // Store the auth token
-            Cookies.set('token', response.token, {
-                expires: 7,
-                path: '/',
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
-            });
-            localStorage.setItem('token', response.token);
             
             return response;
         }
         
-        throw new Error('No token received from server');
+        return response;
     } catch (error: unknown) {
         const apiError = error as ApiError;
         const errorMessage = apiError.message || "An unexpected error occurred";
@@ -156,21 +142,14 @@ export const loginWithGmailPost = async (accessToken: string): Promise<LoginWith
             contentType: 'application/json',
         });
         
-        if (!response.token) {
-            throw new Error('No token received from server');
+        if (response.token) {
+            Cookies.set('token', response.token, {
+                expires: 7,
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
         }
-        
-        // Store the token in both cookie and localStorage
-        Cookies.set('token', response.token, {
-            expires: 7,
-            path: '/',
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
-        localStorage.setItem('token', response.token);
-        
-        // Fetch and store user profile
-        await getUserProfile();
         
         return response;
     } catch (error: unknown) {
@@ -185,49 +164,14 @@ export const loginWithGmailPost = async (accessToken: string): Promise<LoginWith
 // get user profile
 export const getUserProfile = async () => {
     try {
-        const token = Cookies.get('token') || localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
-        console.log('Fetching user profile with token:', token);
-
         const response = await apiController<UserProfileModel>({
             method: 'GET',
             url: APIUrls.userProfile,
-            token,
-            contentType: 'application/json',
         });
-        
-        console.log('User profile response:', response);
-
-        if (!response) {
-            throw new Error('No response received from server');
-        }
-
-        // Store user profile in cookies
-        Cookies.set('user_profile', JSON.stringify(response), {
-            expires: 7,
-            path: '/',
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
-        localStorage.setItem('user_profile', JSON.stringify(response));
-        
         return response;
     } catch (error: unknown) {
-        console.error('Full error details:', error);
-        
-        // Check if it's a response with status code
-        if (error && typeof error === 'object' && 'status' in error) {
-            const statusCode = (error as { status?: number }).status;
-            if (statusCode === 500) {
-                throw new Error('Server error: Please try again later or contact support');
-            }
-        }
-
-        const errorMessage = error instanceof Error ? error.message : "Failed to fetch user profile";
-        throw new Error(`Profile fetch failed: ${errorMessage}`);
+        const apiError = error as ApiError;
+        console.error('Failed to get user profile:', apiError);
     }
 };
 
