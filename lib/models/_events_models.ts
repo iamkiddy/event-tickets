@@ -232,3 +232,37 @@ export interface CreateEventTicket {
 export interface CreateEventTicketResponse {
     message: string;
 }
+
+export type PromotionType = 'discount' | 'coupon';
+export type ValueType = 'percentage' | 'amount';
+
+export interface CreateEventTicketPromotion {
+  code: string;
+  promotionType: PromotionType;
+  value: number;
+  valueType: ValueType;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  quantity: number;
+  tickets: string[];
+}
+
+export interface EventTicketPromotion extends CreateEventTicketPromotion {
+  id: string;
+  isActive: boolean;
+}
+
+export interface CreateEventTicketPromotionResponse {
+  message: string;
+  promotionId: string;
+}
+
+export interface UpdateEventTicketPromotionResponse {
+  message: string;
+}
+
+export interface GetEventTicketPromotionsResponse {
+  promotions: EventTicketPromotion[];
+}

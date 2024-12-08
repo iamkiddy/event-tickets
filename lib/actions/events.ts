@@ -1,7 +1,7 @@
 'use client';
 
 import Cookies from 'js-cookie';
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse } from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -307,6 +307,24 @@ export const createEventTicket = async (eventId: string, data: CreateEventTicket
     console.error('Error creating event ticket:', error);
     const apiError = error as ApiError;
     const errorMessage = apiError.message || "Failed to create event ticket";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getEventTicketPromotions = async (eventId: string): Promise<GetEventTicketPromotionsResponse> => {
+  try {
+    const token = Cookies.get('token');
+    const response = await apiController<GetEventTicketPromotionsResponse>({
+      method: 'GET',
+      url: `${APIUrls.getEventTicketPromotions}/${eventId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event ticket promotions:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event ticket promotions";
     throw new Error(errorMessage);
   }
 };
