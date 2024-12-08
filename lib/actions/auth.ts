@@ -78,7 +78,7 @@ export const initiateGoogleLogin = async () => {
         });
         
         if (response.message) {
-            window.location.href = response.message; // The message contains the Google OAuth URL
+            window.location.href = response.message; 
         }
     } catch (error: unknown) {
         const apiError = error as ApiError;

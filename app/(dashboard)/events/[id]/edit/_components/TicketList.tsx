@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash } from 'lucide-react';
-import { TicketType } from '@/app/codepass/types';
+import { TicketType } from '@/app/(main)/codepass/types';
 import { getEventTickets } from '@/lib/actions/events';
 import { CreateTicketModal } from './CreateTicketsModel';
 interface TicketListProps {

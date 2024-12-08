@@ -13,7 +13,6 @@ export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsR
       throw new Error('Authentication required');
     }
 
-    // Construct query string from params
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());

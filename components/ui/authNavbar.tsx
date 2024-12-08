@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { NavLink } from '@/app/codepass/components/NavLink';
-import { SearchBar } from '@/app/codepass/components/SearchBar';
+import { NavLink } from '@/app/(main)/codepass/components/NavLink';
+import { SearchBar } from '@/app/(main)/codepass/components/SearchBar';
 import { Tag } from 'lucide-react';
 import { UserDropdown } from '@/components/userDropdown';
 interface AuthenticatedNavProps {

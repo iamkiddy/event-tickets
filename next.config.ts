@@ -8,7 +8,8 @@ const nextConfig = {
       'storage.googleapis.com',
       'player.vimeo.com',
       'vod-progressive.akamaized.net',
-      'res.cloudinary.com'
+      'res.cloudinary.com',
+      'ui-avatars.com'
     ],
   },
 }

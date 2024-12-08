@@ -4,6 +4,8 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AuthenticatedNav } from '@/components/ui/authNavbar';
+import { DashboardNav } from '@/components/ui/dashboardNav';
+import { SideNav } from '@/components/ui/sideNav';
 
 export default function AuthenticatedLayout({
   children,
@@ -15,8 +17,13 @@ export default function AuthenticatedLayout({
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
 
-  // Don't show AuthenticatedNav for dashboard routes
-  const isDashboardRoute = pathname.startsWith('/dashboard');
+  // Check if current route is a dashboard route
+  const isDashboardRoute = pathname.startsWith('/dashboard') || 
+    pathname.startsWith('/home') || 
+    pathname.startsWith('/events') ||
+    pathname.startsWith('/orders') ||
+    pathname.startsWith('/finance') ||
+    pathname.startsWith('/settings');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,13 +40,32 @@ export default function AuthenticatedLayout({
 
   return (
     <>
-      {isAuthenticated && !isDashboardRoute && (
-        <AuthenticatedNav
-          isScrolled={isScrolled}
-          showSearchInNav={showSearchInNav}
-        />
+      {isAuthenticated ? (
+        isDashboardRoute ? (
+          // Dashboard Layout
+          <div className="min-h-screen bg-gray-50">
+            <DashboardNav />
+            <SideNav />
+            <div className="pl-16 pt-16">
+              <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {children}
+              </main>
+            </div>
+          </div>
+        ) : (
+          // Regular Authenticated Layout
+          <>
+            <AuthenticatedNav
+              isScrolled={isScrolled}
+              showSearchInNav={showSearchInNav}
+            />
+            {children}
+          </>
+        )
+      ) : (
+        // Unauthenticated Layout
+        children
       )}
-      {children}
     </>
   );
-} 
+}
