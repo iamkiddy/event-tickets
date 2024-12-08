@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from '@/lib/context/AuthContext';
 import  AuthenticatedLayout  from "@/lib/context/AuthenticatedLayout"
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: "CodePass",
@@ -24,6 +25,11 @@ export default function RootLayout({
             </AuthenticatedLayout>
           </AuthProvider>
         </GoogleOAuthProvider>
+        <Toaster 
+          position="top-right"
+          richColors
+          closeButton
+        />
       </body>
     </html>
   );

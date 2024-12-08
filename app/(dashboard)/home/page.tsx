@@ -28,7 +28,7 @@ export default function DashboardHome() {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold text-gray-900">Start from scratch</h2>
             <p className="mt-2 text-gray-600">
-              Add all your event details, create new tickets, and set up recurring events.
+              Add all your event details, create new tickets, or recreate an old event.
             </p>
             <div className="flex gap-4 mt-4">
               <Link 
@@ -38,18 +38,6 @@ export default function DashboardHome() {
               >
                 <PlusCircle className="w-4 h-4" />
                 Create event
-              </Link>
-              <Link 
-                href="/create/ai" 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-400 rounded-lg 
-                  border border-gray-200 cursor-not-allowed opacity-80 text-sm font-medium relative group"
-              >
-                <Sparkles className="w-4 h-4" />
-                Create with AI
-                <span className="absolute -top-7 -right-5 px-1.5 py-0.5 bg-amber-400 text-amber-900 
-                  text-[10px] font-semibold rounded-full">
-                  BETA
-                </span>
               </Link>
             </div>
           </div>

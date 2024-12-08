@@ -37,33 +37,39 @@ export default async function <T, D = unknown>({
   if (data) {
     if (contentType === "application/json") {
       headers["Content-Type"] = "application/json";
-      body = JSON.stringify(data); // Do not stringify data for multipart/form-data
+      body = JSON.stringify(data);
     } else if (contentType === "multipart/form-data") {
-      // Create a FormData object for multipart/form-data
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value as string | Blob);
-      });
-      body = formData;
+      // Don't set Content-Type for multipart/form-data
+      body = data instanceof FormData ? data : Object.assign(new FormData(), data);
     } else {
       headers["Content-Type"] = contentType || "application/x-www-form-urlencoded";
       body = new URLSearchParams(data as Record<string, string>).toString();
     }
   }
   
-  const response = await fetch(url, {
-    method: method,
-    cache: "no-store",
-    headers: headers,
-    body: body,
+  console.log('Request details:', {
+    url,
+    method,
+    headers,
+    bodyType: body instanceof FormData ? 'FormData' : typeof body
   });
 
-  const result = response.body ? await response.json() : null;
+  const response = await fetch(url, {
+    method,
+    headers,
+    body,
+  });
 
-  if (response.status === 200 || response.status === 201) {
-    return result as T;
-  } else {
-    const errorMessage = result?.detail || result?.message || "An error occurred";
-    throw new Error(errorMessage); // Only throw the error message
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    console.error('Response error:', {
+      status: response.status,
+      statusText: response.statusText,
+      errorData
+    });
+    throw new Error(errorData?.detail || errorData?.message || "An error occurred");
   }
+
+  const result = await response.json().catch(() => null);
+  return result as T;
 }

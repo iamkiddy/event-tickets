@@ -1,3 +1,5 @@
+import { TicketType } from "@/app/codepass/types";
+
 export interface Event {
     id: string;
     title: string;
@@ -21,4 +23,212 @@ export interface GetEventsParams {
     page?: number;
     limit?: number;
     status?: string;
+    category?: string;
+    eventType?: string;
+}
+
+export interface EventFAQ {
+    question: string;
+    answer: string;
+}
+
+export interface EventAgendaItem {
+    title: string;
+    description: string;
+    startTime: string;
+    endTime: string;
+    host: string[];
+}
+
+export interface CreateEvent {
+    title: string;
+    summary: string;
+    overview: string;
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    totalCapacity: number;
+    tags: string[];
+    locationType: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    eventFAQ: {
+        question: string;
+        answer: string;
+    }[];
+    eventAgenda: {
+        title: string;
+        description: string;
+        startTime: string;
+        endTime: string;
+        host: string[];
+    }[];
+}
+
+export interface Event extends CreateEvent {
+    id: string;
+    soldOut: number;
+    totalGross: number;
+    status: 'published' | 'draft';
+}
+
+export interface CreateEventResponse {
+    message: string;
+    eventId: string;
+}
+
+
+export interface UpdateEventImages {
+    eventId: string;
+    images: string[];
+}
+
+export interface UpdateEventVideos {
+    eventId: string;
+    videos: string[];
+}
+
+export interface UpdateEventImagesResponse {
+    message: string;
+}
+
+export interface UpdateEventVideosResponse {
+    message: string;
+}
+
+export interface UtilsEventTypesResponse {
+    id: string;
+    name: string;
+}
+
+export interface UtilsCategoriesResponse {
+    id: string;
+    name: string;
+    image: string;
+    subCategories: string[];
+}
+
+export interface UpdateEventFAQ {
+    id: string;
+    eventId: string;
+    question: string;
+}
+
+export interface UpdateEventAgenda {
+    id: string;
+    eventId: string;
+    title: string;
+    description: string;
+    startTime: string;
+    endTime: string;
+    host: string[];
+}
+
+export interface UpdateEventFAQResponse {
+    message: string;
+}
+
+export interface UpdateEventAgendaResponse {
+    message: string;
+}
+
+export interface GetEventById {
+    eventId: string;
+}
+
+export interface EventFAQResponse {
+    question: string;
+    answer: string;
+    id: string;
+}
+
+export interface EventAgendaResponse {
+    title: string;
+    description: string;
+    startTime: string;
+    endTime: string;
+    host: string[];
+    id: string;
+}
+
+export interface EventImage {
+    id: string;
+    url: string;
+    isPrimary: boolean;
+}
+
+export interface EventVideo {
+    id: string;
+    url: string;
+}
+
+export interface GetEventByIdResponse {
+    title: string;
+    summary: string;
+    overview: string;
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    totalCapacity: number;
+    tags: string[];
+    locationType: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    eventFAQ: EventFAQResponse[];
+    eventAgenda: EventAgendaResponse[];
+    images: EventImage[];
+    video?: EventVideo;
+    tickets: TicketType[];
+    status: 'draft' | 'published' | 'private';
+}
+
+export interface UpdateEventFiles {
+    eventId: string;
+    files: string[];
+}
+
+export interface GetEventFilesResponse {
+    images: EventImage[];
+    video?: EventVideo;
+}
+
+export interface GetEventTicketsResponse {
+    tickets: {
+        name: string;
+        price: number;
+        quantity: number;
+        currency: string;
+        startDate: string;
+        endDate: string;
+        startTime: string;
+        endTime: string;
+        isActive: boolean;
+        id: string;
+    }[];
+}
+
+export interface CreateEventTicket {
+    name: string;
+    price: number;
+    quantity: number;
+    currency: string;
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+    isActive: boolean;
+}
+
+export interface CreateEventTicketResponse {
+    message: string;
 }

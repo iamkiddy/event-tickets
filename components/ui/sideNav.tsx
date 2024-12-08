@@ -7,8 +7,7 @@ import {
     House,
   CalendarDays,
   Ticket,
-  Users,
-  BarChart3,
+  Landmark,
   Settings,
   HelpCircle
 } from 'lucide-react';
@@ -16,9 +15,8 @@ import {
 const navItems = [
   { icon: House, href: '/home', label: 'Dashboard' },
   { icon: CalendarDays, href: '/events', label: 'Events' },
-  { icon: Ticket, href: '/tickets', label: 'Tickets' },
-  { icon: Users, href: '/attendees', label: 'Attendees' },
-  { icon: BarChart3, href: '/analytics', label: 'Analytics' },
+  { icon: Ticket, href: '/orders', label: 'Orders' },
+  { icon: Landmark, href: '/finance', label: 'Finance' },
   { icon: Settings, href: '/settings', label: 'Settings' },
   { icon: HelpCircle, href: '/help', label: 'Help' },
 ];

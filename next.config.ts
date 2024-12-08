@@ -7,7 +7,8 @@ const nextConfig = {
       'upload.wikimedia.org',
       'storage.googleapis.com',
       'player.vimeo.com',
-      'vod-progressive.akamaized.net'
+      'vod-progressive.akamaized.net',
+      'res.cloudinary.com'
     ],
   },
 }

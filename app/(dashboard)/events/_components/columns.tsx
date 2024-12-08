@@ -2,8 +2,15 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users } from 'lucide-react';
+import { MoreVertical, Calendar, Users, Pencil, Trash2, Eye, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from 'next/link';
 
 export const columns: ColumnDef<Event>[] = [
   {
@@ -18,7 +25,9 @@ export const columns: ColumnDef<Event>[] = [
           </div>
           <div>
             <h3 className="font-medium text-gray-900">{event.title}</h3>
-            <p className="text-sm text-gray-500">ID: {event.id}</p>
+            <p className="text-sm text-gray-500">
+              {new Date(event.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
           </div>
         </div>
       );
@@ -37,8 +46,8 @@ export const columns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: 'soldOut',
+    header: 'Sold',
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -61,11 +70,49 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     id: 'actions',
-    cell: () => {
+    header: 'Actions',
+    cell: ({ row }) => {
+      const event = row.original;
+      
       return (
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="w-4 h-4 text-gray-400" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="w-4 h-4 text-gray-400" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40 bg-white">
+            <DropdownMenuItem asChild>
+              <Link 
+                href={`/events/${event.id}/edit`}
+                className="flex items-center gap-2 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 w-full rounded-sm"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="flex items-center gap-2 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 rounded-sm"
+              onClick={() => {
+                // Add verification logic here
+                console.log('Verify event:', event.id);
+              }}
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span>Verify</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 rounded-sm"
+              onClick={() => {
+                // Add delete logic here
+                console.log('Delete event:', event.id);
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },
