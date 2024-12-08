@@ -24,6 +24,12 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
         });
         
         if (response.token) {
+            Cookies.set('temp_email_token', response.token, { 
+                expires: 1/24, // 1 hour
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
             localStorage.setItem('temp_email_token', response.token);
         }
         
@@ -37,7 +43,7 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
 
 export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> => {
     try {
-        const emailToken = localStorage.getItem('temp_email_token') || undefined;
+        const emailToken = Cookies.get('temp_email_token') || localStorage.getItem('temp_email_token') || undefined;
         
         const response = await apiController<VerifyCodeResponse, VerifyCode>({
             method: 'POST',
@@ -48,9 +54,10 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
         });
         
         if (response.token) {
+            Cookies.remove('temp_email_token', { path: '/' });
             localStorage.removeItem('temp_email_token');
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('verified', 'true');
+            
+            return response;
         }
         
         return response;
