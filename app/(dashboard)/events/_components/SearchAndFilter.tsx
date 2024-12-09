@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { getUtilsCategories, getUtilsEventTypes } from '@/lib/actions/events';
 import { UtilsCategoriesResponse, UtilsEventTypesResponse } from '@/lib/models/_events_models';
 
