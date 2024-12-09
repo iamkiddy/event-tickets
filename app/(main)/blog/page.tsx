@@ -3,10 +3,10 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { NavLink } from '../codepass/components/NavLink';
-import { LoginAlert } from '../auth/_components/loginAlert';
+import { NavLink } from '../../codepass/components/NavLink';
+import { LoginAlert } from '../../auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
-import { AuthenticatedNav } from '../../components/ui/authNavbar';
+import { AuthenticatedNav } from '../../../components/ui/authNavbar';
 import Image from 'next/image';
 
 const navLinks = [

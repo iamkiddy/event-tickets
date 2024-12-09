@@ -37,7 +37,7 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
         {!isDashboardRoute && (
           <>
             <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
-              <Link href="/home" className="flex items-center">
+              <Link href="/profile" className="flex items-center">
                 <User className="w-4 h-4 mr-2" />
                   My Profile
               </Link>
