@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LoginAlert } from './_components/loginAlert';
 import { useRouter } from 'next/navigation';
 import { GoogleLoginButton } from './_components/GoogleLoginButton';
+import Image from 'next/image';
 
 export default function Page() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -21,7 +22,8 @@ export default function Page() {
       {/* Left side - Event Image */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent z-10" />
-        <img
+        <Image
+          fill
           src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
           alt="Event background"
           className="object-cover w-full h-full"

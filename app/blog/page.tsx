@@ -7,6 +7,7 @@ import { NavLink } from '../codepass/components/NavLink';
 import { LoginAlert } from '../auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
 import { AuthenticatedNav } from '../../components/ui/authNavbar';
+import Image from 'next/image';
 
 const navLinks = [
   { label: 'Schedule' },
@@ -84,9 +85,10 @@ export default function BlogPage() {
 
       <div className="relative h-[600px] mb-16">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
             alt="Event background"
+            fill
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
@@ -131,7 +133,8 @@ export default function BlogPage() {
           <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               <div className="relative h-[400px] lg:h-full">
-                <img
+                <Image
+                  fill
                   src={blogPosts[0].image}
                   alt={blogPosts[0].title}
                   className="w-full h-full object-cover"
@@ -155,7 +158,8 @@ export default function BlogPage() {
                   {blogPosts[0].description}
                 </p>
                 <div className="flex items-center gap-4 mb-6">
-                  <img
+                  <Image
+                    fill
                     src="https://ui-avatars.com/api/?name=John+Doe"
                     alt={blogPosts[0].author}
                     className="w-10 h-10 rounded-full"
@@ -195,7 +199,8 @@ export default function BlogPage() {
                   transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="relative h-56">
-                  <img
+                  <Image
+                    fill
                     src={post.image}
                     alt={post.title}
                     className="w-full h-full object-cover"
@@ -220,7 +225,8 @@ export default function BlogPage() {
                   </p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
+                        fill
                         src="https://ui-avatars.com/api/?name=John+Doe"
                         alt={post.author}
                         className="w-8 h-8 rounded-full"
