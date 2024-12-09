@@ -1,21 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { LoginAlert } from './_components/loginAlert';
 import { useRouter } from 'next/navigation';
 import { GoogleLoginButton } from './_components/GoogleLoginButton';
 import Image from 'next/image';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function Page() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Get the previous path from sessionStorage
+      const previousPath = sessionStorage.getItem('previousPath') || '/';
+      // Clear the stored path
+      sessionStorage.removeItem('previousPath');
+      // Navigate back to the previous path
+      router.push(previousPath);
+    }
+  }, [isAuthenticated, router]);
 
   const handleLoginSuccess = (status: 'New' | 'Old') => {
     if (status === 'Old') {
-      router.push('/');
+      const previousPath = sessionStorage.getItem('previousPath') || '/';
+      sessionStorage.removeItem('previousPath');
+      router.push(previousPath);
     }
   };
+
+  // If authenticated, don't render the page content
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex">

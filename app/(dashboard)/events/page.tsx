@@ -31,20 +31,16 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/');
-      return;
+    if (isAuthenticated) {
+      const initialParams = {
+        search: searchParams.get('search') || undefined,
+        category: searchParams.get('category') || undefined,
+        eventType: searchParams.get('eventType') || undefined,
+      };
+
+      fetchEvents(initialParams);
     }
-
-    // Get all initial params from URL
-    const initialParams = {
-      search: searchParams.get('search') || undefined,
-      category: searchParams.get('category') || undefined,
-      eventType: searchParams.get('eventType') || undefined,
-    };
-
-    fetchEvents(initialParams);
-  }, [isAuthenticated, router, searchParams]);
+  }, [isAuthenticated, searchParams]);
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
