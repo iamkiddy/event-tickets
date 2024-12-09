@@ -20,6 +20,12 @@ export default class APIUrls {
     // get Utils Event Types
     static readonly utilsEventTypes = `${APIUrls.BASE_URL}/api/v1/utils/event-types`;
 
+    /*
+
+    ORGANIZATION API URLS
+    
+    */
+   
     // GET All Events
     static readonly getAllEvents = `${APIUrls.BASE_URL_ORG}/api/v1/org/events`;
 

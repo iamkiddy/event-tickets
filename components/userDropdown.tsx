@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, Calendar, UserRoundCheck, ArrowLeft } from 'lucide-react';
+import { LogOut, UserRoundCheck, ArrowLeft, ArrowRight, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,12 +35,21 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-white border border-gray-200 mt-4">
         {!isDashboardRoute && (
-          <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
-            <Link href="/home" className="flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              Manage my events
-            </Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
+              <Link href="/home" className="flex items-center">
+                <User className="w-4 h-4 mr-2" />
+                  My Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
+              <Link href="/home" className="flex items-center">
+                <ArrowRight className="w-4 h-4 mr-2" />
+                  Switch to organizer
+              </Link>
+            </DropdownMenuItem>
+            
+          </>
         )}
         {!isAttendingRoute && (
           <DropdownMenuItem 
