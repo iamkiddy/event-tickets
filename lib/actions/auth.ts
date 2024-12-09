@@ -1,4 +1,4 @@
-import { LoginEmail, LoginEmailResponse, SignupCompleteData, VerifyCode, VerifyCodeResponse, LoginWithGmailResponse, UserProfileModel } from "../models/_auth_models";
+import { LoginEmail, LoginEmailResponse, SignupCompleteData, VerifyCode, VerifyCodeResponse, LoginWithGmailResponse, UserProfileModel, UserProfileUpdateModel } from "../models/_auth_models";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import Cookies from 'js-cookie';
@@ -166,11 +166,29 @@ export const getUserProfile = async () => {
     try {
         const response = await apiController<UserProfileModel>({
             method: 'GET',
-            url: APIUrls.getUserProfile,
+            url: APIUrls.userProfile,
         });
         return response;
     } catch (error: unknown) {
         const apiError = error as ApiError;
         console.error('Failed to get user profile:', apiError);
+    }
+};
+
+
+
+// update user profile
+export const updateUserProfile = async (data: UserProfileUpdateModel) => {
+    try {
+        const response = await apiController({
+            method: 'PUT',
+            url: APIUrls.userProfile,
+            data,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        console.error('Failed to update user profile:', apiError);
     }
 };

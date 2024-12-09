@@ -43,3 +43,12 @@ export interface UserProfileModel {
     messageType: string;
     provider:    string;
 }
+
+
+// 
+export interface UserProfileUpdateModel {
+    fullname:    string;
+    phone:       string;
+    country:     string;
+    messageType: string;
+}
