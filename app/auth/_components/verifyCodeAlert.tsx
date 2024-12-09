@@ -4,10 +4,15 @@ import { useState } from 'react';
 import { verifyCode } from '@/lib/actions/auth';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { CompleteSignupAlert } from './completeSignupAlert';
 import { useAuth } from '@/lib/context/AuthContext';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 
 interface VerifyCodeAlertProps {
   open: boolean;
@@ -88,13 +93,20 @@ export const VerifyCodeAlert: React.FC<VerifyCodeAlertProps> = ({ open, onClose,
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter verification code"
+          <InputOTP maxLength={6} 
             className="w-full"
-          />
+            onChange={(value) => setCode(value)}
+            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+          >
+            <InputOTPGroup className='w-full gap-4'>
+              <InputOTPSlot index={0} className='w-full h-10' />
+              <InputOTPSlot index={1} className='w-full h-10' />
+              <InputOTPSlot index={2} className='w-full h-10' />
+              <InputOTPSlot index={3} className='w-full h-10' />
+              <InputOTPSlot index={4} className='w-full h-10' />
+              <InputOTPSlot index={5} className='w-full h-10' />
+            </InputOTPGroup>
+          </InputOTP>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button 
             type="submit" 
