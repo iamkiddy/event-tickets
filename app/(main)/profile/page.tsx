@@ -2,10 +2,12 @@ import React from 'react'
 
 export default function MyProfile() {
   return (
-    <main className="min-h-screen bg-gray-50">
-        <h1 className='text-xl md:text-2xl font-extrabold'>My Profile</h1>
+    <main className="w-full min-h-screen bg-gray-50">
+        <div className='flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16'>
+          <h1 className='text-2xl md:text-4xl font-bold mt-5 md:mt-10'>My Account</h1>
 
-        
+
+        </div>
     </main>
   )
 }
