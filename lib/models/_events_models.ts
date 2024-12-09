@@ -1,4 +1,4 @@
-import { TicketType } from "@/app/codepass/types";
+import { TicketType } from "@/app/(main)/codepass/types";
 
 export interface Event {
     id: string;
