@@ -1,8 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Plus, Tag, Pencil, Trash } from 'lucide-react';
 import { EventTicketPromotion } from '@/lib/models/_events_models';
+import { useState } from 'react';
+import { CreatePromotionModal } from './CreatePromotionModal';
+import { TicketType } from '@/app/(main)/codepass/types';
+
 interface PromotionsSectionProps {
   promotions: EventTicketPromotion[];
+  tickets: TicketType[];
+  eventId: string;
   onCreatePromotion: () => void;
   onEditPromotion: (promotionId: string) => void;
   onDeletePromotion: (promotionId: string) => void;
@@ -10,15 +16,23 @@ interface PromotionsSectionProps {
 
 export function PromotionsSection({
   promotions,
+  tickets,
+  eventId,
   onCreatePromotion,
   onEditPromotion,
   onDeletePromotion
 }: PromotionsSectionProps) {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const handleCreatePromotion = () => {
+    setIsCreateModalOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-end items-center px-4">
         <Button
-          onClick={onCreatePromotion}
+          onClick={handleCreatePromotion}
           className="flex items-center gap-2 bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
         >
           <Plus className="w-4 h-4" />
@@ -39,7 +53,7 @@ export function PromotionsSection({
               </p>
             </div>
             <Button
-              onClick={onCreatePromotion}
+              onClick={handleCreatePromotion}
               className="flex items-center gap-2 bg-primaryColor hover:bg-indigo-700 text-white mx-auto shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
               size="lg"
             >
@@ -108,6 +122,20 @@ export function PromotionsSection({
           ))}
         </div>
       )}
+
+      <CreatePromotionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        eventId={eventId}
+        onSuccess={() => {
+          onCreatePromotion();
+          setIsCreateModalOpen(false);
+        }}
+        availableTickets={tickets.map(ticket => ({
+          id: ticket.id,
+          name: ticket.type
+        }))}
+      />
     </div>
   );
 } 

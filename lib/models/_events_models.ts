@@ -266,3 +266,17 @@ export interface UpdateEventTicketPromotionResponse {
 export interface GetEventTicketPromotionsResponse {
   promotions: EventTicketPromotion[];
 }
+
+export interface CreateEventTicketPromotionRequest {
+  code: string;
+  promotionType: PromotionType;
+  value: number;
+  valueType: ValueType;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  quantity: number;
+  isActive: boolean;
+  tickets: string[];
+}

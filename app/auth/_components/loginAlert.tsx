@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { loginEmail } from '@/lib/actions/auth';
+import { loginEmail,getUserProfile } from '@/lib/actions/auth';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { VerifyCodeAlert } from './verifyCodeAlert';
 import { GoogleLoginButton } from './GoogleLoginButton';
+import { toast } from 'sonner';
 
 interface LoginAlertProps {
   open: boolean;
@@ -37,12 +38,26 @@ export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose, onLoginSu
     }
   };
 
-  const handleVerifySuccess = (status: 'New' | 'Old') => {
-    onLoginSuccess(status);
+  const handleVerifySuccess = async (status: 'New' | 'Old') => {
+    try {
+      if (status === 'Old') {
+        await getUserProfile();
+      }
+      onLoginSuccess(status);
+    } catch (error) {
+      toast.error('Failed to fetch user profile');
+      console.error('Error fetching user profile:', error);
+    }
   };
 
-  const handleGoogleLoginSuccess = () => {
-    onClose();
+  const handleGoogleLoginSuccess = async () => {
+    try {
+      await getUserProfile();
+      onClose();
+    } catch (error) {
+      toast.error('Failed to fetch user profile');
+      console.error('Error fetching user profile:', error);
+    }
   };
 
   if (showVerifyCode) {

@@ -1,85 +1,89 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { UserProfileModel } from '../models/_auth_models';
+import { getServerSession, logout as serverLogout, getUserProfile } from '../actions/auth';
 import Cookies from 'js-cookie';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  token: string | null;
-  login: (token: string) => void;
-  logout: () => void;
+  userProfile: UserProfileModel | null;
+  login: (token: string, profile?: UserProfileModel) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  token: null,
-  login: () => {},
-  logout: () => {},
+  userProfile: null,
+  login: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileModel | null>(null);
 
   useEffect(() => {
-    // Check both cookie and localStorage
-    const cookieToken = Cookies.get('token');
-    const localToken = localStorage.getItem('token');
-    
-    if (cookieToken) {
-      setIsAuthenticated(true);
-      setToken(cookieToken);
-      // Sync localStorage
-      localStorage.setItem('token', cookieToken);
-    } else if (localToken) {
-      // If token exists in localStorage but not in cookies, restore it
-      Cookies.set('token', localToken, {
-        expires: 7,
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
-      });
-      setIsAuthenticated(true);
-      setToken(localToken);
-    }
+    // Check server-side session on mount
+    getServerSession().then((session) => {
+      if (session) {
+        setIsAuthenticated(true);
+        setUserProfile(session.userProfile);
+      }
+    });
   }, []);
 
-  const login = (newToken: string) => {
-    // Set cookie
-    Cookies.set('token', newToken, {
-      expires: 7,
-      path: '/',
+  const login = async (token: string, profile?: UserProfileModel) => {
+    // Set client-side cookies
+    Cookies.set('token', token, {
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      sameSite: 'strict',
+      path: '/',
+      expires: 7 // 7 days
     });
-    
-    // Set localStorage
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('isAuthenticated', 'true');
-    
-    setToken(newToken);
+
+    // If profile is not provided, try to fetch it
+    let userProfile = profile;
+    if (!userProfile) {
+      try {
+        userProfile = await getUserProfile();
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
+    }
+
+    if (userProfile) {
+      Cookies.set('user_profile', JSON.stringify(userProfile), {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        expires: 7 // 7 days
+      });
+      setUserProfile(userProfile);
+    }
+
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    // Clear cookie
-    Cookies.remove('token', { path: '/' });
-    
-    // Clear localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('temp_email_token');
-    localStorage.removeItem('verified');
-    
-    setToken(null);
+  const logout = async () => {
+    await serverLogout();
+    // Clear client-side cookies
+    Cookies.remove('token');
+    Cookies.remove('user_profile');
     setIsAuthenticated(false);
+    setUserProfile(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      userProfile,
+      login, 
+      logout,
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);

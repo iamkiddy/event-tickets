@@ -1,7 +1,9 @@
+'use server';
+
 import { LoginEmail, LoginEmailResponse, SignupCompleteData, VerifyCode, VerifyCodeResponse, LoginWithGmailResponse, UserProfileModel, UserProfileUpdateModel } from "../models/_auth_models";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import Cookies from 'js-cookie';
+import { cookies } from 'next/headers';
 
 interface ApiError extends Error {
     message: string;
@@ -24,13 +26,14 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
         });
         
         if (response.token) {
-            Cookies.set('temp_email_token', response.token, { 
-                expires: 1/24, // 1 hour
-                path: '/',
+            const cookieStore = await cookies();
+            cookieStore.set('temp_email_token', response.token, { 
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 60 * 60 // 1 hour
             });
-            localStorage.setItem('temp_email_token', response.token);
         }
         
         return response;
@@ -43,7 +46,8 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
 
 export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> => {
     try {
-        const emailToken = Cookies.get('temp_email_token') || localStorage.getItem('temp_email_token') || undefined;
+        const cookieStore = await cookies();
+        const emailToken = cookieStore.get('temp_email_token')?.value;
         
         const response = await apiController<VerifyCodeResponse, VerifyCode>({
             method: 'POST',
@@ -54,9 +58,7 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
         });
         
         if (response.token) {
-            Cookies.remove('temp_email_token', { path: '/' });
-            localStorage.removeItem('temp_email_token');
-            
+            cookieStore.delete('temp_email_token');
             return response;
         }
         
@@ -68,12 +70,15 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
     }
 }
 
-export const logout = () => {
-    localStorage.removeItem('token');
+export const logout = async () => {
+    const cookieStore = await cookies();
+    cookieStore.delete('token');
+    cookieStore.delete('user_profile');
 };
 
-export const checkAuth = (): boolean => {
-    const token = localStorage.getItem('token');
+export const checkAuth = async (): Promise<boolean> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     return !!token;
 };
 
@@ -143,11 +148,13 @@ export const loginWithGmailPost = async (accessToken: string): Promise<LoginWith
         });
         
         if (response.token) {
-            Cookies.set('token', response.token, {
-                expires: 7,
-                path: '/',
+            const cookieStore = await cookies();
+            cookieStore.set('token', response.token, {
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 // 7 days
             });
         }
         
@@ -164,14 +171,34 @@ export const loginWithGmailPost = async (accessToken: string): Promise<LoginWith
 // get user profile
 export const getUserProfile = async () => {
     try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+
         const response = await apiController<UserProfileModel>({
             method: 'GET',
             url: APIUrls.userProfile,
+            token,
+            contentType: 'application/json',
         });
+
+        if (response) {
+            cookieStore.set('user_profile', JSON.stringify(response), {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 // 7 days
+            });
+        }
+
         return response;
     } catch (error: unknown) {
         const apiError = error as ApiError;
         console.error('Failed to get user profile:', apiError);
+        throw apiError;
     }
 };
 
@@ -190,5 +217,22 @@ export const updateUserProfile = async (data: UserProfileUpdateModel) => {
     } catch (error: unknown) {
         const apiError = error as ApiError;
         console.error('Failed to update user profile:', apiError);
+    }
+};
+
+// Add helper function to check auth status from server-side
+export const getServerSession = async () => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const userProfileStr = cookieStore.get('user_profile')?.value;
+    
+    if (!token) return null;
+    
+    try {
+        const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
+        return { token, userProfile };
+    } catch (error) {
+        console.error('Error parsing session:', error);
+        return null;
     }
 };

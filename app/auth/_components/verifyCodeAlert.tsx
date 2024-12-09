@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { verifyCode } from '@/lib/actions/auth';
+import { verifyCode, getUserProfile } from '@/lib/actions/auth';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -34,24 +34,33 @@ export const VerifyCodeAlert: React.FC<VerifyCodeAlertProps> = ({ open, onClose,
     setError('');
 
     try {
-      const response = await verifyCode({ passcode: code });
-      login(response.token);
-      setVerificationToken(response.token);
-      
-      if (response.status === 'New') {
-        setShowCompleteSignup(true);
-      } else {
-        onSuccess('Old');
-        onClose();
-      }
+        const response = await verifyCode({ passcode: code });
+        
+        if (response.status === 'New') {
+            setVerificationToken(response.token);
+            setShowCompleteSignup(true);
+        } else {
+            // For existing users, first set the token
+            login(response.token);
+            
+            // Then try to fetch the profile
+            try {
+                await getUserProfile();
+                onSuccess('Old');
+                onClose();
+            } catch (profileError) {
+                console.error('Profile fetch error:', profileError);
+                setError('Logged in but failed to fetch profile. Please try again.');
+            }
+        }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred');
-      }
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError('An unexpected error occurred');
+        }
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 

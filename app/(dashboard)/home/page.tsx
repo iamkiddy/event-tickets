@@ -2,13 +2,18 @@
 
 import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function DashboardHome() {
+  const { userProfile } = useAuth();
+
   return (
     <div className="space-y-12 max-w-5xl mx-auto">
       {/* Welcome & Getting Started */}
       <div className="space-y-8">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome, Francis</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Welcome, {userProfile?.fullname || 'User'}
+        </h1>
         
         {/* Quick Start Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

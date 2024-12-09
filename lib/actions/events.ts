@@ -1,7 +1,7 @@
 'use client';
 
 import Cookies from 'js-cookie';
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse } from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -325,6 +325,25 @@ export const getEventTicketPromotions = async (eventId: string): Promise<GetEven
     console.error('Error fetching event ticket promotions:', error);
     const apiError = error as ApiError;
     const errorMessage = apiError.message || "Failed to fetch event ticket promotions";
+    throw new Error(errorMessage);
+  }
+};
+
+export const createEventTicketPromotion = async (eventId: string, data: CreateEventTicketPromotionRequest): Promise<CreateEventTicketPromotionResponse> => {
+  try {
+    const token = Cookies.get('token');
+    const response = await apiController<CreateEventTicketPromotionResponse>({
+      method: 'POST',
+      url: `${APIUrls.createEventTicketPromotion}/${eventId}`,
+      data,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error creating event ticket promotion:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to create event ticket promotion";
     throw new Error(errorMessage);
   }
 };
