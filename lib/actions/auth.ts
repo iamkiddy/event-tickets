@@ -166,7 +166,7 @@ export const getUserProfile = async () => {
     try {
         const response = await apiController<UserProfileModel>({
             method: 'GET',
-            url: `${APIUrls.BASE_URL}/api/v1/user/profile`,
+            url: APIUrls.getUserProfile,
         });
         return response;
     } catch (error: unknown) {
