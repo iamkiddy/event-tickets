@@ -25,16 +25,16 @@ export default function InputField({
     const IconRight = iconRight;
   return (
     <div className={cn(
-        'w-full flex flex-col gap-4',
+        'w-full flex flex-col gap-3',
         className
     )}>
         {label && (
-            <label className='text-base md:text-lg font-medium text-gray-700'>
+            <label className='text-base font-semibold text-gray-500'>
                 {label}
             </label>
         )}
-        <div className='w-full relative h-10'>
-            {IconLeft && <IconLeft className='w-6 h-6 absolute left-1 text-gray-600'/>}
+        <div className='w-full relative h-10 rounded-md'>
+            {IconLeft && <IconLeft className='w-5 h-5 absolute left-2 text-gray-500 my-2'/>}
             <Input 
                 type={type} 
                 placeholder={placeholder} 
@@ -43,22 +43,13 @@ export default function InputField({
                 required={required}
                 disabled={disabled}
                 className={cn(
-                    'w-full',
+                    'w-full h-full',
                     iconLeft && 'pl-10',
                     iconRight && 'pr-10'
                 )}
             />
-            {IconRight && <IconRight className='w-6 h-6 absolute right-1 text-gray-600'/>}
+            {IconRight && <IconRight className='w-5 h-5 absolute right-2 text-gray-500 my-2'/>}
         </div>
-        <Input 
-            type={type} 
-            placeholder={placeholder} 
-            value={value} 
-            onChange={(e) => setValue(e.target.value)}
-            required={required}
-            disabled={disabled}
-            className='w-full'
-        />
         {error && (
             <span className='text-sm font-semibold text-red-600'>
                 {error}

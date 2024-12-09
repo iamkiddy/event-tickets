@@ -1,5 +1,7 @@
 import React from 'react'
 import TabSelector from './_components/TabSelector'
+import ProfilePage from './_components/ProfilePage';
+import MyTickets from './_components/MyTickets';
 
 interface TabSelectorProps {
   searchParams: {
@@ -12,8 +14,8 @@ interface TabSelectorProps {
 
 export default function MyProfile({ searchParams }: TabSelectorProps) {
   const activeTab = searchParams.tab || 'profile';
-  // const page = searchParams.page || 1;
-  // const query = searchParams.query || '';
+  const page = searchParams.page || 1;
+  const query = searchParams.query || '';
 
 
   return (
@@ -23,7 +25,8 @@ export default function MyProfile({ searchParams }: TabSelectorProps) {
 
           <div className='mt-5 gpa-4'>
             <TabSelector activeTab={activeTab} />
-            
+            {activeTab === 'profile' && <ProfilePage />}
+            {activeTab === 'tickets' && <MyTickets query={query} page={page as number} />}
           </div>
         </div>
     </main>
