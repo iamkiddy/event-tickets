@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
 import SettingsSelector from './_components/SettingsSelector';
 import OrganizerPageTab from './_components/OrganizerPage/OrganizerPageTab';
@@ -10,7 +11,7 @@ interface TabSelectorProps {
   };
 }
 
-export default function SettingsPage({ searchParams }: TabSelectorProps) {
+export default async function SettingsPage({ searchParams }: TabSelectorProps) {
   const activeTab = searchParams.tab || 'organization';
   const page = searchParams.page || 1;
   const query = searchParams.query || '';
@@ -24,11 +25,19 @@ export default function SettingsPage({ searchParams }: TabSelectorProps) {
           </div>
 
           <SettingsSelector activeTab={activeTab} />
+
+          {activeTab === 'organization' && (
+            <OrganizerPageTab/>
+          )}
+
+          {activeTab === 'roles' && (
+            <div>RolePageTab</div>
+          )}
+
+          {activeTab === 'teams' && (
+            <div>TeamsPageTab</div>
+          )}
           
-          <OrganizerPageTab 
-            search={query} 
-            page={page as number}
-          />
         </div>
     </section>
   )
