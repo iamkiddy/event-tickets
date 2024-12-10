@@ -79,8 +79,6 @@ export default class APIUrls {
     static readonly createEventTicketPromotion = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotion`;
 
 
-<<<<<<< HEAD
-=======
     // ---- ORGANIZATION PROFILE ---- //
 
     // get organization profile
@@ -102,5 +100,4 @@ export default class APIUrls {
     // ---- ORGANIZATION TEAM ---- //
 
 
->>>>>>> 03efe2c1436e823174796bade35e453811dfb1dc
 }
