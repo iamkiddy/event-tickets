@@ -14,7 +14,7 @@ export interface IController<T = unknown> {
   method?: HttpMethods;
   url: string;
   token?: string;
-  params?: Record<string, string | number | boolean>;
+  params?: Record<string, string>;
   data?: T;
   contentType?: HttpContentType;
   baseUrl?: string;
@@ -25,6 +25,7 @@ export default async function <T, D = unknown>({
   method = "GET",
   url = "",
   token,
+  params,
   contentType,
   data,
 }: IController<D>): Promise<T> {
@@ -47,14 +48,8 @@ export default async function <T, D = unknown>({
     }
   }
   
-  console.log('Request details:', {
-    url,
-    method,
-    headers,
-    bodyType: body instanceof FormData ? 'FormData' : typeof body
-  });
 
-  const response = await fetch(url, {
+  const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {
     method,
     headers,
     body,

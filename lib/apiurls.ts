@@ -79,4 +79,28 @@ export default class APIUrls {
     static readonly createEventTicketPromotion = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotion`;
 
 
+<<<<<<< HEAD
+=======
+    // ---- ORGANIZATION PROFILE ---- //
+
+    // get organization profile
+    static readonly getOrgProfiles = `${APIUrls.BASE_URL_ORG}/api/v1/users/`;
+
+    // create organization profile
+    static readonly createOrgProfile = `${APIUrls.getOrgProfiles}create`;
+
+    // get organization profile by ID
+    static readonly getOrgProfileById = `${APIUrls.getOrgProfiles}profile/`;
+
+    // update organization profile
+    static readonly updateOrgProfile = `${APIUrls.getOrgProfiles}update/`;
+
+    // delete organization profile
+    static readonly deleteOrgProfile = `${APIUrls.getOrgProfiles}delete/`;
+
+
+    // ---- ORGANIZATION TEAM ---- //
+
+
+>>>>>>> 03efe2c1436e823174796bade35e453811dfb1dc
 }
