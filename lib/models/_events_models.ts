@@ -237,6 +237,7 @@ export type PromotionType = 'discount' | 'coupon';
 export type ValueType = 'percentage' | 'amount';
 
 export interface CreateEventTicketPromotion {
+  id: string;
   code: string;
   promotionType: PromotionType;
   value: number;
@@ -280,3 +281,79 @@ export interface CreateEventTicketPromotionRequest {
   isActive: boolean;
   tickets: string[];
 }
+
+export interface UpdateEventTicket {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    currency: string;
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+    isActive: boolean;
+  }
+  
+  export interface UpdateEventTicketResponse {
+    message: string;
+  }
+
+  export interface DeleteEventTicketResponse {
+    message: string;
+  }
+
+  export interface GetEventTicketPromotionResponse {
+    promotion: EventTicketPromotion;
+  }
+
+  export interface UpdateEventTicketPromotionRequest {
+    id: string;
+    code: string;
+    promotionType: PromotionType;
+    value: number;
+    valueType: ValueType;
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+    quantity: number;
+    isActive: boolean;
+    tickets: string[];
+  }
+
+  export interface UpdateEventTicketPromotionResponse {
+    message: string;
+  }
+
+  export interface DeleteEventTicketPromotionResponse {
+    message: string;
+  }
+
+  export interface getTicketsByIdResponse{
+    name: string;
+    price: number;
+    quantity: number;
+    currency: string;
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+    isActive: boolean;
+    id: string;
+  }
+
+  export interface getEventTicketPromotionByIdResponse{
+    id: string;
+    code: string;
+    promotionType: PromotionType;
+    value: number;
+    valueType: ValueType;
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+    quantity: number;
+    isActive: boolean;
+    tickets: string[];
+    }

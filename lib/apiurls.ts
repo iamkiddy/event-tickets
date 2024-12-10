@@ -72,7 +72,11 @@ export default class APIUrls {
     // get event ticket Promotions
     static readonly getEventTicketPromotions = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotions`;
 
+    // get event ticket promotion by id
+    static readonly getEventTicketPromotion = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotion`;
+
     // create event ticket promotion
     static readonly createEventTicketPromotion = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotion`;
+
 
 }

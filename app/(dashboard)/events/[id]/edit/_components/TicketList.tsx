@@ -9,6 +9,10 @@ import { CreateTicketModal } from './CreateTicketsModel';
 import { PromotionsSection } from './PromotionsSection';
 import { TicketsSection } from './TicketsSection';
 import { EventTicketPromotion } from '@/lib/models/_events_models';
+import { UpdateTicketModal } from './UpdateTicketModal';
+import { DeleteTicketAlert } from './DeleteTicketAlert';
+import { toast } from 'react-hot-toast';
+import { deleteEventTicket } from '@/lib/actions/events';
 
 interface TicketListProps {
   eventId: string;
@@ -21,6 +25,10 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<TicketType | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState<TicketType | null>(null);
 
   const fetchTickets = async () => {
     try {
@@ -61,9 +69,23 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
   const fetchPromotions = async () => {
     try {
       const response = await getEventTicketPromotions(eventId);
-      console.log('Promotions response:', response);
-      if (response && response.promotions) {
+      console.log('Raw promotions response:', response);
+      
+      // Check if response exists
+      if (!response) {
+        console.error('No response received from getEventTicketPromotions');
+        return;
+      }
+      
+      // Check if promotions array exists in response
+      if (Array.isArray(response)) {
+        // If response is directly an array
+        setPromotions(response);
+      } else if (response.promotions && Array.isArray(response.promotions)) {
+        // If response has a promotions property
         setPromotions(response.promotions);
+      } else {
+        console.error('Invalid promotions data structure:', response);
       }
     } catch (err) {
       console.error('Error fetching promotions:', err);
@@ -91,8 +113,25 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
     setIsCreateModalOpen(true);
   };
 
-  const handleDeleteTicket = (ticketId: string) => {
-    setTickets(tickets.filter(ticket => ticket.id !== ticketId));
+  const handleDeleteTicket = (ticket: TicketType) => {
+    setTicketToDelete(ticket);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!ticketToDelete) return;
+    
+    try {
+      await deleteEventTicket(eventId, ticketToDelete.id);
+      toast.success('Ticket deleted successfully');
+      await fetchTickets();
+    } catch (error) {
+      toast.error('Failed to delete ticket');
+      console.error('Error deleting ticket:', error);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setTicketToDelete(null);
+    }
   };
 
   // Helper function to get promotion details for a ticket
@@ -126,6 +165,11 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
       remaining: remaining,
       isActive: isActive
     };
+  };
+
+  const handleEditTicket = (ticket: TicketType) => {
+    setSelectedTicket(ticket);
+    setIsEditModalOpen(true);
   };
 
   return (
@@ -179,6 +223,7 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
                   promotions={promotions}
                   onAddTicket={handleAddTicket}
                   onDeleteTicket={handleDeleteTicket}
+                  onEditTicket={handleEditTicket}
                   formatPromotionDetails={formatPromotionDetails}
                 />
                 <CreateTicketModal
@@ -186,6 +231,25 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
                   onClose={() => setIsCreateModalOpen(false)}
                   eventId={eventId}
                   onSuccess={fetchTickets}
+                />
+                <UpdateTicketModal
+                  isOpen={isEditModalOpen}
+                  onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedTicket(null);
+                  }}
+                  eventId={eventId}
+                  ticket={selectedTicket}
+                  onSuccess={fetchTickets}
+                />
+                <DeleteTicketAlert
+                  isOpen={isDeleteModalOpen}
+                  onClose={() => {
+                    setIsDeleteModalOpen(false);
+                    setTicketToDelete(null);
+                  }}
+                  onConfirm={handleConfirmDelete}
+                  ticketName={ticketToDelete?.type || ''}
                 />
               </>
             )}

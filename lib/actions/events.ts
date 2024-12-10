@@ -1,14 +1,15 @@
-'use client';
+'use server';
 
-import Cookies from 'js-cookie';
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse } from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
+import { cookies } from 'next/headers';
 
 export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) {
       throw new Error('Authentication required');
     }
@@ -37,7 +38,11 @@ export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsR
 
 export const createEvent = async (data: CreateEvent): Promise<CreateEventResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) {
+      throw new Error('Authentication required');
+    }
     
     console.log('Request payload:', JSON.stringify(data, null, 2)); // Debug log
     
@@ -60,7 +65,8 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
 
 export const updateEventImage = async (eventId: string, image: File): Promise<UpdateEventImagesResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
 
     const formData = new FormData();
@@ -92,7 +98,8 @@ export const updateEventImage = async (eventId: string, image: File): Promise<Up
 
 export const updateEventVideo = async (eventId: string, video: File): Promise<UpdateEventVideosResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
 
     const formData = new FormData();
@@ -156,7 +163,8 @@ export const updateEventFAQ = async (params: {
   answer: string;
 }): Promise<any> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
     if (!params.eventId) throw new Error('Event ID is required');
     if (!params.faqId) throw new Error('FAQ ID is required');
@@ -200,7 +208,8 @@ export const updateEventAgenda = async (params: {
   host: string[];
 }): Promise<any> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
     if (!params.eventId) throw new Error('Event ID is required');
     if (!params.id) throw new Error('Agenda ID is required');
@@ -240,7 +249,8 @@ export const updateEventAgenda = async (params: {
 
 export const getEventById = async (eventId: string): Promise<GetEventByIdResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     const response = await apiController<GetEventByIdResponse>({
       method: 'GET',
       url: `${APIUrls.getEventById}/${eventId}`,
@@ -258,7 +268,8 @@ export const getEventById = async (eventId: string): Promise<GetEventByIdRespons
 
 export const getEventFiles = async (eventId: string): Promise<GetEventFilesResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     const response = await apiController<GetEventFilesResponse>({
       method: 'GET',
       url: `${APIUrls.getEventFiles}/${eventId}`,
@@ -276,7 +287,8 @@ export const getEventFiles = async (eventId: string): Promise<GetEventFilesRespo
 
 export const getEventTickets = async (eventId: string): Promise<GetEventTicketsResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     const response = await apiController<GetEventTicketsResponse>({
       method: 'GET',
       url: `${APIUrls.getEventTickets}/${eventId}`,
@@ -294,7 +306,10 @@ export const getEventTickets = async (eventId: string): Promise<GetEventTicketsR
 
 export const createEventTicket = async (eventId: string, data: CreateEventTicket): Promise<CreateEventTicketResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
     const response = await apiController<CreateEventTicketResponse>({
       method: 'POST',
       url: `${APIUrls.getEventTickets}/${eventId}`,
@@ -313,7 +328,10 @@ export const createEventTicket = async (eventId: string, data: CreateEventTicket
 
 export const getEventTicketPromotions = async (eventId: string): Promise<GetEventTicketPromotionsResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
     const response = await apiController<GetEventTicketPromotionsResponse>({
       method: 'GET',
       url: `${APIUrls.getEventTicketPromotions}/${eventId}`,
@@ -331,7 +349,10 @@ export const getEventTicketPromotions = async (eventId: string): Promise<GetEven
 
 export const createEventTicketPromotion = async (eventId: string, data: CreateEventTicketPromotionRequest): Promise<CreateEventTicketPromotionResponse> => {
   try {
-    const token = Cookies.get('token');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
     const response = await apiController<CreateEventTicketPromotionResponse>({
       method: 'POST',
       url: `${APIUrls.createEventTicketPromotion}/${eventId}`,
@@ -344,6 +365,167 @@ export const createEventTicketPromotion = async (eventId: string, data: CreateEv
     console.error('Error creating event ticket promotion:', error);
     const apiError = error as ApiError;
     const errorMessage = apiError.message || "Failed to create event ticket promotion";
+    throw new Error(errorMessage);
+  }
+};
+
+export const updateEventTicket = async (eventId: string, ticketId: string, data: Omit<UpdateEventTicket, 'id'>): Promise<UpdateEventTicketResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    console.log('Updating ticket with data:', {
+      ticketId,
+      data
+    });
+
+    const response = await apiController<UpdateEventTicketResponse>({
+      method: 'PUT',
+      url: `${APIUrls.getEventTickets}/${ticketId}`,
+      data: {
+        name: data.name,
+        price: data.price,
+        quantity: data.quantity,
+        currency: data.currency,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        isActive: data.isActive
+      },
+      token,
+      contentType: 'application/json',
+    });
+
+    console.log('Update response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error updating event ticket:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to update event ticket";
+    throw new Error(errorMessage);
+  }
+};
+
+export const deleteEventTicket = async (eventId: string, ticketId: string): Promise<DeleteEventTicketResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<DeleteEventTicketResponse>({
+      method: 'DELETE',
+      url: `${APIUrls.getEventTickets}/${ticketId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting event ticket:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to delete ticket";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getEventTicketPromotion = async (promotionId: string): Promise<GetEventTicketPromotionResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const response = await apiController<GetEventTicketPromotionResponse>({
+      method: 'GET',
+      url: `${APIUrls.getEventTicketPromotion}/${promotionId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event ticket promotion:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event ticket promotion";
+    throw new Error(errorMessage);
+  }
+};
+
+export const updateEventTicketPromotion = async (promotionId: string, data: UpdateEventTicketPromotionRequest): Promise<UpdateEventTicketPromotionResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<UpdateEventTicketPromotionResponse>({
+      method: 'PUT',
+      url: `${APIUrls.getEventTicketPromotion}/${promotionId}`,
+      data,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error updating event ticket promotion:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to update event ticket promotion";
+    throw new Error(errorMessage);
+  }
+};
+
+export const deleteEventTicketPromotion = async (promotionId: string): Promise<DeleteEventTicketPromotionResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<DeleteEventTicketPromotionResponse>({
+      method: 'DELETE',
+      url: `${APIUrls.getEventTicketPromotion}/${promotionId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting event ticket promotion:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to delete event ticket promotion";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getTicketsById = async (ticketId: string): Promise<getTicketsByIdResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const response = await apiController<getTicketsByIdResponse>({
+      method: 'GET',
+      url: `${APIUrls.getEventTickets}/${ticketId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event ticket:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event ticket";
+    throw new Error(errorMessage);
+  }
+};
+
+
+export const getEventTicketPromotionById = async (promotionId: string): Promise<getEventTicketPromotionByIdResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const response = await apiController<getEventTicketPromotionByIdResponse>({
+      method: 'GET',
+      url: `${APIUrls.getEventTicketPromotion}/${promotionId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event ticket promotion:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event ticket promotion";
     throw new Error(errorMessage);
   }
 };

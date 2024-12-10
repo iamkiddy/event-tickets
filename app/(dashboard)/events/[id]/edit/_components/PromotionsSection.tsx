@@ -1,9 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Tag, Pencil, Trash } from 'lucide-react';
+import { Plus, Tag, Pencil, Trash, Calendar, Ticket, PercentIcon } from 'lucide-react';
 import { EventTicketPromotion } from '@/lib/models/_events_models';
 import { useState } from 'react';
 import { CreatePromotionModal } from './CreatePromotionModal';
 import { TicketType } from '@/app/(main)/codepass/types';
+import { Card } from '@/components/ui/card';
+import { UpdatePromotionModal } from './UpdatePromotionModal';
+import { toast } from 'react-hot-toast';
+import { deleteEventTicketPromotion } from '@/lib/actions/events';
+import { DeletePromotionAlert } from './DeletePromotionAlert';
+import { ViewPromotionSheet } from './ViewPromotionSheet';
 
 interface PromotionsSectionProps {
   promotions: EventTicketPromotion[];
@@ -23,9 +29,51 @@ export function PromotionsSection({
   onDeletePromotion
 }: PromotionsSectionProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedPromotion, setSelectedPromotion] = useState<EventTicketPromotion | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [promotionToDelete, setPromotionToDelete] = useState<EventTicketPromotion | null>(null);
+  const [isViewSheetOpen, setIsViewSheetOpen] = useState(false);
+  const [selectedPromotionId, setSelectedPromotionId] = useState<string>('');
 
   const handleCreatePromotion = () => {
     setIsCreateModalOpen(true);
+  };
+
+  const handleEditPromotion = (promotionId: string) => {
+    const promotion = promotions.find(p => p.id === promotionId);
+    if (promotion) {
+      setSelectedPromotion(promotion);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleDeletePromotion = (promotionId: string) => {
+    const promotion = promotions.find(p => p.id === promotionId);
+    if (promotion) {
+      setPromotionToDelete(promotion);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const handleCardClick = (promotionId: string) => {
+    setSelectedPromotionId(promotionId);
+    setIsViewSheetOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!promotionToDelete) return;
+    
+    try {
+      await deleteEventTicketPromotion(promotionToDelete.id);
+      toast.success('Promotion deleted successfully');
+      onCreatePromotion(); // Refresh the list
+      setIsDeleteModalOpen(false);
+      setPromotionToDelete(null);
+    } catch (error) {
+      console.error('Error deleting promotion:', error);
+      toast.error('Failed to delete promotion');
+    }
   };
 
   return (
@@ -64,62 +112,113 @@ export function PromotionsSection({
         </div>
       ) : (
         <div className="grid gap-4">
-          {promotions.map((promotion) => (
-            <div
-              key={promotion.id}
-              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-indigo-100"
-            >
-              <div className="flex justify-between items-start">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {promotion.code}
-                    </h3>
-                    <span className="px-3 py-1 bg-green-50 text-green-600 text-sm font-medium rounded-full">
-                      {promotion.valueType === 'percentage' ? `${promotion.value}% OFF` : `$${promotion.value} OFF`}
-                    </span>
-                    {new Date(promotion.endDate) < new Date() && (
-                      <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">
-                        Expired
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1 text-sm text-gray-500">
-                    <p className="flex items-center gap-2">
-                      <span className="font-medium">Valid:</span>
-                      {new Date(promotion.startDate).toLocaleDateString()} - {new Date(promotion.endDate).toLocaleDateString()}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-medium">Quantity:</span>
-                      {promotion.quantity > 0 ? (
-                        <span className="text-green-600">{promotion.quantity} remaining</span>
-                      ) : (
-                        <span className="text-gray-600">Unlimited</span>
+          {promotions.map((promotion) => {
+            const isExpired = new Date(promotion.endDate) < new Date();
+            const appliedTickets = tickets.filter(ticket => promotion.tickets.includes(ticket.id));
+
+            return (
+              <Card
+                key={promotion.id}
+                className={`group hover:shadow-lg transition-all duration-300 border-indigo-50 cursor-pointer
+                  ${isExpired ? 'bg-gray-50' : 'bg-white'}`}
+                onClick={() => handleCardClick(promotion.id)}
+              >
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-4 flex-1">
+                      {/* Header Section */}
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <PercentIcon className={`w-5 h-5 ${isExpired ? 'text-gray-400' : 'text-primaryColor'}`} />
+                          <h3 className={`text-xl font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-900'} 
+                            group-hover:text-primaryColor transition-colors`}>
+                            {promotion.code}
+                          </h3>
+                        </div>
+                        <span className={`px-4 py-1.5 text-sm font-medium rounded-full
+                          ${isExpired 
+                            ? 'bg-gray-100 text-gray-600' 
+                            : 'bg-green-50 text-green-600'}`}>
+                          {promotion.valueType === 'percentage' ? `${promotion.value}% OFF` : `$${promotion.value} OFF`}
+                        </span>
+                        {isExpired && (
+                          <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">
+                            Expired
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Details Section */}
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            Valid: {new Date(promotion.startDate).toLocaleDateString()} - {new Date(promotion.endDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            {promotion.quantity > 0 ? (
+                              <span className="text-green-600 font-medium">{promotion.quantity} remaining</span>
+                            ) : (
+                              <span className="text-gray-600">Unlimited</span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Applied Tickets Section */}
+                      {appliedTickets.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Ticket className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm font-medium text-gray-700">Applied to:</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {appliedTickets.map(ticket => (
+                              <span
+                                key={ticket.id}
+                                className="px-3 py-1 bg-indigo-50 text-primaryColor text-sm font-medium rounded-full"
+                              >
+                                {ticket.type}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       )}
-                    </p>
+                    </div>
+
+                    {/* Actions Section */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditPromotion(promotion.id);
+                        }}
+                        className="text-gray-500 hover:text-primaryColor hover:bg-indigo-50"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePromotion(promotion.id);
+                        }}
+                        className="text-gray-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEditPromotion(promotion.id)}
-                    className="text-gray-500 hover:text-primaryColor hover:bg-indigo-50"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeletePromotion(promotion.id)}
-                    className="text-gray-500 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -136,6 +235,36 @@ export function PromotionsSection({
           name: ticket.type
         }))}
       />
+
+      <UpdatePromotionModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedPromotion(null);
+        }}
+        promotion={selectedPromotion}
+        onSuccess={onCreatePromotion}
+        availableTickets={tickets.map(ticket => ({
+          id: ticket.id,
+          name: ticket.type
+        }))}
+      />
+
+      <DeletePromotionAlert
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setPromotionToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        promotionCode={promotionToDelete?.code || ''}
+      />
+
+      <ViewPromotionSheet
+        isOpen={isViewSheetOpen}
+        onClose={() => setIsViewSheetOpen(false)}
+        promotionId={selectedPromotionId}
+      />
     </div>
   );
-} 
+}
