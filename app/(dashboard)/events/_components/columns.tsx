@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users, Pencil, Trash2, Eye, CheckCircle } from 'lucide-react';
+import { MoreVertical, Calendar, Users, Pencil, Trash2, Eye, CheckCircle, CalendarX2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,17 +18,26 @@ export const columns: ColumnDef<Event>[] = [
     header: 'Event',
     cell: ({ row }) => {
       const event = row.original;
+
       return (
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-gray-200 overflow-hidden">
-            <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+          <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+            {event.image && event.image.trim() !== "" ? (
+              <img
+                src={event.image}
+              alt={event.title}
+              className="w-full h-full object-cover"
+            />
+            ) : (
+              <CalendarX2 className="w-6 h-6 text-gray-400" />
+            )}
           </div>
           <div>
             <h3 className="font-medium text-gray-900">{event.title}</h3>
             <p className="text-sm text-gray-500">
               {new Date(event.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
-          </div>
+        </div>
         </div>
       );
     },
@@ -73,7 +82,7 @@ export const columns: ColumnDef<Event>[] = [
     header: 'Actions',
     cell: ({ row }) => {
       const event = row.original;
-      
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -116,4 +125,4 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
   },
-]; 
+];

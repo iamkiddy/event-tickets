@@ -1,6 +1,6 @@
 'use server';
 
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, } from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -526,6 +526,49 @@ export const getEventTicketPromotionById = async (promotionId: string): Promise<
     console.error('Error fetching event ticket promotion:', error);
     const apiError = error as ApiError;
     const errorMessage = apiError.message || "Failed to fetch event ticket promotion";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getEventFinalStage = async (eventId: string): Promise<GetEventFinalStage> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<GetEventFinalStage>({
+      method: 'GET',
+      url: `${APIUrls.getFinalStage}/${eventId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event final stage', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event final stage";
+    throw new Error(errorMessage);
+  }
+};
+
+export const publishEvent = async (eventId: string, data: PublishEventRequest): Promise<PublishEventResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<PublishEventResponse>({
+      method: 'PUT',
+      url: `${APIUrls.getFinalStage}/${eventId}`,
+      data,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error publishing event:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to publish event";
     throw new Error(errorMessage);
   }
 };

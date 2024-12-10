@@ -78,6 +78,9 @@ export default class APIUrls {
     // create event ticket promotion
     static readonly createEventTicketPromotion = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/promotion`;
 
+    //  get final event stage 
+    static readonly getFinalStage = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/final-event`;
+
 
     // ---- ORGANIZATION PROFILE ---- //
 

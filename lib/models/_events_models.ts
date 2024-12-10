@@ -357,3 +357,26 @@ export interface UpdateEventTicket {
     isActive: boolean;
     tickets: string[];
     }
+
+export interface GetEventFinalStage{
+    organiser:string,
+    category:string,
+    subCategories: string[];
+    registrationUrl:string;
+    isPublished:boolean;
+    isRefundable:boolean;
+    daysBefore:number;
+}
+
+export interface PublishEventRequest{
+    organiser:string,
+    category:string,
+    subCategories: string[];
+    registrationUrl:string;
+    isPublished:boolean;
+    isRefundable:boolean;
+    daysBefore:number;
+}
+export interface PublishEventResponse{
+    message:string;
+}
