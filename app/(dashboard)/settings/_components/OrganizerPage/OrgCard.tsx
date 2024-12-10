@@ -1,16 +1,19 @@
+"use client"
 import { OrgProfileViewModel } from '@/lib/models/_org_models'
 import React from 'react'
 import Image from 'next/image'
 import { EllipsisVertical, User } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
+
 interface OrgCardProps {
     data: OrgProfileViewModel
-}
+}   
+
 
 export default function OrgCard({ data }: OrgCardProps) {
   return (
-    <div className='w-full bg-white flex flex-row gap-4 h-[80px] items-center px-5 rounded-lg'>
+    <div className='w-full bg-white flex flex-row gap-4 h-[80px] items-center px-5 rounded-lg mt-5'>
         <div className='w-[60px] h-[60px] rounded-full relative overflow-hidden bg-gray-400'>
             {data.profileImage ? (
                 <Image src={data.profileImage} fill alt={data.name} className='absolute'/>
