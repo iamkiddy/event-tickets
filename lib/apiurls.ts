@@ -132,5 +132,11 @@ export default class APIUrls {
     //  faq utils
         static readonly faqUtils = `${APIUrls.BASE_URL}/api/v1/utils/faqs`;
 
+    //  newsletter utils
+        static readonly newsletterUtils = `${APIUrls.BASE_URL}/api/v1/utils/subscribe-newsletter`;
+
+    //  get homepage utils
+        static readonly getHomepageUtils = `${APIUrls.BASE_URL}/api/v1/main/home`;
+
 
 }

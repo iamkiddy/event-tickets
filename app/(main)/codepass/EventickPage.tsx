@@ -12,6 +12,8 @@ import { Footer } from './components/Footer';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
 import { EventsBanner } from './components/EventsBanner';
+import { GetCategoryUtilsResponse, GetEventTypeUtilsResponse, GetHomepageUtilsResponse } from '@/lib/models/_main_models';
+import { getCategoryUtils, getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
 
 const navLinks = [
   { label: 'Schedule' },
@@ -20,101 +22,14 @@ const navLinks = [
   { label: 'Contact' }
 ];
 
-const events = [
-  {
-    month: 'APR',
-    day: '14',
-    title: 'Wonder Girls 2010 Wonder Girls World Tour San Francisco',
-    description: "We'll get you directly seated and inside for you to enjoy the show.",
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'AUG',
-    day: '20',
-    title: 'JYJ 2011 JYJ Worldwide Concert Barcelona',
-    description: 'Directly seated and inside for you to enjoy the show.',
-    image: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'SEP',
-    day: '05',
-    title: 'Live Concert Singing Competition 2024',
-    description: 'Join us for an amazing night of musical talent and competition.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'OCT',
-    day: '15',
-    title: 'International Music Festival 2024',
-    description: 'A celebration of diverse musical genres from around the world.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'NOV',
-    day: '25',
-    title: 'Rock & Roll Hall of Fame Concert',
-    description: 'Experience the legends of rock music live on stage.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'NOV',
-    day: '25',
-    title: 'Rock & Roll Hall of Fame Concert',
-    description: 'Experience the legends of rock music live on stage.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'NOV',
-    day: '25',
-    title: 'Rock & Roll Hall of Fame Concert',
-    description: 'Experience the legends of rock music live on stage.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'NOV',
-    day: '25',
-    title: 'Rock & Roll Hall of Fame Concert',
-    description: 'Experience the legends of rock music live on stage.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    month: 'NOV',
-    day: '25',
-    title: 'Rock & Roll Hall of Fame Concert',
-    description: 'Experience the legends of rock music live on stage.',
-    image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-];
-
-const blogPosts = [
-  {
-    image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/b2905736e4c054874f5000c449195259afc5d4fbd743c2793853105f0c6b05d4?placeholderIfAbsent=true&apiKey=343ef0e5af634a268a7f26dcf5b09d31',
-    title: '6 Strategies to Find Your Conference Keynote and Other Speakers',
-    description: 'Sekarang, kamu bisa produksi tiket fisik untuk eventmu bersama Bostiketbos. Hanya perlu mengikuti beberapa langkah mudah.',
-    date: '12 Mar',
-    author: 'Jhon Doe'
-  },
-  {
-    image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/6a9227dd6d09750c569d0aed6a58d64fd762ee214a9363e1b6019f1bc897e2d6?placeholderIfAbsent=true&apiKey=343ef0e5af634a268a7f26dcf5b09d31',
-    title: 'How Successfully Used Paid Marketing to Drive Incremental Ticket Sales',
-    description: 'Sekarang, kamu bisa produksi tiket fisik untuk eventmu bersama Bostiketbos. Hanya perlu mengikuti beberapa langkah mudah.',
-    date: '12 Mar',
-    author: 'Jhon Doe'
-  },
-  {
-    image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/77bf3d839341449773d8a565f8488283d4450b428fd8b5852d37a76922d95aad?placeholderIfAbsent=true&apiKey=343ef0e5af634a268a7f26dcf5b09d31',
-    title: 'Introducing Workspaces: Work smarter, not harder with new navigation',
-    description: 'Sekarang, kamu bisa produksi tiket fisik untuk eventmu bersama Bostiketbos. Hanya perlu mengikuti beberapa langkah mudah.',
-    date: '12 Mar',
-    author: 'Jhon Doe'
-  }
-];
-
 export default function EventickPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [showSearchInNav, setShowSearchInNav] = React.useState(false);
+  const [categories, setCategories] = React.useState<GetCategoryUtilsResponse[]>([]);
+  const [eventTypes, setEventTypes] = React.useState<GetEventTypeUtilsResponse[]>([]);
+  const [homeData, setHomeData] = React.useState<GetHomepageUtilsResponse | null>(null);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -128,6 +43,45 @@ export default function EventickPage() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategoryUtils();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchEventTypes = async () => {
+      try {
+        const eventTypesData = await getEventTypeUtils();
+        setEventTypes(eventTypesData);
+      } catch (error) {
+        console.error('Error fetching event types:', error);
+      }
+    };
+
+    fetchEventTypes();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        const data = await getHomepageUtils();
+        setHomeData(data);
+      } catch (error) {
+        console.error('Error fetching homepage data:', error);
+      }
+    };
+
+    fetchHomeData();
   }, []);
 
   return (
@@ -232,7 +186,7 @@ export default function EventickPage() {
 
       {/* Categories Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <Categories />
+        <Categories categories={homeData?.featuredCategories || []} />
       </div>
 
       {/* Rest of the content */}
@@ -249,9 +203,12 @@ export default function EventickPage() {
                   text-primaryColor border border-indigo-100 focus:outline-none 
                   focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
               >
-                <option value="any">Any Category</option>
-                <option value="weekend">Weekend Events</option>
-                <option value="weekday">Weekday Events</option>
+                <option value="">Any Category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
 
               <select 
@@ -260,9 +217,11 @@ export default function EventickPage() {
                   focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
               >
                 <option value="any">Event Type</option>
-                <option value="concert">Concerts</option>
-                <option value="conference">Conferences</option>
-                <option value="workshop">Workshops</option>
+                {eventTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
               </select>
 
               <select 
@@ -279,11 +238,15 @@ export default function EventickPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {events.map((event, index) => (
+            {homeData?.upcomingEvents.map((event, index) => (
               <EventCard 
-                key={`${event.month}-${event.day}-${index}`} 
-                {...event} 
-                id={String(index + 1)}
+                key={event.id}
+                id={event.id}
+                month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
+                day={new Date(event.startDate).getDate().toString()}
+                title={event.title}
+                description={event.summary}
+                image={event.image}
               />
             ))}
           </div>
@@ -292,8 +255,15 @@ export default function EventickPage() {
         <section className="mt-16">
           <h2 className="text-2xl font-bold mb-8">Latest Blog Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <BlogCard key={post.title} {...post} />
+            {homeData?.pageBlogs.map((post) => (
+              <BlogCard 
+                key={post.id}
+                image={post.image}
+                title={post.title}
+                description={post.summary}
+                date={post.date}
+                author={post.author}
+              />
             ))}
           </div>
         </section>

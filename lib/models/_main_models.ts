@@ -20,3 +20,43 @@ export interface GetFaqUtilsResponse {
     question: string;
     answer: string;
 }
+
+export interface GetNewsletterUtilsRequest {
+    email: string;
+}
+
+export interface GetNewsletterUtilsResponse {
+    message: string;
+}
+
+export interface GetHomepageUtilsResponse {
+    featuredCategories: {
+        image: string;
+        name: string;
+        totalEvents: number;
+    }[];
+    upcomingEvents: {
+        id: string;
+        image: string;
+        title: string;
+        startDate: string;
+        summary: string;
+        isPublish: boolean;
+    }[];
+    mostViewedEvents: {
+        id: string;
+        image: string;
+        title: string;
+        startDate: string;
+        summary: string;
+        isPublish: boolean;
+    }[];
+    pageBlogs: {
+        id: string;
+        image: string;
+        title: string;
+        summary: string;
+        author: string;
+        date: string;
+    }[];
+}
