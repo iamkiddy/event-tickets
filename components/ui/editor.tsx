@@ -8,12 +8,16 @@ interface EditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  name?: string;
+  required?: boolean; 
+  disabled?: boolean;
 }
 
-export function Editor({ value, onChange, placeholder }: EditorProps) {
+export function Editor({ value, onChange, placeholder, required, disabled }: EditorProps) {
   const editor = useEditor({
     extensions: [StarterKit],
     content: value,
+    editable: !disabled,
     editorProps: {
       attributes: {
         class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] px-4 py-2 border border-gray-200 rounded-lg',
@@ -60,7 +64,11 @@ export function Editor({ value, onChange, placeholder }: EditorProps) {
           <ListOrdered className="w-4 h-4" />
         </button>
       </div>
-      <EditorContent editor={editor} />
+      <EditorContent 
+        placeholder={placeholder}
+        required={required}
+        editor={editor}
+      />
     </div>
   );
 }

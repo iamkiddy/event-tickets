@@ -13,7 +13,7 @@ import ErrorPageCard from '@/components/custom/ErrorPageCard';
 
 
 export default function OrganizerPageTab() {
-  const { data, isLoading, isError, error } = useQuery({ 
+  const { data, isLoading, isError } = useQuery({ 
     queryKey: ['orgs'], 
     queryFn: () => getAllOrgProfiles()
   })

@@ -26,11 +26,11 @@ export default function InputField({
     const IconRight = iconRight;
   return (
     <div className={cn(
-        'w-full flex flex-col gap-3',
+        'w-full flex flex-col',
         className
     )}>
         {label && (
-            <label className='text-base font-semibold text-gray-500'>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 {label}
             </label>
         )}
