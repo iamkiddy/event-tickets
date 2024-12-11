@@ -69,3 +69,47 @@ export const getOrgProfileById = async (id: string) => {
         throw new Error(errorMessage);
     }
 }
+
+
+
+// update a profile
+export const updateOrgProfile = async (id: string, formData: FormData) => {
+    const token = (await cookies()).get('token')?.value;
+
+    try {
+        const response = await apiController<ResponseModel>({
+            method: 'PUT',
+            url: `${APIUrls.updateOrgProfile}${id}`,
+            token,
+            data: formData,
+            contentType: 'multipart/form-data',
+        });
+
+        return response;
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
+        throw new Error(errorMessage);
+    }
+}
+
+
+
+// delete a profile
+export const deleteOrgProfile = async (id: string) => {
+    const token = (await cookies()).get('token')?.value;
+
+    try {
+        const response = await apiController<ResponseModel>({
+            method: 'DELETE',
+            url: `${APIUrls.deleteOrgProfile}${id}`,
+            token,
+        });
+
+        return response;
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "An unexpected error occurred";
+        throw new Error(errorMessage);
+    }
+}
