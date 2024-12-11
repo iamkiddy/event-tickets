@@ -364,7 +364,6 @@ export interface GetEventFinalStage{
     organiser:string,
     category:string,
     subCategories: string[];
-    registrationUrl:string;
     isPublished:boolean;
     isRefundable:boolean;
     daysBefore:number;
@@ -374,7 +373,6 @@ export interface PublishEventRequest {
     organizer: string;
     category: string;
     subcategory: string;
-    registrationUrl: string;
     isPublished: boolean;
     isRefundable: boolean;
     daysBefore: number;
