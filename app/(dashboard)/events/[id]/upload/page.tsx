@@ -397,59 +397,38 @@ export default function UploadEventMedia() {
         )}
 
         {/* Upload Progress and Actions */}
-        {uploadedMedia.length > 0 && (
-          <div className="mt-8 space-y-6">
-            {uploadedMedia.map(media => (
-              <div key={media.id} className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    {media.type === 'image' ? (
-                      <ImageIcon className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <Video className="w-4 h-4 text-gray-500" />
-                    )}
-                    <span className="font-medium text-gray-700">
-                      {media.file.name}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {Math.round(media.file.size / 1024)}KB
-                  </span>
-                </div>
-                {isUploading && (
-                  <Progress 
-                    value={media.progress} 
-                    className="h-2 bg-gray-200"
-                  />
-                )}
-              </div>
-            ))}
-
-            <div className="flex justify-end gap-4">
-              <Button
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isUploading}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleUpload}
-                disabled={isUploading}
-                className="bg-primaryColor hover:bg-indigo-700 text-white"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  'Upload Media'
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
+        <div className="mt-8 flex justify-end gap-4">
+          <Button
+            variant="secondary"
+            onClick={() => router.push(`/events/${params.id}/edit`)}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6"
+          >
+            Skip & Continue
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={isUploading}
+          >
+            Cancel
+          </Button>
+          {uploadedMedia.length > 0 && (
+            <Button
+              onClick={handleUpload}
+              disabled={isUploading}
+              className="bg-primaryColor hover:bg-indigo-700 text-white"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                'Upload Media'
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

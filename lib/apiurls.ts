@@ -54,8 +54,14 @@ export default class APIUrls {
     // Update Event Images
     static readonly updateEventImages = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/image`;
 
+    // Delete Event Image
+    static readonly deleteEventImage = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/delete/image`;
+
     // Update Event Videos
     static readonly updateEventVideos = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/video`;
+
+    // Delete Event Video
+    static readonly deleteEventVideo = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/delete/video`;
 
     // Update Event FAQ
     static readonly updateEventFAQ = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/faq`;

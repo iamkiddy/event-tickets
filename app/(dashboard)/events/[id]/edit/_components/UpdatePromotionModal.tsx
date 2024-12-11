@@ -5,8 +5,17 @@ import { Input } from '@/components/ui/input';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { EventTicketPromotion, UpdateEventTicketPromotionRequest } from '@/lib/models/_events_models';
-import { updateEventTicketPromotion } from '@/lib/actions/events';
+import { EventTicketPromotion, UpdateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
+import { updateEventTicketPromotion, getEventsUtils } from '@/lib/actions/events';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UpdatePromotionModalProps {
   isOpen: boolean;
@@ -24,6 +33,8 @@ export function UpdatePromotionModal({
   availableTickets
 }: UpdatePromotionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [formData, setFormData] = useState<UpdateEventTicketPromotionRequest>({
     id: '',
     code: '',
@@ -38,6 +49,22 @@ export function UpdatePromotionModal({
     isActive: true,
     tickets: []
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchEventUtils();
+    }
+  }, [isOpen]);
+
+  const fetchEventUtils = async () => {
+    try {
+      const response = await getEventsUtils();
+      setEventUtils(Array.isArray(response) ? response : [response]);
+    } catch (error) {
+      console.error('Error fetching event utils:', error);
+      toast.error('Failed to fetch event options');
+    }
+  };
 
   useEffect(() => {
     if (promotion) {
@@ -84,8 +111,30 @@ export function UpdatePromotionModal({
           <SheetTitle className="text-2xl font-semibold text-gray-900">Update Promotion</SheetTitle>
         </SheetHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form fields - same as CreatePromotionModal */}
           <div className="space-y-6">
+            {/* Event Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Event</label>
+              <Select
+                value={selectedEvent}
+                onValueChange={setSelectedEvent}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select an event" />
+                </SelectTrigger>
+                <SelectContent className='bg-white'>
+                  <SelectGroup>
+                    <SelectLabel>Available Events</SelectLabel>
+                    {eventUtils.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.title}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Promotion Code</label>
               <Input
@@ -100,14 +149,18 @@ export function UpdatePromotionModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Discount Type</label>
-                <select
+                <Select
                   value={formData.valueType}
-                  onChange={(e) => setFormData({ ...formData, valueType: e.target.value as 'percentage' | 'amount' })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+                  onValueChange={(value) => setFormData({ ...formData, valueType: value as 'percentage' | 'amount' })}
                 >
-                  <option value="percentage">Percentage</option>
-                  <option value="amount">Fixed Amount</option>
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select discount type" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-white'>
+                    <SelectItem value="percentage">Percentage</SelectItem>
+                    <SelectItem value="amount">Fixed Amount</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -136,22 +189,71 @@ export function UpdatePromotionModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Apply to Tickets</label>
-              <select
-                multiple
-                value={formData.tickets}
-                onChange={(e) => {
-                  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-                  setFormData({ ...formData, tickets: selectedOptions });
+              <Select
+                value={formData.tickets[0] || ''} // Since it's multiple, we'll handle array in onChange
+                onValueChange={(value) => {
+                  const selectedTickets = [...formData.tickets];
+                  if (selectedTickets.includes(value)) {
+                    // Remove if already selected
+                    const index = selectedTickets.indexOf(value);
+                    selectedTickets.splice(index, 1);
+                  } else {
+                    // Add if not selected
+                    selectedTickets.push(value);
+                  }
+                  setFormData({ ...formData, tickets: selectedTickets });
                 }}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-                required
               >
-                {availableTickets.map(ticket => (
-                  <option key={ticket.id} value={ticket.id}>
-                    {ticket.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select tickets to apply promotion" />
+                </SelectTrigger>
+                <SelectContent className='bg-white'>
+                  <SelectGroup>
+                    <SelectLabel>Available Tickets</SelectLabel>
+                    {availableTickets.map(ticket => (
+                      <SelectItem 
+                        key={ticket.id} 
+                        value={ticket.id}
+                        className={formData.tickets.includes(ticket.id) ? 'bg-primary/10' : ''}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{ticket.name}</span>
+                          {formData.tickets.includes(ticket.id) && (
+                            <span className="text-xs bg-primary/20 px-2 py-0.5 rounded">Selected</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              {/* Selected Tickets Display */}
+              {formData.tickets.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {formData.tickets.map(ticketId => {
+                    const ticket = availableTickets.find(t => t.id === ticketId);
+                    return ticket ? (
+                      <span
+                        key={ticket.id}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded"
+                      >
+                        {ticket.name}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedTickets = formData.tickets.filter(id => id !== ticketId);
+                            setFormData({ ...formData, tickets: updatedTickets });
+                          }}
+                          className="hover:text-primary/80"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -209,4 +311,4 @@ export function UpdatePromotionModal({
       </SheetContent>
     </Sheet>
   );
-} 
+}

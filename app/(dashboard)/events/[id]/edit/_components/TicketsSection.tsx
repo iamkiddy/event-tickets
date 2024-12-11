@@ -142,7 +142,10 @@ export function TicketsSection({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onEditTicket(ticket)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditTicket(ticket);
+                        }}
                         className="text-gray-500 hover:text-primaryColor hover:bg-indigo-50"
                       >
                         <Pencil className="w-4 h-4" />
@@ -150,7 +153,10 @@ export function TicketsSection({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDeleteTicket(ticket)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteTicket(ticket);
+                        }}
                         className="text-gray-500 hover:text-red-600 hover:bg-red-50"
                       >
                         <Trash className="w-4 h-4" />

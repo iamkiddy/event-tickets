@@ -68,23 +68,10 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     const fetchData = async () => {
       try {
         const eventData = await getEventFinalStage(eventId);
-        console.log('Event Final Stage Data:', {
-          organiser: eventData.organiser,
-          category: eventData.category,
-          subCategories: eventData.subCategories,
-          registrationUrl: eventData.registrationUrl,
-          isPublished: eventData.isPublished,
-          isRefundable: eventData.isRefundable,
-          daysBefore: eventData.daysBefore
-        });
-        
         const [organiserData, categoryData] = await Promise.all([
           getOrganiserUtils(),
           getUtilsCategories()
         ]);
-
-        console.log('Organiser Data:', organiserData);
-        console.log('Category Data:', categoryData);
 
         if (Array.isArray(organiserData)) {
           setOrganisers(organiserData);
@@ -109,41 +96,6 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
           isRefundable: eventData.isRefundable,
           daysBefore: eventData.daysBefore
         });
-
-        const debugInfo = document.createElement('div');
-        debugInfo.style.padding = '1rem';
-        debugInfo.style.margin = '1rem';
-        debugInfo.style.backgroundColor = '#f0f0f0';
-        debugInfo.style.borderRadius = '0.5rem';
-        debugInfo.innerHTML = `
-          <h3>Debug Information</h3>
-          <pre>${JSON.stringify({
-            organiser: eventData.organiser,
-            category: eventData.category,
-            subCategories: eventData.subCategories,
-            registrationUrl: eventData.registrationUrl,
-            isPublished: eventData.isPublished,
-            isRefundable: eventData.isRefundable,
-            daysBefore: eventData.daysBefore
-          }, null, 2)}</pre>
-        `;
-        
-        const debugSection = (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-2">Debug Information</h3>
-            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
-              {JSON.stringify({
-                organiser: eventData.organiser,
-                category: eventData.category,
-                subCategories: eventData.subCategories,
-                registrationUrl: eventData.registrationUrl,
-                isPublished: eventData.isPublished,
-                isRefundable: eventData.isRefundable,
-                daysBefore: eventData.daysBefore
-              }, null, 2)}
-            </pre>
-          </div>
-        );
 
         if (eventData.category) {
           const selectedCategory = categoryData.find(cat => cat.id === eventData.category);
@@ -374,39 +326,29 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Publishing Checklist</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Publishing Steps</h2>
         <div className="space-y-4">
           <ChecklistItem
             title="Basic Information"
-            description="Add event title, date, and description"
+            description="Add event title, date, time, and description"
             isCompleted={true}
           />
           <ChecklistItem
             title="Media"
-            description="Upload at least one event image"
+            description="Upload event images and videos"
             isCompleted={true}
           />
           <ChecklistItem
             title="Tickets"
-            description="Create at least one ticket type"
+            description="Create and configure ticket types"
             isCompleted={true}
           />
+          <ChecklistItem
+            title="Publishing Details"
+            description="Set organizer, category, and registration options"
+            isCompleted={!!publishData.organizer && !!publishData.category}
+          />
         </div>
-      </div>
-
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Debug Information</h2>
-        <pre className="text-sm text-gray-600 whitespace-pre-wrap overflow-x-auto">
-          {JSON.stringify({
-            organizer: publishData.organizer,
-            category: publishData.category,
-            subcategory: publishData.subcategory,
-            registrationUrl: publishData.registrationUrl,
-            isPublished: publishData.isPublished,
-            isRefundable: publishData.isRefundable,
-            daysBefore: publishData.daysBefore
-          }, null, 2)}
-        </pre>
       </div>
     </div>
   );

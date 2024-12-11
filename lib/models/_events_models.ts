@@ -384,15 +384,21 @@ export interface PublishEventResponse{
     message:string;
 }
 
-export interface GetOrganizerUtils{
-    
-        id: string;
-        title: string;
+export interface GetOrganizerUtils {
+    id: string;
+    title: string;
 }
 
-export interface GetEventUtils{
-    event:{
-    id:string;
-    title:string;
-    }
+export interface GetEventUtils {
+    id: string;
+    title: string;
+}
+
+
+export interface DeleteEventImageResponse {
+    message: string;
+}
+
+export interface DeleteEventVideoResponse {
+    message: string;
 }
