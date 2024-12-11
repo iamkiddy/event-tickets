@@ -6,6 +6,7 @@ import { LucideIcon } from 'lucide-react';
 interface InputFieldProps {
     label?: string;
     type?: string;
+    name?: string;
     placeholder?: string;
     value: string;
     setValue: (value: string) => void;
@@ -18,7 +19,7 @@ interface InputFieldProps {
 }
 
 export default function InputField({ 
-    label, type, placeholder, value, setValue, 
+    label, type, placeholder, value, setValue, name,
     error, required, disabled, className, iconLeft, iconRight
 }: InputFieldProps) {
     const IconLeft = iconLeft;
@@ -39,6 +40,7 @@ export default function InputField({
                 type={type} 
                 placeholder={placeholder} 
                 value={value} 
+                name={name}
                 onChange={(e) => setValue(e.target.value)}
                 required={required}
                 disabled={disabled}

@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query'
 import { getAllOrgProfiles } from '@/lib/actions/organizer_actions'
 import PageLoader from '../PageLoader'
 import OrgCard from './OrgCard'
+import NoDataFund from '@/components/custom/NoDataFund';
+import ErrorPageCard from '@/components/custom/ErrorPageCard';
 
 
 export default function OrganizerPageTab() {
@@ -34,6 +36,9 @@ export default function OrganizerPageTab() {
             <OrgCard key={org.id} data={org} />
           ))
         )}
+
+        {isError && <ErrorPageCard />}
+        {(!isLoading && data?.length === 0) && <NoDataFund/>}
     </section>
   )
 }
