@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories } from '@/lib/actions/events';
 import { PublishEventRequest, GetOrganizerUtils, UtilsCategoriesResponse } from '@/lib/models/_events_models';
-import   {MultiSelect} from "@/components/ui/multiSelect"
 
 interface PublishingListProps {
   eventId: string;
@@ -20,8 +19,6 @@ interface ChecklistItemProps {
   description: string;
   isCompleted: boolean;
 }
-
-
 
 function ChecklistItem({ title, description, isCompleted }: ChecklistItemProps) {
   return (
@@ -55,12 +52,12 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [organisers, setOrganisers] = useState<GetOrganizerUtils[]>([]);
-  const [categories, setCategories] = useState<UtilsCategoriesResponse[]>([]);  // State for categories
-  const [subCategories, setSubCategories] = useState<string[]>([]); // State for subcategories based on selected category
-  const [publishData, setPublishData] = useState<PublishEventRequest>({
-    organiser: '',
-    category: '',  // This will store the category ID
-    subCategories: [],  // Store selected subcategories as an array
+  const [categories, setCategories] = useState<UtilsCategoriesResponse[]>([]);
+  const [subCategories, setSubCategories] = useState<string[]>([]);
+  const [publishData, setPublishData] = useState({
+    organizer: '',
+    category: '',
+    subcategory: '',
     registrationUrl: '',
     isPublished: true,
     isRefundable: true,
@@ -70,39 +67,92 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch event data, organisers, and categories
-        const [eventData, organiserData, categoryData] = await Promise.all([
-          getEventFinalStage(eventId),
-          getOrganiserUtils(),
-          getUtilsCategories() // Fetch categories
-        ]);
-
-        // Ensure organiserData is an array
-        if (Array.isArray(organiserData)) {
-          setOrganisers(organiserData);
-        } else {
-          console.error('Expected organiserData to be an array, received:', organiserData);
-          setOrganisers([]); // Fallback to empty array
-        }
-
-        // Set categories (ensure categoryData is an array)
-        if (Array.isArray(categoryData)) {
-          setCategories(categoryData); // categoryData should be an array of objects with id, name, subCategories
-        } else {
-          console.error('Expected categoryData to be an array, received:', categoryData);
-          setCategories([]); // Fallback to empty array
-        }
-
-        // Set publish data
-        setPublishData({
-          organiser: eventData.organiser || '',
-          category: eventData.category || '',  // category ID should be set here
-          subCategories: eventData.subCategories || [],
-          registrationUrl: eventData.registrationUrl || '',
+        const eventData = await getEventFinalStage(eventId);
+        console.log('Event Final Stage Data:', {
+          organiser: eventData.organiser,
+          category: eventData.category,
+          subCategories: eventData.subCategories,
+          registrationUrl: eventData.registrationUrl,
           isPublished: eventData.isPublished,
           isRefundable: eventData.isRefundable,
           daysBefore: eventData.daysBefore
         });
+        
+        const [organiserData, categoryData] = await Promise.all([
+          getOrganiserUtils(),
+          getUtilsCategories()
+        ]);
+
+        console.log('Organiser Data:', organiserData);
+        console.log('Category Data:', categoryData);
+
+        if (Array.isArray(organiserData)) {
+          setOrganisers(organiserData);
+        } else {
+          console.error('Expected organiserData to be an array:', organiserData);
+          setOrganisers([]);
+        }
+
+        if (Array.isArray(categoryData)) {
+          setCategories(categoryData);
+        } else {
+          console.error('Expected categoryData to be an array:', categoryData);
+          setCategories([]);
+        }
+
+        setPublishData({
+          organizer: eventData.organiser || '',
+          category: eventData.category || '',
+          subcategory: eventData.subCategories?.[0] || '',
+          registrationUrl: eventData.registrationUrl || '',
+          isPublished: true,
+          isRefundable: eventData.isRefundable,
+          daysBefore: eventData.daysBefore
+        });
+
+        const debugInfo = document.createElement('div');
+        debugInfo.style.padding = '1rem';
+        debugInfo.style.margin = '1rem';
+        debugInfo.style.backgroundColor = '#f0f0f0';
+        debugInfo.style.borderRadius = '0.5rem';
+        debugInfo.innerHTML = `
+          <h3>Debug Information</h3>
+          <pre>${JSON.stringify({
+            organiser: eventData.organiser,
+            category: eventData.category,
+            subCategories: eventData.subCategories,
+            registrationUrl: eventData.registrationUrl,
+            isPublished: eventData.isPublished,
+            isRefundable: eventData.isRefundable,
+            daysBefore: eventData.daysBefore
+          }, null, 2)}</pre>
+        `;
+        
+        const debugSection = (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium text-gray-900 mb-2">Debug Information</h3>
+            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+              {JSON.stringify({
+                organiser: eventData.organiser,
+                category: eventData.category,
+                subCategories: eventData.subCategories,
+                registrationUrl: eventData.registrationUrl,
+                isPublished: eventData.isPublished,
+                isRefundable: eventData.isRefundable,
+                daysBefore: eventData.daysBefore
+              }, null, 2)}
+            </pre>
+          </div>
+        );
+
+        if (eventData.category) {
+          const selectedCategory = categoryData.find(cat => cat.id === eventData.category);
+          if (selectedCategory && Array.isArray(selectedCategory.subCategories)) {
+            setSubCategories(selectedCategory.subCategories);
+          } else {
+            setSubCategories([]);
+          }
+        }
 
         setStatus(eventData.isPublished ? 'published' : 'draft');
         setIsLoading(false);
@@ -118,34 +168,56 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     }
   }, [eventId]);
 
-  // Update subcategories based on selected category
   const handleCategoryChange = (categoryId: string) => {
     setPublishData({
       ...publishData,
       category: categoryId,
-      subCategories: [] // Clear subcategories on category change
+      subcategory: '' // Reset subcategory when category changes
     });
 
     const selectedCategory = categories.find((category) => category.id === categoryId);
-    if (selectedCategory) {
+    if (selectedCategory && Array.isArray(selectedCategory.subCategories)) {
       setSubCategories(selectedCategory.subCategories);
+    } else {
+      // If no subcategories or invalid data, set empty array
+      setSubCategories([]);
     }
   };
 
   const handlePublish = async () => {
-    if (!publishData.organiser || !publishData.category || publishData.subCategories.length === 0) {
-      toast.error('Please fill in all required fields');
+    // Check if organizer and category are filled
+    if (!publishData.organizer || !publishData.category) {
+      toast.error('Please fill in all required fields (Organizer and Category)');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await publishEvent(eventId, publishData);
+      const dataToPublish = {
+        ...publishData,
+        isPublished: true,
+        // If no subcategories available, send an empty string
+        subcategory: subCategories.length === 0 ? '' : publishData.subcategory
+      };
+      
+      console.log('Publishing event with data:', dataToPublish);
+
+      const response = await publishEvent(eventId, dataToPublish);
+      
       setStatus('published');
-      toast.success('Event published successfully');
+      toast.success(response.message || 'Event published successfully');
     } catch (error) {
-      console.error('Error publishing event:', error);
-      toast.error('Failed to publish event');
+      let errorMessage = 'Failed to publish event';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        console.error('API Error details:', error);
+        const apiError = error as { message?: string };
+        errorMessage = apiError.message || errorMessage;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -170,8 +242,8 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 Organizer *
               </label>
               <Select
-                value={publishData.organiser}
-                onValueChange={(value) => setPublishData({ ...publishData, organiser: value })}
+                value={publishData.organizer}
+                onValueChange={(value) => setPublishData({ ...publishData, organizer: value })}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select organizer" />
@@ -190,16 +262,16 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 Category *
               </label>
               <Select
-                value={publishData.category}  // This is now the category ID
-                onValueChange={handleCategoryChange}  // Update subcategories based on category selection
+                value={publishData.category}
+                onValueChange={handleCategoryChange}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>  {/* Use the category ID as the value */}
-                      {category.name}  {/* Display the name to the user */}
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -207,14 +279,29 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subcategories *
+                Subcategory *
               </label>
-              <MultiSelect
-                  value={publishData.subCategories}
-                  onValueChange={(value) => setPublishData({ ...publishData, subCategories: value })}
-                  options={subCategories}
-                  placeholder="Select subcategories"
-                />
+              {subCategories.length > 0 ? (
+                <Select
+                  value={publishData.subcategory}
+                  onValueChange={(value) => setPublishData({ ...publishData, subcategory: value })}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select subcategory" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {subCategories.map((subCategory) => (
+                      <SelectItem key={subCategory} value={subCategory}>
+                        {subCategory}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="text-sm text-gray-500 p-2 border rounded-md bg-gray-50">
+                  No subcategories available for this category
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -273,13 +360,14 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
               </p>
             </div>
           </div>
+
           <div>
             <Button
               onClick={handlePublish}
-              disabled={isSubmitting || status === 'published'}
+              disabled={isSubmitting}
               className="w-full bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
             >
-              {isSubmitting ? 'Publishing...' : status === 'published' ? 'Published' : 'Publish Event'}
+              {isSubmitting ? 'Publishing...' : 'Publish Event'}
             </Button>
           </div>
         </div>
@@ -304,6 +392,21 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
             isCompleted={true}
           />
         </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Debug Information</h2>
+        <pre className="text-sm text-gray-600 whitespace-pre-wrap overflow-x-auto">
+          {JSON.stringify({
+            organizer: publishData.organizer,
+            category: publishData.category,
+            subcategory: publishData.subcategory,
+            registrationUrl: publishData.registrationUrl,
+            isPublished: publishData.isPublished,
+            isRefundable: publishData.isRefundable,
+            daysBefore: publishData.daysBefore
+          }, null, 2)}
+        </pre>
       </div>
     </div>
   );

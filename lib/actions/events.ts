@@ -141,18 +141,16 @@ export const getUtilsEventTypes = async (): Promise<UtilsEventTypesResponse> => 
   }
 };
 
-export const getUtilsCategories = async (): Promise<UtilsCategoriesResponse> => {
+export const getUtilsCategories = async (): Promise<UtilsCategoriesResponse[]> => {
   try {
-    const response = await apiController<UtilsCategoriesResponse>({
+    const response = await apiController<UtilsCategoriesResponse[]>({
       method: 'GET',
       url: APIUrls.utilsCategories,
     });
     return response;
   } catch (error) {
     console.error('Error fetching categories:', error);
-    const apiError = error as ApiError;
-    const errorMessage = apiError.message || "Failed to fetch categories";
-    throw new Error(errorMessage);
+    throw new Error('Failed to fetch categories');
   }
 };
 
@@ -542,6 +540,17 @@ export const getEventFinalStage = async (eventId: string): Promise<GetEventFinal
       token,
       contentType: 'application/json',
     });
+
+    console.log('Event Final Stage Data:', {
+      organiser: response.organiser,
+      category: response.category,
+      subCategories: response.subCategories,
+      registrationUrl: response.registrationUrl,
+      isPublished: response.isPublished,
+      isRefundable: response.isRefundable,
+      daysBefore: response.daysBefore
+    });
+
     return response;
   } catch (error) {
     console.error('Error fetching event final stage', error);
