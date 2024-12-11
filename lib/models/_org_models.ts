@@ -1,4 +1,3 @@
-
 // Org Profile Page View Model
 export interface OrgProfileViewModel {
     id:           string;
