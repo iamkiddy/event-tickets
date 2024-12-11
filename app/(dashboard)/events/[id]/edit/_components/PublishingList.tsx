@@ -1,52 +1,163 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Globe, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-
-interface PublishEventRequest {
-  organizer: string;
-  category: string;
-  subcategory: string;
-  registrationUrl: string;
-  isPublished: boolean;
-  isRefundable: boolean;
-  daysBefore: number;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories } from '@/lib/actions/events';
+import { PublishEventRequest, GetOrganizerUtils, UtilsCategoriesResponse } from '@/lib/models/_events_models';
+import   {MultiSelect} from "@/components/ui/multiSelect"
 
 interface PublishingListProps {
   eventId: string;
   currentStatus?: 'draft' | 'published' | 'private';
 }
 
+interface ChecklistItemProps {
+  title: string;
+  description: string;
+  isCompleted: boolean;
+}
+
+
+
+function ChecklistItem({ title, description, isCompleted }: ChecklistItemProps) {
+  return (
+    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+      <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-1
+        ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`}>
+        <svg
+          className="w-3 h-3 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <div>
+        <h3 className="font-medium text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-600 mt-1">{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingListProps) {
   const [status, setStatus] = useState<'draft' | 'published' | 'private'>(currentStatus);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [organisers, setOrganisers] = useState<GetOrganizerUtils[]>([]);
+  const [categories, setCategories] = useState<UtilsCategoriesResponse[]>([]);  // State for categories
+  const [subCategories, setSubCategories] = useState<string[]>([]); // State for subcategories based on selected category
   const [publishData, setPublishData] = useState<PublishEventRequest>({
-    organizer: '',
-    category: '',
-    subcategory: '',
+    organiser: '',
+    category: '',  // This will store the category ID
+    subCategories: [],  // Store selected subcategories as an array
     registrationUrl: '',
     isPublished: true,
     isRefundable: true,
     daysBefore: 7
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch event data, organisers, and categories
+        const [eventData, organiserData, categoryData] = await Promise.all([
+          getEventFinalStage(eventId),
+          getOrganiserUtils(),
+          getUtilsCategories() // Fetch categories
+        ]);
+
+        // Ensure organiserData is an array
+        if (Array.isArray(organiserData)) {
+          setOrganisers(organiserData);
+        } else {
+          console.error('Expected organiserData to be an array, received:', organiserData);
+          setOrganisers([]); // Fallback to empty array
+        }
+
+        // Set categories (ensure categoryData is an array)
+        if (Array.isArray(categoryData)) {
+          setCategories(categoryData); // categoryData should be an array of objects with id, name, subCategories
+        } else {
+          console.error('Expected categoryData to be an array, received:', categoryData);
+          setCategories([]); // Fallback to empty array
+        }
+
+        // Set publish data
+        setPublishData({
+          organiser: eventData.organiser || '',
+          category: eventData.category || '',  // category ID should be set here
+          subCategories: eventData.subCategories || [],
+          registrationUrl: eventData.registrationUrl || '',
+          isPublished: eventData.isPublished,
+          isRefundable: eventData.isRefundable,
+          daysBefore: eventData.daysBefore
+        });
+
+        setStatus(eventData.isPublished ? 'published' : 'draft');
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Failed to fetch event details');
+        setIsLoading(false);
+      }
+    };
+
+    if (eventId) {
+      fetchData();
+    }
+  }, [eventId]);
+
+  // Update subcategories based on selected category
+  const handleCategoryChange = (categoryId: string) => {
+    setPublishData({
+      ...publishData,
+      category: categoryId,
+      subCategories: [] // Clear subcategories on category change
+    });
+
+    const selectedCategory = categories.find((category) => category.id === categoryId);
+    if (selectedCategory) {
+      setSubCategories(selectedCategory.subCategories);
+    }
+  };
+
   const handlePublish = async () => {
+    if (!publishData.organiser || !publishData.category || publishData.subCategories.length === 0) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Add your publish API call here with publishData
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Replace with actual API call
+      await publishEvent(eventId, publishData);
       setStatus('published');
       toast.success('Event published successfully');
     } catch (error) {
+      console.error('Error publishing event:', error);
       toast.error('Failed to publish event');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryColor"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -56,36 +167,54 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Organizer
+                Organizer *
               </label>
-              <Input
-                value={publishData.organizer}
-                onChange={(e) => setPublishData({ ...publishData, organizer: e.target.value })}
-                className="w-full"
-                placeholder="Enter organizer name"
-              />
+              <Select
+                value={publishData.organiser}
+                onValueChange={(value) => setPublishData({ ...publishData, organiser: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select organizer" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {organisers.map((org) => (
+                    <SelectItem key={org.id} value={org.id}>
+                      {org.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
+                Category *
               </label>
-              <Input
-                value={publishData.category}
-                onChange={(e) => setPublishData({ ...publishData, category: e.target.value })}
-                className="w-full"
-                placeholder="Enter category"
-              />
+              <Select
+                value={publishData.category}  // This is now the category ID
+                onValueChange={handleCategoryChange}  // Update subcategories based on category selection
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>  {/* Use the category ID as the value */}
+                      {category.name}  {/* Display the name to the user */}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subcategory
+                Subcategories *
               </label>
-              <Input
-                value={publishData.subcategory}
-                onChange={(e) => setPublishData({ ...publishData, subcategory: e.target.value })}
-                className="w-full"
-                placeholder="Enter subcategory"
-              />
+              <MultiSelect
+                  value={publishData.subCategories}
+                  onValueChange={(value) => setPublishData({ ...publishData, subCategories: value })}
+                  options={subCategories}
+                  placeholder="Select subcategories"
+                />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -96,6 +225,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 onChange={(e) => setPublishData({ ...publishData, registrationUrl: e.target.value })}
                 className="w-full"
                 placeholder="Enter registration URL"
+                type="url"
               />
             </div>
           </div>
@@ -115,7 +245,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 <Input
                   type="number"
                   value={publishData.daysBefore}
-                  onChange={(e) => setPublishData({ ...publishData, daysBefore: Number(e.target.value) })}
+                  onChange={(e) => setPublishData({ ...publishData, daysBefore: Math.max(0, Number(e.target.value)) })}
                   className="w-20"
                   min={0}
                 />
@@ -143,14 +273,13 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
               </p>
             </div>
           </div>
-
           <div>
             <Button
               onClick={handlePublish}
               disabled={isSubmitting || status === 'published'}
               className="w-full bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
             >
-              {status === 'published' ? 'Published' : 'Publish Event'}
+              {isSubmitting ? 'Publishing...' : status === 'published' ? 'Published' : 'Publish Event'}
             </Button>
           </div>
         </div>
@@ -179,36 +308,3 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     </div>
   );
 }
-
-interface ChecklistItemProps {
-  title: string;
-  description: string;
-  isCompleted: boolean;
-}
-
-function ChecklistItem({ title, description, isCompleted }: ChecklistItemProps) {
-  return (
-    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-      <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-1
-        ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`}>
-        <svg
-          className="w-3 h-3 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-      <div>
-        <h3 className="font-medium text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
-      </div>
-    </div>
-  );
-} 

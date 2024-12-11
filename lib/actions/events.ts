@@ -1,6 +1,6 @@
 'use server';
 
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse } from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,GetOrganizerUtils ,GetEventUtils} from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -564,11 +564,60 @@ export const publishEvent = async (eventId: string, data: PublishEventRequest): 
       token,
       contentType: 'application/json',
     });
+    
     return response;
   } catch (error) {
-    console.error('Error publishing event:', error);
+    // Log the error properly
+    if (error instanceof Error) {
+      console.error('Error publishing event:', error.message);
+      throw new Error(error.message);
+    } else {
+      // Handle the case where error is not a typical Error object
+      console.error('Unexpected error:', JSON.stringify(error));
+      throw new Error('An unexpected error occurred');
+    }
+  }
+};
+
+export const getOrganiserUtils = async (): Promise<GetOrganizerUtils> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<GetOrganizerUtils>({
+      method: 'GET',
+      url: `${APIUrls.getOrganizerUtils}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event organiser utils', error);
     const apiError = error as ApiError;
-    const errorMessage = apiError.message || "Failed to publish event";
+    const errorMessage = apiError.message || "Failed to fetch organiser utils";
     throw new Error(errorMessage);
   }
 };
+
+export const getEventsUtils = async (): Promise<GetEventUtils> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<GetEventUtils>({
+      method: 'GET',
+      url: `${APIUrls.getEventUtils}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching event utils', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event utils";
+    throw new Error(errorMessage);
+  }
+
+}

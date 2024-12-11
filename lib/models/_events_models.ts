@@ -113,6 +113,8 @@ export interface UtilsCategoriesResponse {
     subCategories: string[];
 }
 
+
+
 export interface UpdateEventFAQ {
     id: string;
     eventId: string;
@@ -379,4 +381,17 @@ export interface PublishEventRequest{
 }
 export interface PublishEventResponse{
     message:string;
+}
+
+export interface GetOrganizerUtils{
+    
+        id: string;
+        title: string;
+}
+
+export interface GetEventUtils{
+    event:{
+    id:string;
+    title:string;
+    }
 }

@@ -81,6 +81,12 @@ export default class APIUrls {
     //  get final event stage 
     static readonly getFinalStage = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/final-event`;
 
+    // get organiser utils
+    static readonly getOrganizerUtils = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/util/organizations`;
+
+    // get event utils
+    static readonly getEventUtils = `${APIUrls.BASE_URL_ORG}/api/v1/ticket/util/events`;
+
 
     // ---- ORGANIZATION PROFILE ---- //
 
@@ -101,6 +107,24 @@ export default class APIUrls {
 
 
     // ---- ORGANIZATION TEAM ---- //
+
+      /*
+
+        Client API URLS
+    
+    */
+
+    //  event tyoe utils
+        static readonly eventTypeUtils = `${APIUrls.BASE_URL}/api/v1/utils/event-types`;
+
+    //  category utils
+        static readonly categoryUtils = `${APIUrls.BASE_URL}/api/v1/utils/categories`;
+        
+    // banner utils
+        static readonly bannerUtils = `${APIUrls.BASE_URL}/api/v1/utils/banners`;
+        
+    //  faq utils
+        static readonly faqUtils = `${APIUrls.BASE_URL}/api/v1/utils/faqs`;
 
 
 }
