@@ -120,7 +120,7 @@ export default class APIUrls {
     
     */
 
-    //  event tyoe utils
+    //  event type utils
         static readonly eventTypeUtils = `${APIUrls.BASE_URL}/api/v1/utils/event-types`;
 
     //  category utils
