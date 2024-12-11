@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { CreateEventTicketPromotionRequest } from '@/lib/models/_events_models';
-import { createEventTicketPromotion } from '@/lib/actions/events';
+import { CreateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
+import { createEventTicketPromotion, getEventsUtils } from '@/lib/actions/events';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreatePromotionModalProps {
   isOpen: boolean;
@@ -24,6 +33,25 @@ export function CreatePromotionModal({
   availableTickets 
 }: CreatePromotionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<string>('');
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchEventUtils();
+    }
+  }, [isOpen]);
+
+  const fetchEventUtils = async () => {
+    try {
+      const response = await getEventsUtils();
+      setEventUtils(Array.isArray(response) ? response : [response]);
+    } catch (error) {
+      console.error('Error fetching event utils:', error);
+      toast.error('Failed to fetch event options');
+    }
+  };
+
   const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
     code: '',
     promotionType: 'discount',
@@ -115,22 +143,68 @@ export function CreatePromotionModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Apply to Tickets</label>
-              <select
-                multiple
-                value={formData.tickets}
-                onChange={(e) => {
-                  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-                  setFormData({ ...formData, tickets: selectedOptions });
+              <Select
+                value={formData.tickets[0] || ''}
+                onValueChange={(value) => {
+                  const selectedTickets = [...formData.tickets];
+                  if (selectedTickets.includes(value)) {
+                    const index = selectedTickets.indexOf(value);
+                    selectedTickets.splice(index, 1);
+                  } else {
+                    selectedTickets.push(value);
+                  }
+                  setFormData({ ...formData, tickets: selectedTickets });
                 }}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-                required
               >
-                {availableTickets.map(ticket => (
-                  <option key={ticket.id} value={ticket.id}>
-                    {ticket.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select tickets to apply promotion" />
+                </SelectTrigger>
+                <SelectContent className='bg-white'>
+                  <SelectGroup>
+                    <SelectLabel>Available Tickets</SelectLabel>
+                    {availableTickets.map(ticket => (
+                      <SelectItem 
+                        key={ticket.id} 
+                        value={ticket.id}
+                        className={formData.tickets.includes(ticket.id) ? 'bg-primary/10' : ''}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{ticket.name}</span>
+                          {formData.tickets.includes(ticket.id) && (
+                            <span className="text-xs bg-primary/20 px-2 py-0.5 rounded">Selected</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              {formData.tickets.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {formData.tickets.map(ticketId => {
+                    const ticket = availableTickets.find(t => t.id === ticketId);
+                    return ticket ? (
+                      <span
+                        key={ticket.id}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded"
+                      >
+                        {ticket.name}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedTickets = formData.tickets.filter(id => id !== ticketId);
+                            setFormData({ ...formData, tickets: updatedTickets });
+                          }}
+                          className="hover:text-primary/80"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

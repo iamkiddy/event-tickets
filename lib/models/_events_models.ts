@@ -113,6 +113,8 @@ export interface UtilsCategoriesResponse {
     subCategories: string[];
 }
 
+
+
 export interface UpdateEventFAQ {
     id: string;
     eventId: string;
@@ -368,15 +370,35 @@ export interface GetEventFinalStage{
     daysBefore:number;
 }
 
-export interface PublishEventRequest{
-    organiser:string,
-    category:string,
-    subCategories: string[];
-    registrationUrl:string;
-    isPublished:boolean;
-    isRefundable:boolean;
-    daysBefore:number;
+export interface PublishEventRequest {
+    organizer: string;
+    category: string;
+    subcategory: string;
+    registrationUrl: string;
+    isPublished: boolean;
+    isRefundable: boolean;
+    daysBefore: number;
 }
+
 export interface PublishEventResponse{
     message:string;
+}
+
+export interface GetOrganizerUtils {
+    id: string;
+    title: string;
+}
+
+export interface GetEventUtils {
+    id: string;
+    title: string;
+}
+
+
+export interface DeleteEventImageResponse {
+    message: string;
+}
+
+export interface DeleteEventVideoResponse {
+    message: string;
 }
