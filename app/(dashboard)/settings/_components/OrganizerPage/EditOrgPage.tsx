@@ -62,7 +62,7 @@ export default function EditOrgPage({ id }: { id: string }) {
 
         {isLoading ? (
           Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className='w-full h-10' />
+            <Skeleton key={i} className='w-full h-10 bg-gray-200 mt-3' />
           ))
         ) : (
             <form action={mutate} className='w-full flex flex-col gap-4 mt-5'>
