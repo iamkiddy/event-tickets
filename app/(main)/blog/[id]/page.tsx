@@ -70,31 +70,37 @@ const navLinks = [
 
 interface Comment {
   id: string;
-  author: string;
-  authorImage: string;
+  user: string;
   content: string;
   date: string;
-  likes: number;
 }
 
-const mockComments: Comment[] = [
-  {
-    id: "1",
-    author: "Alice Johnson",
-    authorImage: "https://ui-avatars.com/api/?name=Alice+Johnson",
-    content: "This is a fantastic analysis of AI in event planning. I particularly enjoyed the section about smart attendee matching.",
-    date: "2024-03-19T10:30:00",
-    likes: 12
-  },
-  {
-    id: "2",
-    author: "Mark Wilson",
-    authorImage: "https://ui-avatars.com/api/?name=Mark+Wilson",
-    content: "Great insights! Would love to see more about how small events can implement these technologies cost-effectively.",
-    date: "2024-03-19T09:15:00",
-    likes: 8
-  }
-];
+interface CommentsResponse {
+  page: number;
+  total: number;
+  limit: number;
+  data: Comment[];
+}
+
+const mockComments: CommentsResponse = {
+  page: 0,
+  total: 2,
+  limit: 10,
+  data: [
+    {
+      id: "1",
+      user: "Alice Johnson",
+      content: "This is a fantastic analysis of AI in event planning. I particularly enjoyed the section about smart attendee matching.",
+      date: "2024-03-19T10:30:00"
+    },
+    {
+      id: "2",
+      user: "Mark Wilson",
+      content: "Great insights! Would love to see more about how small events can implement these technologies cost-effectively.",
+      date: "2024-03-19T09:15:00"
+    }
+  ]
+};
 
 export default function BlogDetailsPage() {
   const { isAuthenticated } = useAuth();
@@ -289,6 +295,51 @@ export default function BlogDetailsPage() {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Comments ({mockComments.total})</h2>
+          
+          <div className="mb-8">
+            <div className="flex items-start gap-4">
+              <Avatar>
+                <AvatarImage src={isAuthenticated ? "user-avatar-url" : ""} />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <Textarea 
+                  placeholder={isAuthenticated ? "Write a comment..." : "Please login to comment"} 
+                  disabled={!isAuthenticated}
+                  className="mb-2"
+                />
+                {isAuthenticated && (
+                  <Button className="float-right">Post Comment</Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {mockComments.data.map((comment) => (
+              <div key={comment.id} className="flex gap-4">
+                <Avatar>
+                  <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user)}`} />
+                  <AvatarFallback>{comment.user[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-gray-900">{comment.user}</span>
+                      <span className="text-sm text-gray-500">
+                        {formatDistanceToNow(new Date(comment.date), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p className="text-gray-600">{comment.content}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

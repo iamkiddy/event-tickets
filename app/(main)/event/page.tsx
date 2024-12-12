@@ -33,7 +33,7 @@ const mockEvents: EventsResponse = {
   data: [
     {
       id: '1',
-      image: '/events/event1.jpg',
+      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30',
       title: 'Tech Conference 2024',
       startDate: '2024-06-15',
       summary: 'Join us for the biggest tech conference of the year',
@@ -42,6 +42,39 @@ const mockEvents: EventsResponse = {
       location: 'San Francisco, CA',
       category: 'Technology'
     },
+    {
+      id: '2',
+      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30',
+      title: 'Tech Conference 2024',
+      startDate: '2024-06-15',
+      summary: 'Join us for the biggest tech conference of the year',
+      isPublish: true,
+      price: 'From $99',
+      location: 'San Francisco, CA',
+      category: 'Technology'
+    },
+    {
+      id: '3',
+      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30',
+      title: 'Tech Conference 2024',
+      startDate: '2024-06-15',
+      summary: 'Join us for the biggest tech conference of the year',
+      isPublish: true,
+      price: 'From $99',
+      location: 'San Francisco, CA',
+      category: 'Technology'
+    },
+    {
+      id: '4',
+      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30',
+      title: 'Tech Conference 2024',
+      startDate: '2024-06-15',
+      summary: 'Join us for the biggest tech conference of the year',
+      isPublish: true,
+      price: 'From $99',
+      location: 'San Francisco, CA',
+      category: 'Technology'
+    }
     // Add more mock events...
   ]
 };
@@ -92,111 +125,127 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section with Search */}
-      <div className="relative h-[50vh] min-h-[500px] flex items-center">
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="object-cover w-full h-full"
-            poster="/events-hero-fallback.jpg"
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/50 to-black/80" />
+      <div className="relative h-[600px] mb-16">
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+            alt="Events background"
+            fill
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         </div>
 
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-full flex flex-col items-center justify-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center max-w-4xl mb-6 animate-fade-in">
+          <div className="h-full flex flex-col items-center justify-center pt-20">
+            <span className="inline-block px-4 py-1 bg-indigo-600/90 text-white text-sm font-medium rounded-full mb-6">
+              Find Your Next Event
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-8 max-w-4xl leading-tight">
               Find Your Next Experience
             </h1>
-            <p className="text-lg md:text-xl text-white/80 text-center max-w-2xl mb-12">
+            <p className="text-lg md:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-12">
               Discover amazing events happening around you
             </p>
 
             {/* Enhanced Search Bar */}
             <div className="w-full max-w-4xl">
-              <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl p-3 md:p-4">
+              <div className="bg-white/95 backdrop-blur-lg rounded-full shadow-xl p-3 md:p-4">
                 <div className="flex flex-col lg:flex-row gap-3">
                   {/* Search Input */}
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search events..."
-                      value={filters.search}
-                      onChange={(e) => updateFilters({ search: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-white 
-                        text-gray-900 placeholder:text-gray-500
-                        focus:outline-none focus:ring-2 focus:ring-primaryColor/20 
-                        transition-all duration-200"
-                    />
+                  <div className="flex-1 relative group border-r border-gray-200">
+                    <div className="px-8 h-full">
+                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
+                        Search Events
+                      </label>
+                      <div className="flex items-center">
+                        <Search className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
+                        <input
+                          placeholder="Search events..."
+                          value={filters.search}
+                          onChange={(e) => updateFilters({ search: e.target.value })}
+                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Filters Group */}
-                  <div className="flex flex-col sm:flex-row gap-2 lg:w-auto">
-                    <select
-                      value={filters.where}
-                      onChange={(e) => updateFilters({ where: e.target.value })}
-                      className="px-4 py-3.5 rounded-xl border border-gray-100 bg-white
-                        text-gray-700 appearance-none cursor-pointer
-                        focus:outline-none focus:ring-2 focus:ring-primaryColor/20
-                        transition-all duration-200"
-                    >
-                      <option value="">Location</option>
-                      <option value="nearby">Nearby</option>
-                      <option value="online">Online</option>
-                    </select>
+                  {/* Location */}
+                  <div className="flex-1 relative group border-r border-gray-200">
+                    <div className="px-8 h-full">
+                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
+                        Location
+                      </label>
+                      <div className="flex items-center">
+                        <MapPin className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
+                        <select
+                          value={filters.where}
+                          onChange={(e) => updateFilters({ where: e.target.value })}
+                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0 w-full appearance-none cursor-pointer"
+                        >
+                          <option value="">Where to?</option>
+                          <option value="nearby">Nearby</option>
+                          <option value="online">Online</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-                    <select
-                      value={filters.date}
-                      onChange={(e) => updateFilters({ date: e.target.value })}
-                      className="px-4 py-3.5 rounded-xl border border-gray-100 bg-white
-                        text-gray-700 appearance-none cursor-pointer
-                        focus:outline-none focus:ring-2 focus:ring-primaryColor/20
-                        transition-all duration-200"
-                    >
-                      <option value="">When</option>
-                      <option value="today">Today</option>
-                      <option value="tomorrow">Tomorrow</option>
-                      <option value="weekend">This Weekend</option>
-                      <option value="week">This Week</option>
-                      <option value="month">This Month</option>
-                    </select>
+                  {/* Date */}
+                  <div className="flex-1 relative group">
+                    <div className="px-8 h-full">
+                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
+                        When
+                      </label>
+                      <div className="flex items-center">
+                        <Calendar className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
+                        <select
+                          value={filters.date}
+                          onChange={(e) => updateFilters({ date: e.target.value })}
+                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0 w-full appearance-none cursor-pointer"
+                        >
+                          <option value="">Add dates</option>
+                          <option value="today">Today</option>
+                          <option value="tomorrow">Tomorrow</option>
+                          <option value="weekend">This Weekend</option>
+                          <option value="week">This Week</option>
+                          <option value="month">This Month</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
+                  <div className="px-2">
                     <button 
-                      className="bg-primaryColor text-white px-6 py-3.5 rounded-xl
-                        hover:bg-indigo-700 active:bg-indigo-800
-                        transition-all duration-200 flex items-center justify-center gap-2
-                        shadow-lg shadow-primaryColor/25"
+                      className="h-12 px-8 bg-gradient-to-r from-primaryColor to-indigo-700 
+                        hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full 
+                        font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                     >
+                      <Search className="h-4 w-4 mr-2 inline-block" />
                       Search
-                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Quick Links */}
-              <div className="mt-4 flex flex-wrap justify-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-full 
-                  bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
-                  <Tag className="w-4 h-4" />
-                  <span>Popular Events</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-full 
-                  bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
-                  <MapPin className="w-4 h-4" />
-                  <span>Near Me</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-full 
-                  bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
-                  <Calendar className="w-4 h-4" />
-                  <span>This Weekend</span>
-                </button>
-              </div>
+            {/* Quick Links */}
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full 
+                bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
+                <Tag className="w-4 h-4" />
+                <span>Popular Events</span>
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full 
+                bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
+                <MapPin className="w-4 h-4" />
+                <span>Near Me</span>
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full 
+                bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
+                <Calendar className="w-4 h-4" />
+                <span>This Weekend</span>
+              </button>
             </div>
           </div>
         </div>
