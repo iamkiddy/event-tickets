@@ -120,7 +120,7 @@ export default class APIUrls {
     
     */
 
-    //  event tyoe utils
+    //  event type utils
         static readonly eventTypeUtils = `${APIUrls.BASE_URL}/api/v1/utils/event-types`;
 
     //  category utils
@@ -131,6 +131,12 @@ export default class APIUrls {
         
     //  faq utils
         static readonly faqUtils = `${APIUrls.BASE_URL}/api/v1/utils/faqs`;
+
+    //  newsletter utils
+        static readonly newsletterUtils = `${APIUrls.BASE_URL}/api/v1/utils/subscribe-newsletter`;
+
+    //  get homepage utils
+        static readonly getHomepageUtils = `${APIUrls.BASE_URL}/api/v1/main/home`;
 
 
 }
