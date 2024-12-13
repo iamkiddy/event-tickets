@@ -185,7 +185,7 @@ export const getUserProfile = async () => {
         });
 
         if (response) {
-            cookieStore.set('user_profile', JSON.stringify(response), {
+            (await cookies()).set('user_profile', JSON.stringify(response), {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
@@ -230,7 +230,8 @@ export const getServerSession = async () => {
     
     try {
         const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
-        return { token, userProfile };
+        const userProfileModel: UserProfileModel | null = userProfile ? userProfile as UserProfileModel : null;
+        return { token, userProfileModel };
     } catch (error) {
         console.error('Error parsing session:', error);
         return null;
