@@ -588,7 +588,6 @@ export const getEventFinalStage = async (eventId: string): Promise<GetEventFinal
       organiser: response.organiser,
       category: response.category,
       subCategories: response.subCategories,
-      registrationUrl: response.registrationUrl,
       isPublished: response.isPublished,
       isRefundable: response.isRefundable,
       daysBefore: response.daysBefore

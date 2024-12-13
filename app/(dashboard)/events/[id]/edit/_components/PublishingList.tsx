@@ -58,7 +58,6 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     organizer: '',
     category: '',
     subcategory: '',
-    registrationUrl: '',
     isPublished: true,
     isRefundable: true,
     daysBefore: 7
@@ -91,7 +90,6 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
           organizer: eventData.organiser || '',
           category: eventData.category || '',
           subcategory: eventData.subCategories?.[0] || '',
-          registrationUrl: eventData.registrationUrl || '',
           isPublished: true,
           isRefundable: eventData.isRefundable,
           daysBefore: eventData.daysBefore
@@ -255,18 +253,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 </div>
               )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Registration URL
-              </label>
-              <Input
-                value={publishData.registrationUrl}
-                onChange={(e) => setPublishData({ ...publishData, registrationUrl: e.target.value })}
-                className="w-full"
-                placeholder="Enter registration URL"
-                type="url"
-              />
-            </div>
+            
           </div>
 
           <div className="flex items-center gap-4">

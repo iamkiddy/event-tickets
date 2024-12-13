@@ -8,6 +8,9 @@ import { LoginAlert } from '../../auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
 import { AuthenticatedNav } from '../../../components/ui/authNavbar';
 import Image from 'next/image';
+import { Input } from "@/components/ui/input";
+import { getAllBlogs } from '@/lib/actions/blog';
+import { GetAllBlogsResponse } from '@/lib/models/_blogs_models';
 
 const navLinks = [
   { label: 'Schedule' },
@@ -18,26 +21,22 @@ const navLinks = [
   { label: 'Login', isButton: true }
 ];
 
-const blogPosts = [
-  {
-    image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/b2905736e4c054874f5000c449195259afc5d4fbd743c2793853105f0c6b05d4',
-    title: '6 Strategies to Find Your Conference Keynote and Other Speakers',
-    description: 'Sekarang, kamu bisa produksi tiket fisik untuk eventmu bersama Bostiketbos. Hanya perlu mengikuti beberapa langkah mudah.',
-    date: '12 Mar',
-    author: 'Jhon Doe',
-    category: 'Event Planning',
-    readTime: '5 min read'
-  },
-  // ... add more blog posts
+const categories = [
+  'All',
+  'Event Planning',
+  'Marketing',
+  'Technology',
+  'Tips & Tricks'
 ];
-
-const categories = ['All', 'Event Planning', 'Marketing', 'Technology', 'Tips & Tricks'];
 
 export default function BlogPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState('All');
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [blogs, setBlogs] = React.useState<GetAllBlogsResponse['data']>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +46,22 @@ export default function BlogPage() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  React.useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await getAllBlogs();
+        setBlogs(response.data);
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+        // You might want to add error state handling here
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   return (
@@ -114,6 +129,17 @@ export default function BlogPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
             Browse by Category
           </h2>
+          
+          <div className="mb-8">
+            <Input
+              type="search"
+              placeholder="Search articles..."
+              className="w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
           <div className="flex flex-wrap gap-4 justify-center">
             {categories.map((category) => (
               <Button
@@ -130,129 +156,128 @@ export default function BlogPage() {
 
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Post</h2>
-          <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="relative h-[400px] lg:h-full">
-                <Image
-                  fill
-                  src={blogPosts[0].image}
-                  alt={blogPosts[0].title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-6 left-6">
-                  <span className="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                    {blogPosts[0].category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-8 lg:p-12 flex flex-col justify-center">
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                  <span>{blogPosts[0].date}</span>
-                  <span>•</span>
-                  <span>{blogPosts[0].readTime}</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {blogPosts[0].title}
-                </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  {blogPosts[0].description}
-                </p>
-                <div className="flex items-center gap-4 mb-6">
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : blogs.length > 0 && (
+            <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                <div className="relative h-[400px] lg:h-full">
                   <Image
                     fill
-                    src="https://ui-avatars.com/api/?name=John+Doe"
-                    alt={blogPosts[0].author}
-                    className="w-10 h-10 rounded-full"
+                    src={blogs[0].image}
+                    alt={blogs[0].title}
+                    className="w-full h-full object-cover"
                   />
-                  <div>
-                    <div className="font-medium text-gray-900">{blogPosts[0].author}</div>
-                    <div className="text-sm text-gray-500">Event Specialist</div>
+                  <div className="absolute top-6 left-6">
+                    <span className="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">
+                      {blogs[0].title}
+                    </span>
                   </div>
                 </div>
-                <Link 
-                  href={`/blog/${blogPosts[0].title.toLowerCase().replace(/ /g, '-')}`}
-                  className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
-                    transition-colors group"
-                >
-                  Read Full Article 
-                  <svg 
-                    className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor"
+                <div className="p-8 lg:p-12 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                    <span>{new Date(blogs[0].date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {blogs[0].title}
+                  </h3>
+                  <p className="text-gray-600 mb-6 line-clamp-3">
+                    {blogs[0].summary}
+                  </p>
+                  <div className="flex items-center gap-4 mb-6">
+                    <Image
+                      fill
+                      src="https://ui-avatars.com/api/?name=John+Doe"
+                      alt={blogs[0].author}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900">{blogs[0].author}</div>
+                      <div className="text-sm text-gray-500">Event Specialist</div>
+                    </div>
+                  </div>
+                  <Link 
+                    href={`/blog/${blogs[0].title.toLowerCase().replace(/ /g, '-')}`}
+                    className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
+                      transition-colors group"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
+                    Read Full Article 
+                    <svg 
+                      className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          )}
         </div>
 
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Latest Posts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.slice(1).map((post, index) => (
-              <article
-                key={index}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl 
-                  transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="relative h-56">
-                  <Image
-                    fill
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm">
-                      {post.category}
-                    </span>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogs.slice(1).map((post) => (
+                <article
+                  key={post.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl 
+                    transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <div className="relative h-56">
+                    <Image
+                      fill
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                    <span>{post.date}</span>
-                    <span>•</span>
-                    <span>{post.readTime}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {post.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        fill
-                        src="https://ui-avatars.com/api/?name=John+Doe"
-                        alt={post.author}
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <span className="text-sm font-medium text-gray-900">{post.author}</span>
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                      <span>{new Date(post.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
                     </div>
-                    <Link 
-                      href={`/blog/${post.title.toLowerCase().replace(/ /g, '-')}`}
-                      className="text-indigo-600 font-medium hover:text-indigo-700 
-                        transition-colors inline-flex items-center gap-1 group"
-                    >
-                      Read More 
-                      <svg 
-                        className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor"
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 line-clamp-2">
+                      {post.summary}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          fill
+                          src="https://ui-avatars.com/api/?name=John+Doe"
+                          alt={post.author}
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <span className="text-sm font-medium text-gray-900">{post.author}</span>
+                      </div>
+                      <Link 
+                        href={`/blog/${post.id}`}
+                        className="text-indigo-600 font-medium hover:text-indigo-700 
+                          transition-colors inline-flex items-center gap-1 group"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                        Read More 
+                        <svg 
+                          className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
