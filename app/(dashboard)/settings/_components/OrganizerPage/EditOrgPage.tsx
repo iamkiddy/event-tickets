@@ -20,8 +20,8 @@ export default function EditOrgPage({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const [imageFile, setImageFile] = React.useState<File | null>(null);
 
-  const { data, isLoading, isError } = useQuery({ 
-    queryKey: ['org'], 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['org', id],
     queryFn: () => getOrgProfileById(id)
   })
 

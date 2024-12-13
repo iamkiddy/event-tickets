@@ -103,7 +103,7 @@ export default class APIUrls {
     static readonly createOrgProfile = `${APIUrls.getOrgProfiles}create`;
 
     // get organization profile by ID
-    static readonly getOrgProfileById = `${APIUrls.getOrgProfiles}profile/`;
+    static readonly getOrgProfileById = `http://127.0.0.1:8000/profile/`;
 
     // update organization profile
     static readonly updateOrgProfile = `${APIUrls.getOrgProfiles}update/`;
