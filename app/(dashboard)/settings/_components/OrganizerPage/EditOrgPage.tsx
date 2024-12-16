@@ -20,8 +20,8 @@ export default function EditOrgPage({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const [imageFile, setImageFile] = React.useState<File | null>(null);
 
-  const { data, isLoading, isError } = useQuery({ 
-    queryKey: ['org'], 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['org', id],
     queryFn: () => getOrgProfileById(id)
   })
 
@@ -37,9 +37,10 @@ export default function EditOrgPage({ id }: { id: string }) {
   const { mutate, isPending } = useMutation({
     onMutate: async (formData: FormData) => {
       if (imageFile) {
-        formData.append('profileImage', imageFile as Blob);
+        formData.append('profileImage', imageFile);
       }
-      await updateOrgProfile(id, formData);
+      const response = await updateOrgProfile(id, formData);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orgs'] });
@@ -54,7 +55,7 @@ export default function EditOrgPage({ id }: { id: string }) {
         <SheetHeader>
             <SheetTitle>Edit Organizer Profile</SheetTitle>
             <SheetDescription>
-                Add a new organizer profile to your organization.
+                Edit your organizer profile.
             </SheetDescription>
         </SheetHeader>
 

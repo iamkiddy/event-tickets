@@ -16,7 +16,7 @@ export default function ErrorPageCard({ icon, className, title }: ErrorPageCardP
         className
     )}>
         {icon || <ShieldAlert className="w-12 h-12 text-red-500 opacity-40" />}
-        <h2 className='text-lg md:text-xl font-medium text-gray-500'>
+        <h2 className='text-lg md:text-xl font-medium text-gray-500 text-center'>
             {title || 'Something went wrong!. Please try again later.'}
         </h2>
     </div>

@@ -26,17 +26,18 @@ export default function AddOrgPage() {
       country: 'Ghana'
     });
 
-
     const { mutate, isPending } = useMutation({
       onMutate: async (formData: FormData) => {
         if (imageFile) {
-          formData.append('profileImage', imageFile as Blob);
+          formData.append('profileImage', imageFile);
         }
-        await createOrgProfile(formData);
+        const response = await createOrgProfile(formData);
+        console.log(response);
+        return response;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['orgs'] });
-        toast.success('Profile added successfully');
+        toast.success('Profile added successfully', {position: 'top-center'});
         setFormData({name: '', bio: '', phone1: '', phone2: '', website: '', country: 'Ghana'});
       }
     })

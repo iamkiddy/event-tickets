@@ -32,7 +32,7 @@ export default function OrganizerPageTab() {
         {isLoading ? (
           <PageLoader />
         ) : (
-          data?.map((org) => (
+          !isError && data?.map((org) => (
             <OrgCard key={org.id} data={org} />
           ))
         )}

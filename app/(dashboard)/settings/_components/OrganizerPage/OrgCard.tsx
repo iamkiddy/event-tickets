@@ -4,13 +4,14 @@ import React from 'react'
 import Image from 'next/image'
 import { EllipsisVertical, User } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import EditOrgPage from './EditOrgPage'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { deleteOrgProfile } from '@/lib/actions/organizer_actions'
+import { DialogTitle } from '@radix-ui/react-dialog'
 
 
 interface OrgCardProps {
@@ -69,27 +70,32 @@ const DeleteOrgProfileModel = (id: string) => {
         onMutate: async () => deleteOrgProfile(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['orgs'] });
-            toast.success('Profile deleted successfully', {position: 'top-center', style: {backgroundColor: 'red', color: 'white'}});
+            toast.success('Profile deleted successfully', {position: 'top-center'});
         },
         onError: () => {
-            toast.error('An error occurred while deleting profile', {position: 'top-center', style: {backgroundColor: 'red', color: 'white'}});
+            toast.error('An error occurred while deleting profile', {position: 'top-center'});
         }
     })
 
     return (
-        <DialogContent className='px-2'>
-            <p className='text-base'>
-                Are you sure you want to delete this profile?
-            </p>
+        <DialogContent className='px-2 md:px-5'>
+            <DialogHeader>
+                <DialogTitle className='text-base font-semibold text-gray-700'>
+                    Delete Profile
+                </DialogTitle>
+                <DialogDescription className='text-base text-gray-500'>
+                    Are you sure you want to delete this profile?
+                </DialogDescription>
+            </DialogHeader>
             <div className='flex flex-col md:flex-row gap-4'>
                 <DialogClose asChild>
-                    <Button className='w-full md:w-fit' variant='secondary'>Cancel</Button>
+                    <Button className='w-full'>Cancel</Button>
                 </DialogClose>
                 <Button 
                 disabled={isPending} 
                 onClick={() => mutate()}
                 className='w-full bg-red-500'>
-                        Delete
+                    Delete
                 </Button>
             </div>
         </DialogContent>
