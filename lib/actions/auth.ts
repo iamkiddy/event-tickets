@@ -10,9 +10,15 @@ interface ApiError extends Error {
     status?: number;
 }
 
+interface ValidationError extends ApiError {
+    detail: {
+        msg: string;
+    }[];
+}
+
 export interface SignupResponse {
   success: boolean;
-  token: string;
+  token?: string;
   message?: string;
 }
 
@@ -49,23 +55,32 @@ export const verifyCode = async (data: VerifyCode): Promise<VerifyCodeResponse> 
         const cookieStore = await cookies();
         const emailToken = cookieStore.get('temp_email_token')?.value;
         
+        if (!emailToken) {
+            throw new Error('Email token not found');
+        }
         const response = await apiController<VerifyCodeResponse, VerifyCode>({
             method: 'POST',
             url: APIUrls.verify,
             data,
-            contentType: 'application/json',
             token: emailToken,
+            contentType: 'application/json',
         });
-        
+
+        // Store the verification token in cookies
         if (response.token) {
-            cookieStore.delete('temp_email_token');
-            return response;
+            cookieStore.set('verification_token', response.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 60 * 5 // 5 minutes
+            });
         }
-        
+
         return response;
-    } catch (error: unknown) {
-        const apiError = error as ApiError;
-        const errorMessage = apiError.message || "An unexpected error occurred";
+    } catch (error: any) {
+        // Handle both string and object error messages
+        const errorMessage = typeof error === 'object' ? error?.message || "Verification failed" : error;
         throw new Error(errorMessage);
     }
 }
@@ -100,30 +115,72 @@ export const initiateGoogleLogin = async () => {
 
 export const completeSignup = async (data: SignupCompleteData): Promise<SignupResponse> => {
     try {
-        const signupToken = localStorage.getItem('signup_token') || undefined;
+        const cookieStore = await cookies();
+        const verificationToken = cookieStore.get('verification_token')?.value;
         
-        const response = await apiController<SignupResponse, SignupCompleteData>({
-            method: 'POST',
-            url: APIUrls.completeSignup,
-            data,
-            contentType: 'application/json',
-            token: signupToken,
-        });
-
-        if (response.success && response.token) {
-            localStorage.removeItem('signup_token');
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('verified', 'true');
+        if (!verificationToken) {
+            return {
+                success: false,
+                message: 'Verification token not found'
+            };
         }
 
-        return response;
-    } catch (error: unknown) {
-        const apiError = error as ApiError;
-        const errorMessage = apiError.message || "An unexpected error occurred";
-        throw new Error(errorMessage);
-    }
-}  
+        try {
+            const response = await apiController<SignupResponse, SignupCompleteData>({
+                method: 'POST',
+                url: APIUrls.completeSignup,
+                data,
+                token: verificationToken,
+                contentType: 'application/json',
+            });
 
+            // Clear verification token as it's no longer needed
+            cookieStore.delete('verification_token');
+
+            // Set the auth token in cookies
+            if (response.token) {
+                cookieStore.set('token', response.token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    path: '/',
+                    maxAge: 30 * 24 * 60 * 60 // 30 days
+                });
+            }
+
+            return {
+                success: true,
+                message: response.message || 'Signup completed successfully',
+                token: response.token
+            };
+        } catch (apiError: any) {
+            console.error('API Error:', apiError);
+            
+            // Handle validation errors
+            if (apiError?.detail && Array.isArray(apiError.detail)) {
+                const validationError = apiError as ValidationError;
+                const errorMessage = validationError.detail
+                    .map(error => error.msg)
+                    .join(', ');
+                return {
+                    success: false,
+                    message: errorMessage
+                };
+            }
+            
+            return {
+                success: false,
+                message: apiError?.message || 'Failed to complete signup'
+            };
+        }
+    } catch (error: any) {
+        console.error('Server action error:', error);
+        return {
+            success: false,
+            message: 'An unexpected error occurred'
+        };
+    }
+}
 
 export const loginWithGmail = async (): Promise<LoginWithGmailResponse> => {
     try {

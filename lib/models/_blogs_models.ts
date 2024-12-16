@@ -53,5 +53,3 @@ export interface AddBlogCommentResponse {
 export interface LikeBlogResponse {
     success: boolean;
 }
-
-

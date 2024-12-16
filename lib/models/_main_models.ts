@@ -60,3 +60,4 @@ export interface GetHomepageUtilsResponse {
         date: string;
     }[];
 }
+

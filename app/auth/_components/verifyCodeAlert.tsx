@@ -36,14 +36,15 @@ export const VerifyCodeAlert: React.FC<VerifyCodeAlertProps> = ({ open, onClose,
     try {
         const response = await verifyCode({ passcode: code });
         
+        // Store the verification token regardless of user status
+        setVerificationToken(response.token);
+        
         if (response.status === 'New') {
-            setVerificationToken(response.token);
             setShowCompleteSignup(true);
         } else {
-            // For existing users, first set the token
+            // For existing users, set the token and proceed with login
             login(response.token);
             
-            // Then try to fetch the profile
             try {
                 await getUserProfile();
                 onSuccess('Old');

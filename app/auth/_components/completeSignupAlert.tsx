@@ -1,10 +1,34 @@
+'use client';
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { completeSignup } from '@/lib/actions/auth';
+import { completeSignup, getUserProfile } from '@/lib/actions/auth';
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useAuth } from '@/lib/context/AuthContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// List of African countries
+const africanCountries = [
+  { code: 'GH', name: 'Ghana' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'KE', name: 'Kenya' },
+  { code: 'ZA', name: 'South Africa' },
+  { code: 'EG', name: 'Egypt' },
+  { code: 'ET', name: 'Ethiopia' },
+  { code: 'TZ', name: 'Tanzania' },
+  { code: 'UG', name: 'Uganda' },
+  { code: 'RW', name: 'Rwanda' },
+  // Add more African countries as needed
+];
 
 interface CompleteSignupAlertProps {
   open: boolean;
@@ -21,32 +45,48 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
 }) => {
   const [fullname, setFullname] = useState('');
   const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState('GH');
   const [isAgree, setIsAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    try {
-      if (!fullname.trim() || !phone.trim()) {
-        throw new Error('Please fill in all required fields');
-      }
+    if (!fullname.trim() || !phone.trim() || !country) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
 
-      if (verificationToken) {
-        localStorage.setItem('signup_token', verificationToken);
-      }
+    if (!isAgree) {
+      setError('Please agree to the terms and conditions');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await completeSignup({ 
+        fullname: fullname.trim(), 
+        phone: phone.trim(), 
+        isAgree,
+        country
+      });
       
-      await completeSignup({ fullname, phone, isAgree });
-      onSuccess();
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
+      if (response.success && response.token) {
+        // For new users, set the token and proceed with login
+        login(response.token);
+        onSuccess();
+        onClose();
       } else {
-        setError('An unexpected error occurred');
+        setError(response.message || 'Failed to complete signup');
       }
+    } catch (error: any) {
+      console.error('Complete signup error:', error);
+      setError('Failed to complete signup. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -92,6 +132,21 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
             className="w-full"
             required
           />
+          <Select
+            value={country}
+            onValueChange={setCountry}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your country" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {africanCountries.map((country) => (
+                <SelectItem key={country.code} value={country.code}>
+                  {country.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="terms" 
@@ -115,4 +170,4 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
       </AlertDialogContent>
     </AlertDialog>
   );
-}; 
+};

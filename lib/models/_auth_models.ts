@@ -22,10 +22,21 @@ export interface SignupCompleteData {
     fullname: string;
     phone: string;
     isAgree: boolean;
+    country?: string;
 }
 
 export interface SignupResponse {
     success: boolean;
+    message: string;
+    token?: string;
+}
+
+export interface ValidationError {
+    detail: Array<{
+        loc: (string | number)[];
+        msg: string;
+        type: string;
+    }>;
 }
 
 export interface LoginWithGmailResponse {
