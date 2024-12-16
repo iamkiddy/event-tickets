@@ -18,7 +18,10 @@ export default function SelectField({
     name, label, className, value, setValue, disabled, required, placeholder, children
 }: SelectFieldProps) {
   return (
-    <div>
+    <div className={cn(
+        'w-full h-10 rounded-md',
+        className
+    )}>
         <label className="block text-sm font-medium text-gray-700 mb-2">
             {label}
         </label>
@@ -29,10 +32,7 @@ export default function SelectField({
             disabled={disabled}
             required={required}
         >
-            <SelectTrigger className={cn(
-                'w-full h-10 rounded-md',
-                className
-            )}>
+            <SelectTrigger className='w-full h-10 rounded-md'>
                 <SelectValue placeholder={placeholder || 'Select Item'} />
             </SelectTrigger>
             <SelectContent>

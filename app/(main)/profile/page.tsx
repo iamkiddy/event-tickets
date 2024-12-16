@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import TabSelector from './_components/TabSelector'
-import ProfilePage from './_components/ProfilePage';
-import MyTickets from './_components/MyTickets';
+import ProfilePage from './_components/Profile/ProfilePage';
+import MyTickets from './_components/Tickets/MyTickets';
+import { getServerSession } from '@/lib/actions/auth';
+import ProfileLoader from './_components/Profile/ProfileLoader';
+import { UserProfileModel } from '@/lib/models/_auth_models';
 
 interface TabSelectorProps {
   searchParams: {
@@ -12,10 +15,13 @@ interface TabSelectorProps {
 }
 
 
-export default function MyProfile({ searchParams }: TabSelectorProps) {
-  const activeTab = searchParams.tab || 'profile';
-  const page = searchParams.page || 1;
-  const query = searchParams.query || '';
+export default async function MyProfile({ searchParams }: TabSelectorProps) {
+  const params = await searchParams;
+  const activeTab = params.tab || 'profile';
+  const page = params.page || 1;
+  const query = params.query || '';
+
+  const userData = await getServerSession();
 
 
   return (
@@ -25,7 +31,11 @@ export default function MyProfile({ searchParams }: TabSelectorProps) {
 
           <div className='mt-5 gpa-4'>
             <TabSelector activeTab={activeTab} />
-            {activeTab === 'profile' && <ProfilePage />}
+            {activeTab === 'profile' && (
+              <Suspense fallback={<ProfileLoader/>}>
+                <ProfilePage data={userData?.userProfileModel as UserProfileModel} />
+              </Suspense>
+            )}
             {activeTab === 'tickets' && <MyTickets query={query} page={page as number} />}
           </div>
         </div>
