@@ -1,5 +1,6 @@
 import * as React from "react";
 import { BlogCardProps } from "../types";
+import parser from 'html-react-parser';
 
 export const BlogCard: React.FC<BlogCardProps> = ({
   image,
@@ -19,7 +20,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       <h3 className="self-start mt-5 text-xl font-bold leading-8 text-blue-950">
         {title}
       </h3>
-      <p className="mt-5 text-base leading-6 text-black">{description}</p>
+      <p className="mt-5 text-base leading-6 text-black">{parser(description)}</p>
       <time className="self-start mt-5 text-sm text-neutral-400">
         {date} - {author}
       </time>

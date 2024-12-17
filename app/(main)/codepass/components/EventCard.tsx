@@ -2,6 +2,7 @@ import * as React from "react";
 import { EventCardProps } from "../types";
 import Link from "next/link";
 import Image from "next/image";
+import parser from 'html-react-parser';
 
 export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
   id = "1",
@@ -38,7 +39,7 @@ export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
             {title}
           </h3>
           <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {description}
+            {parser(description)}
           </p>
           
           <div className="mt-auto flex items-center justify-between">
