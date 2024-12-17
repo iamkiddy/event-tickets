@@ -39,13 +39,10 @@ export default function EditOrgPage({ id }: { id: string }) {
       if (imageFile) {
         formData.append('profileImage', imageFile);
       }
-      const response = await updateOrgProfile(id, formData);
-      return response;
-    },
-    onSuccess: () => {
+      await updateOrgProfile(id, formData);
       queryClient.invalidateQueries({ queryKey: ['orgs'] });
       toast.success('Profile added successfully');
-    }
+    },
   })
     
 

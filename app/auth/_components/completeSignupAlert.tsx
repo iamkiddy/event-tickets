@@ -18,20 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import PhoneNumberField from '@/components/custom/PhoneNumberField.tsx/PhoneNumberField';
+import SelectField from '@/components/custom/SelectField';
+import { getCountriesOptions } from '@/components/custom/PhoneNumberField.tsx/helpers';
 
-// List of African countries
-const africanCountries = [
-  { code: 'GH', name: 'Ghana' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'KE', name: 'Kenya' },
-  { code: 'ZA', name: 'South Africa' },
-  { code: 'EG', name: 'Egypt' },
-  { code: 'ET', name: 'Ethiopia' },
-  { code: 'TZ', name: 'Tanzania' },
-  { code: 'UG', name: 'Uganda' },
-  { code: 'RW', name: 'Rwanda' },
-  // Add more African countries as needed
-];
 
 interface CompleteSignupAlertProps {
   open: boolean;
@@ -48,7 +37,7 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
 }) => {
   const [fullname, setFullname] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('GH');
+  const [country, setCountry] = useState('Ghana');
   const [isAgree, setIsAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -133,28 +122,25 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
           />
           <PhoneNumberField
             name='phone'
-            label='Phone Number'
             phoneValue={phone}
             onChange={(value) => setPhone(value)}
             required={true}
             disabled={loading}
             className='w-full'
           />
-          <Select
+          <SelectField
+            name='country'
             value={country}
-            onValueChange={setCountry}
+            setValue={(value) => setCountry(value)}
+            disabled={loading}
+            className='w-full'
           >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select your country" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {africanCountries.map((country) => (
-                <SelectItem key={country.code} value={country.code}>
-                  {country.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {getCountriesOptions().map((country) => (
+              <SelectItem key={country.value} value={country.label}>
+                {country.label}
+              </SelectItem>
+            ))}
+          </SelectField>
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="terms" 

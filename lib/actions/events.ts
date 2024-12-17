@@ -1,11 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse, UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, GetEventTicketsResponse, UpdateEventFAQ, UpdateEventAgenda, GetEventById, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse, getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse} from '../models/_events_models';
+import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesResponse,
+   UpdateEventVideosResponse, UtilsEventTypesResponse, UtilsCategoriesResponse, GetEventsParams, 
+   GetEventTicketsResponse, GetEventByIdResponse, GetEventFilesResponse, CreateEventTicket, 
+   CreateEventTicketResponse, GetEventTicketPromotionsResponse, CreateEventTicketPromotionRequest, 
+   CreateEventTicketPromotionResponse, UpdateEventTicket, UpdateEventTicketResponse, 
+   DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, 
+   UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse,
+  getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,
+  GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse
+} from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
 import { cookies } from 'next/headers';
 
+
+// Get all events
 export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsResponse> => {
   try {
     const cookieStore = await cookies();
@@ -36,6 +48,8 @@ export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsR
   }
 };
 
+
+// Create an event
 export const createEvent = async (data: CreateEvent): Promise<CreateEventResponse> => {
   try {
     const cookieStore = await cookies();
@@ -43,8 +57,6 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
     if (!token) {
       throw new Error('Authentication required');
     }
-    
-    console.log('Request payload:', JSON.stringify(data, null, 2)); // Debug log
     
     const response = await apiController<CreateEventResponse, CreateEvent>({
       method: 'POST',
@@ -63,6 +75,8 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
   }
 };
 
+
+// Update event images
 export const updateEventImage = async (eventId: string, image: File): Promise<UpdateEventImagesResponse> => {
   try {
     const cookieStore = await cookies();
@@ -429,10 +443,6 @@ export const updateEventTicket = async (eventId: string, ticketId: string, data:
         price: data.price,
         quantity: data.quantity,
         currency: data.currency,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        startTime: data.startTime,
-        endTime: data.endTime,
         isActive: data.isActive
       },
       token,

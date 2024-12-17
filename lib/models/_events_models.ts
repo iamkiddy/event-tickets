@@ -224,10 +224,6 @@ export interface CreateEventTicket {
     price: number;
     quantity: number;
     currency: string;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
     isActive: boolean;
 }
 
@@ -275,9 +271,7 @@ export interface CreateEventTicketPromotionRequest {
   promotionType: PromotionType;
   value: number;
   valueType: ValueType;
-  startDate: string;
   endDate: string;
-  startTime: string;
   endTime: string;
   quantity: number;
   isActive: boolean;
@@ -290,10 +284,6 @@ export interface UpdateEventTicket {
     price: number;
     quantity: number;
     currency: string;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
     isActive: boolean;
   }
   
@@ -315,9 +305,7 @@ export interface UpdateEventTicket {
     promotionType: PromotionType;
     value: number;
     valueType: ValueType;
-    startDate: string;
     endDate: string;
-    startTime: string;
     endTime: string;
     quantity: number;
     isActive: boolean;

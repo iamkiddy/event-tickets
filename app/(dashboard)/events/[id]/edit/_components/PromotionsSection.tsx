@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from '@/components/ui/button';
 import { Plus, Tag, Pencil, Trash, Calendar, Ticket, PercentIcon } from 'lucide-react';
 import { EventTicketPromotion } from '@/lib/models/_events_models';

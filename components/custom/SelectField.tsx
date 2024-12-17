@@ -19,10 +19,10 @@ export default function SelectField({
 }: SelectFieldProps) {
   return (
     <div className={cn(
-        'w-full h-10 rounded-md',
+        'w-full h-10 rounded-md flex flex-col',
         className
     )}>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="text-sm font-medium text-gray-700 mb-2">
             {label}
         </label>
         <Select
@@ -32,10 +32,10 @@ export default function SelectField({
             disabled={disabled}
             required={required}
         >
-            <SelectTrigger className='w-full h-10 rounded-md'>
+            <SelectTrigger className='w-full rounded-md'>
                 <SelectValue placeholder={placeholder || 'Select Item'} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className='w-full rounded-md bg-white'>
                 {children}
             </SelectContent>
         </Select>

@@ -31,15 +31,12 @@ export default function AddOrgPage() {
         if (imageFile) {
           formData.append('profileImage', imageFile);
         }
-        const response = await createOrgProfile(formData);
-        console.log(response);
-        return response;
-      },
-      onSuccess: () => {
+        await createOrgProfile(formData);
         queryClient.invalidateQueries({ queryKey: ['orgs'] });
-        toast.success('Profile added successfully', {position: 'top-center'});
         setFormData({name: '', bio: '', phone1: '', phone2: '', website: '', country: 'Ghana'});
-      }
+        setImageFile(null);
+        toast.success('Profile added successfully', {position: 'top-center'});
+      },
     })
     
 

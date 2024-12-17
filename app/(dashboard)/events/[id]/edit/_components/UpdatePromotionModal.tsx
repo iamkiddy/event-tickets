@@ -1,21 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { EventTicketPromotion, UpdateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
 import { updateEventTicketPromotion, getEventsUtils } from '@/lib/actions/events';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import {SelectItem} from "@/components/ui/select";
+import InputField from '@/components/custom/InputField';
+import SelectField from '@/components/custom/SelectField';
 
 interface UpdatePromotionModalProps {
   isOpen: boolean;
@@ -34,16 +28,13 @@ export function UpdatePromotionModal({
 }: UpdatePromotionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [formData, setFormData] = useState<UpdateEventTicketPromotionRequest>({
     id: '',
     code: '',
     promotionType: 'discount',
     value: 0,
     valueType: 'percentage',
-    startDate: '',
     endDate: '',
-    startTime: '',
     endTime: '',
     quantity: 0,
     isActive: true,
@@ -74,9 +65,7 @@ export function UpdatePromotionModal({
         promotionType: promotion.promotionType,
         value: promotion.value,
         valueType: promotion.valueType,
-        startDate: promotion.startDate,
         endDate: promotion.endDate,
-        startTime: promotion.startTime,
         endTime: promotion.endTime,
         quantity: promotion.quantity,
         isActive: promotion.isActive,
@@ -93,12 +82,12 @@ export function UpdatePromotionModal({
 
     try {
       await updateEventTicketPromotion(promotion.id, formData);
-      toast.success('Promotion updated successfully');
+      toast.success('Promotion updated successfully', {position: 'top-center'});
       onSuccess();
       onClose();
     } catch (error) {
       console.error('Error updating promotion:', error);
-      toast.error('Failed to update promotion');
+      toast.error('Failed to update promotion', {position: 'top-center'});
     } finally {
       setIsSubmitting(false);
     }
@@ -112,123 +101,67 @@ export function UpdatePromotionModal({
         </SheetHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
-            {/* Event Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Event</label>
-              <Select
-                value={selectedEvent}
-                onValueChange={setSelectedEvent}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select an event" />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectGroup>
-                    <SelectLabel>Available Events</SelectLabel>
-                    {eventUtils.map((event) => (
-                      <SelectItem key={event.id} value={event.id}>
-                        {event.title}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Promotion Code</label>
-              <Input
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                required
-                placeholder="e.g., SUMMER2024"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-              />
-            </div>
+            <InputField
+              label="Promotion Code"
+              value={formData.code}
+              setValue={(value) => setFormData({ ...formData, code: value })}
+              required
+              placeholder="e.g., SUMMER2024"
+              disabled={isSubmitting}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discount Type</label>
-                <Select
-                  value={formData.valueType}
-                  onValueChange={(value) => setFormData({ ...formData, valueType: value as 'percentage' | 'amount' })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select discount type" />
-                  </SelectTrigger>
-                  <SelectContent className='bg-white'>
-                    <SelectItem value="percentage">Percentage</SelectItem>
-                    <SelectItem value="amount">Fixed Amount</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {formData.valueType === 'percentage' ? 'Percentage Off' : 'Amount Off'}
-                </label>
-                <Input
-                  type="number"
-                  value={formData.value}
-                  onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-                />
-              </div>
-            </div>
+              <SelectField
+                label='Discount Type'
+                value={formData.valueType}
+                setValue={(value) => setFormData({ ...formData, valueType: value as 'percentage' | 'amount' })}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Quantity (0 for unlimited)</label>
-              <Input
-                type="number"
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+              >
+                <SelectItem value="percentage">Percentage</SelectItem>
+                <SelectItem value="amount">Fixed Amount</SelectItem>
+              </SelectField>
+
+              <InputField
+                label={formData.valueType === 'percentage' ? 'Percentage Off' : 'Amount Off'}
+                value={formData.value.toString()}
+                setValue={(value) => setFormData({ ...formData, value: Number(value) })}
                 required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+                placeholder={formData.valueType === 'percentage' ? '10' : '5.00'}
+                disabled={isSubmitting}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Apply to Tickets</label>
-              <Select
-                value={formData.tickets[0] || ''} // Since it's multiple, we'll handle array in onChange
-                onValueChange={(value) => {
+            <InputField
+              label="Quantity (0 for unlimited)"
+              value={formData.quantity.toString()}
+              setValue={(value) => setFormData({ ...formData, quantity: Number(value) })}
+              required
+              type="number"
+              disabled={isSubmitting}
+            />
+
+            <div className='w-full flex flex-col gap-4 mb-4'>
+              <SelectField
+                label='Apply to Tickets'
+                value={formData.tickets[0] || ''}
+                setValue={(value) => {
                   const selectedTickets = [...formData.tickets];
                   if (selectedTickets.includes(value)) {
-                    // Remove if already selected
                     const index = selectedTickets.indexOf(value);
                     selectedTickets.splice(index, 1);
                   } else {
-                    // Add if not selected
                     selectedTickets.push(value);
                   }
                   setFormData({ ...formData, tickets: selectedTickets });
                 }}
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select tickets to apply promotion" />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectGroup>
-                    <SelectLabel>Available Tickets</SelectLabel>
-                    {availableTickets.map(ticket => (
-                      <SelectItem 
-                        key={ticket.id} 
-                        value={ticket.id}
-                        className={formData.tickets.includes(ticket.id) ? 'bg-primary/10' : ''}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>{ticket.name}</span>
-                          {formData.tickets.includes(ticket.id) && (
-                            <span className="text-xs bg-primary/20 px-2 py-0.5 rounded">Selected</span>
-                          )}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                {availableTickets.map(ticket => (
+                  <SelectItem key={ticket.id} value={ticket.id}>
+                    {ticket.name}
+                  </SelectItem>
+                ))}
+              </SelectField>
 
-              {/* Selected Tickets Display */}
               {formData.tickets.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {formData.tickets.map(ticketId => {
@@ -257,21 +190,6 @@ export function UpdatePromotionModal({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                <DateTimePicker
-                  date={formData.startDate ? new Date(formData.startDate) : undefined}
-                  setDate={(date) => {
-                    if (date) {
-                      setFormData({
-                        ...formData,
-                        startDate: format(date, 'yyyy-MM-dd'),
-                        startTime: format(date, 'HH:mm')
-                      });
-                    }
-                  }}
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                 <DateTimePicker
