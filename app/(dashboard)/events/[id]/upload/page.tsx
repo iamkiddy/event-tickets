@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { updateEventImage } from '@/lib/actions/events';
 import { updateEventVideo } from '@/lib/actions/events';
 
@@ -18,11 +17,7 @@ interface UploadedMedia {
   progress?: number;
 }
 
-// API endpoints for different media types
-const UPLOAD_ENDPOINTS = {
-  image: '/api/events/media/images',
-  video: '/api/events/media/videos'
-};
+
 
 export default function UploadEventMedia() {
   const params = useParams();

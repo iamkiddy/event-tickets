@@ -9,9 +9,14 @@ import { NavLink } from '../../codepass/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Share2, Bookmark, Eye } from 'lucide-react';
 import { LoginAlert } from '../../../auth/_components/loginAlert';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from 'date-fns';
+import { getBlogById, likeBlog } from '@/lib/actions/blog';
+import { useParams } from 'next/navigation';
+import parser from 'html-react-parser';
+import { toast } from 'sonner';
+import {navLinks} from "@/app/(main)/codepass/EventickPage"
+
 // Type definition for blog post
 interface BlogPost {
   id: string;
@@ -28,46 +33,6 @@ interface BlogPost {
   userHasLiked: boolean;
 }
 
-// Mock data matching the API structure
-const mockBlog: BlogPost = {
-  id: "1",
-  image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
-  title: "The Future of Event Technology: AI-Powered Event Planning",
-  content: `
-    <h2>Revolutionizing Event Management with AI</h2>
-    <p>The events industry is on the cusp of a technological revolution. Artificial Intelligence is transforming how we plan, execute, and experience events...</p>
-    
-    <h3>Key Innovations in Event Technology</h3>
-    <ul>
-      <li>Smart Attendee Matching</li>
-      <li>Real-time Analytics</li>
-      <li>Automated Scheduling</li>
-      <li>Personalized Experiences</li>
-    </ul>
-    
-    <blockquote>
-      "The future of events lies in the perfect blend of human creativity and artificial intelligence."
-    </blockquote>
-  `,
-  author: "John Doe",
-  date: "2024-03-20",
-  totalViews: 1234,
-  categories: ["Technology", "Event Planning"],
-  tags: ["Event Tech", "AI", "Future Events", "Digital Innovation"],
-  comments: 56,
-  totalLikes: 245,
-  userHasLiked: false
-};
-
-const navLinks = [
-  { label: 'Schedule' },
-  { label: 'Speakers' },
-  { label: 'Ticket' },
-  { label: 'Contact' },
-  { label: 'Create Event', isCreate: true },
-  { label: 'Login', isButton: true }
-];
-
 interface Comment {
   id: string;
   user: string;
@@ -75,40 +40,18 @@ interface Comment {
   date: string;
 }
 
-interface CommentsResponse {
-  page: number;
-  total: number;
-  limit: number;
-  data: Comment[];
-}
 
-const mockComments: CommentsResponse = {
-  page: 0,
-  total: 2,
-  limit: 10,
-  data: [
-    {
-      id: "1",
-      user: "Alice Johnson",
-      content: "This is a fantastic analysis of AI in event planning. I particularly enjoyed the section about smart attendee matching.",
-      date: "2024-03-19T10:30:00"
-    },
-    {
-      id: "2",
-      user: "Mark Wilson",
-      content: "Great insights! Would love to see more about how small events can implement these technologies cost-effectively.",
-      date: "2024-03-19T09:15:00"
-    }
-  ]
-};
 
 export default function BlogDetailsPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
-  const [isLiked, setIsLiked] = React.useState(mockBlog.userHasLiked);
+  const [blog, setBlog] = React.useState<BlogPost | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLiked, setIsLiked] = React.useState(false);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
-  const [likeCount, setLikeCount] = React.useState(mockBlog.totalLikes);
+  const [likeCount, setLikeCount] = React.useState(0);
+  const params = useParams();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -120,15 +63,75 @@ export default function BlogDetailsPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLike = () => {
+  React.useEffect(() => {
+    const fetchBlog = async () => {
+      if (!params.id) return;
+      
+      setIsLoading(true);
+      try {
+        const response = await getBlogById(params.id as string);
+        setBlog(response);
+        setIsLiked(response.userHasLiked);
+        setLikeCount(response.totalLikes);
+      } catch (error) {
+        console.error('Error fetching blog:', error);
+        toast.error('Failed to load blog post');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBlog();
+  }, [params.id]);
+
+  const handleLike = async () => {
     if (!isAuthenticated) {
       setShowLoginDialog(true);
       return;
     }
-    setIsLiked(!isLiked);
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-    // Here you would typically make an API call to update the like status
+
+    if (!blog) return;
+
+    try {
+      const response = await likeBlog(blog.id);
+      setIsLiked(response.success);
+      toast.success(response.success ? 'Added to your likes' : 'Removed from your likes');
+    } catch (error) {
+      console.error('Error liking blog:', error);
+      toast.error('Failed to update like status');
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-32">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="animate-pulse">
+            <div className="h-8 w-32 bg-gray-200 rounded mb-4" />
+            <div className="h-12 w-3/4 bg-gray-200 rounded mb-8" />
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-full" />
+              <div className="h-4 bg-gray-200 rounded w-full" />
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!blog) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-32">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Blog post not found</h1>
+          <Link href="/blog" className="text-indigo-600 hover:text-indigo-700 mt-4 inline-block">
+            Return to blog list
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -167,8 +170,8 @@ export default function BlogDetailsPage() {
       <div className="relative h-[600px]">
         <div className="absolute inset-0">
           <Image
-            src={mockBlog.image}
-            alt={mockBlog.title}
+            src={blog.image}
+            alt={blog.title}
             fill
             className="w-full h-full object-cover"
             priority
@@ -179,32 +182,28 @@ export default function BlogDetailsPage() {
         <div className="relative h-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-full flex flex-col items-center justify-center pt-20">
             <div className="flex gap-2 mb-6">
-              {mockBlog.categories.map(category => (
+              {blog.categories.map(category => (
                 <span key={category} className="inline-block px-4 py-1 bg-indigo-600/90 text-white text-sm font-medium rounded-full">
                   {category}
                 </span>
               ))}
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-8 leading-tight">
-              {mockBlog.title}
+              {blog.title}
             </h1>
             
             <div className="flex items-center gap-4 text-white/90 bg-black/30 p-4 rounded-xl backdrop-blur-sm">
               <Image
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(mockBlog.author)}&background=random`}
-                alt={mockBlog.author}
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author)}&background=random`}
+                alt={blog.author}
                 width={48}
                 height={48}
                 className="rounded-full ring-2 ring-indigo-500"
               />
               <div>
-                <div className="font-medium">{mockBlog.author}</div>
-                <div className="text-sm text-gray-300">
-                  {new Date(mockBlog.date).toLocaleDateString('en-US', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
+                <div className="font-medium">{blog.author}</div>
+                <div className="text-sm text-white/75">
+                  {formatDistanceToNow(new Date(blog.date), { addSuffix: true })}
                 </div>
               </div>
             </div>
@@ -212,134 +211,73 @@ export default function BlogDetailsPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="sticky top-20 z-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm mb-8 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`flex items-center gap-2 ${isLiked ? 'text-red-500' : ''}`}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div className="prose prose-lg max-w-none">
+            {parser(blog.content)}
+          </div>
+
+          <div className="flex items-center justify-between mt-8 pt-8 border-t">
+            <div className="flex items-center gap-8">
+              <button
                 onClick={handleLike}
+                className={`flex items-center gap-2 ${
+                  isLiked ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'
+                } transition-colors`}
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
                 <span>{likeCount}</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                <span>{mockBlog.comments}</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                <Eye className="w-5 h-5" />
-                <span>{mockBlog.totalViews}</span>
-              </Button>
+              </button>
+              <button className="flex items-center gap-2 text-gray-500 hover:text-indigo-500 transition-colors">
+                <MessageCircle className="w-6 h-6" />
+                <span>{blog.comments}</span>
+              </button>
+              <button className="flex items-center gap-2 text-gray-500 hover:text-indigo-500 transition-colors">
+                <Eye className="w-6 h-6" />
+                <span>{blog.totalViews}</span>
+              </button>
             </div>
+            
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm">
-                <Share2 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+              <button className="flex items-center gap-2 text-gray-500 hover:text-indigo-500 transition-colors">
+                <Share2 className="w-6 h-6" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+              <button
                 onClick={() => setIsBookmarked(!isBookmarked)}
+                className={`flex items-center gap-2 ${
+                  isBookmarked ? 'text-indigo-500' : 'text-gray-500 hover:text-indigo-500'
+                } transition-colors`}
               >
-                <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current text-indigo-500' : ''}`} />
+                <Bookmark className={`w-6 h-6 ${isBookmarked ? 'fill-current' : ''}`} />
+                <span className="hidden sm:inline">Save</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Discussion</h3>
+          
+          {isAuthenticated ? (
+            <div className="mb-8">
+              <Textarea
+                placeholder="Share your thoughts..."
+                className="min-h-[100px] mb-4"
+              />
+              <Button>Post Comment</Button>
+            </div>
+          ) : (
+            <div className="bg-gray-50 rounded-xl p-6 text-center mb-8">
+              <p className="text-gray-600 mb-4">Join the discussion</p>
+              <Button onClick={() => setShowLoginDialog(true)}>
+                Log in to comment
               </Button>
             </div>
-          </div>
-        </div>
+          )}
 
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="px-8 pt-8">
-            <div className="flex flex-wrap gap-2 mb-8">
-              {mockBlog.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-8">
-            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-blockquote:border-indigo-500 prose-blockquote:text-gray-700" 
-              dangerouslySetInnerHTML={{ __html: mockBlog.content }}>
-            </div>
-          </div>
-
-          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
-            <div className="flex items-center justify-between">
-              <Link 
-                href="/blog"
-                className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
-                  transition-colors group"
-              >
-                <svg 
-                  className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform rotate-180" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-                Back to Blog
-              </Link>
-              <div className="flex gap-4">
-                <Button variant="outline" size="sm">
-                  Share Article
-                </Button>
-                <Button size="sm">
-                  Follow Author
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Comments ({mockComments.total})</h2>
-          
-          <div className="mb-8">
-            <div className="flex items-start gap-4">
-              <Avatar>
-                <AvatarImage src={isAuthenticated ? "user-avatar-url" : ""} />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <Textarea 
-                  placeholder={isAuthenticated ? "Write a comment..." : "Please login to comment"} 
-                  disabled={!isAuthenticated}
-                  className="mb-2"
-                />
-                {isAuthenticated && (
-                  <Button className="float-right">Post Comment</Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {mockComments.data.map((comment) => (
-              <div key={comment.id} className="flex gap-4">
-                <Avatar>
-                  <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user)}`} />
-                  <AvatarFallback>{comment.user[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{comment.user}</span>
-                      <span className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(comment.date), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <p className="text-gray-600">{comment.content}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="space-y-8">
+            {/* Comments will be implemented in the next phase */}
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users, Pencil, Trash2, Eye, CheckCircle, CalendarX2 } from 'lucide-react';
+import { MoreVertical, Calendar, Users, Trash2, Eye, CheckCircle, CalendarX2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

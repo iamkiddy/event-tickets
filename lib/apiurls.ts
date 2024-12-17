@@ -138,7 +138,13 @@ export default class APIUrls {
     //  get homepage utils
         static readonly getHomepageUtils = `${APIUrls.BASE_URL}/api/v1/main/home`;
 
-        // get all blogs
-        static readonly getBlogs = `${APIUrls.BASE_URL}/api/v1/blogs`;
+    /*
+
+        BLOG API URLS
+    
+    */
+
+    // get all blogs
+    static readonly getAllBlogs = `${APIUrls.BASE_URL}/api/v1/blogs`;
 
 }

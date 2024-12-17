@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories } from '@/lib/actions/events';
-import { PublishEventRequest, GetOrganizerUtils, UtilsCategoriesResponse } from '@/lib/models/_events_models';
+import { GetOrganizerUtils, UtilsCategoriesResponse } from '@/lib/models/_events_models';
 
 interface PublishingListProps {
   eventId: string;

@@ -5,41 +5,16 @@ import { format } from 'date-fns';
 import { 
   CreditCard, 
   Plus,
-  Calendar, 
-  CheckCircle2,
-  AlertCircle,
-  Search,
-  FileText,
   Wallet,
   Trash2,
   Edit,
   Lock
 } from 'lucide-react';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+
 
 interface PaymentMethod {
   id: string;

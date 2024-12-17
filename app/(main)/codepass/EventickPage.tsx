@@ -19,7 +19,7 @@ import { EventCardSkeleton, BlogCardSkeleton, CategorySkeleton, EventsBannerSkel
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from 'next/image';
 
-const navLinks = [
+export const navLinks = [
   { label: 'Schedule' },
   { label: 'Speakers' },
   { label: 'Ticket' },

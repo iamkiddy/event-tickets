@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { File, Trash2, Download, Loader2, ImageIcon, Video, Plus } from 'lucide-react';
+import { File, Trash2, Download, Loader2, Video, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { getEventFiles, deleteEventImage, deleteEventVideo } from '@/lib/actions/events';
-import { GetEventFilesResponse } from '@/lib/models/_events_models';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -72,7 +71,7 @@ export function FileList({ eventId }: FileListProps) {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
       toast.error('Failed to download file');
     }
   };

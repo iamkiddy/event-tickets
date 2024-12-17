@@ -17,7 +17,7 @@ export const getAllBlogs = async (): Promise<GetAllBlogsResponse> => {
   try {
     const response = await apiController<GetAllBlogsResponse>({
       method: 'GET',
-      url: APIUrls.getBlogs,
+      url: APIUrls.getAllBlogs,
       contentType: 'application/json',
     });
     return response;
@@ -33,14 +33,15 @@ export const getBlogById = async (blogId: string): Promise<GetBlogByIdResponse> 
   try {
     const response = await apiController<GetBlogByIdResponse>({
       method: 'GET',
-      url: `${APIUrls.getBlogs}/${blogId}`,
+      url: `${APIUrls.getAllBlogs}/${blogId}`, 
       contentType: 'application/json',
     });
     return response;
   } catch (error) {
     console.error('Error fetching blog:', error);
     const apiError = error as ApiError;
-    throw new Error(apiError.message || "Failed to fetch blog");
+    const errorMessage = apiError.message || "Failed to fetch blog";
+    throw new Error(errorMessage);
   }
 };
 
@@ -48,7 +49,7 @@ export const getBlogComments = async (blogId: string): Promise<GetBlogCommentsRe
   try {
     const response = await apiController<GetBlogCommentsResponse>({
       method: 'GET',
-      url: `${APIUrls.getBlogs}/${blogId}`,
+      url: `${APIUrls.getAllBlogs}/${blogId}`,
       contentType: 'application/json',
     });
     return response;
@@ -63,7 +64,7 @@ export const addBlogComment = async (blogId: string, comment: AddBlogCommentRequ
   try {
     await apiController<void>({
       method: 'POST',
-      url: `${APIUrls.getBlogs}/${blogId}/comments`,
+      url: `${APIUrls.getAllBlogs}/${blogId}/comments`,
       contentType: 'application/json',
       data: comment,
     });
@@ -78,7 +79,7 @@ export const likeBlog = async (blogId: string): Promise<LikeBlogResponse> => {
   try {
     const response = await apiController<LikeBlogResponse>({
       method: 'POST',
-      url: `${APIUrls.getBlogs}/${blogId}/like`,
+      url: `${APIUrls.getAllBlogs}/${blogId}/like`,
       contentType: 'application/json',
     });
     return response;
@@ -88,4 +89,3 @@ export const likeBlog = async (blogId: string): Promise<LikeBlogResponse> => {
     throw new Error(apiError.message || "Failed to like blog");
   }
 };
-

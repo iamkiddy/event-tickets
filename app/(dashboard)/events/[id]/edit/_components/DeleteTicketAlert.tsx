@@ -31,7 +31,7 @@ export function DeleteTicketAlert({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the ticket "{ticketName}". This action cannot be undone.
+              This will permanently delete the ticket &quot;{ticketName}&quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Button

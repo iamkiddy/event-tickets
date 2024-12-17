@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,9 +8,10 @@ import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart } from 'lucide-
 import { toast } from 'sonner';
 import { dummyEvent } from '@/app/(dashboard)/events/[id]/page';
 
+
 export default function EventPage() {
   const params = useParams();
-  const [event, setEvent] = useState<any>(dummyEvent);
+  const [event] = useState<any>(dummyEvent);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -35,7 +35,7 @@ export default function EventPage() {
         // TODO: Add getEventById to your events actions
         // const response = await getEventById(params.id as string);
         // setEvent(response);
-      } catch (error) {
+      } catch  {
         toast.error('Failed to fetch event details');
       } finally {
         setIsLoading(false);

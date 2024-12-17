@@ -11,15 +11,9 @@ import Image from 'next/image';
 import { Input } from "@/components/ui/input";
 import { getAllBlogs } from '@/lib/actions/blog';
 import { GetAllBlogsResponse } from '@/lib/models/_blogs_models';
-
-const navLinks = [
-  { label: 'Schedule' },
-  { label: 'Speakers' },
-  { label: 'Ticket' },
-  { label: 'Contact' },
-  { label: 'Create Event', isCreate: true },
-  { label: 'Login', isButton: true }
-];
+import { BlogCardSkeleton } from '../codepass/components/skeletons';
+import parser from 'html-react-parser';
+import {navLinks} from "@/app/(main)/codepass/EventickPage"
 
 const categories = [
   'All',
@@ -157,7 +151,34 @@ export default function BlogPage() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Post</h2>
           {isLoading ? (
-            <div>Loading...</div>
+            <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                <div className="relative h-[400px] lg:h-full">
+                  <div className="w-full h-full">
+                    <div className="absolute top-6 left-6">
+                      <div className="bg-gray-200 dark:bg-gray-700 h-8 w-24 rounded-full animate-pulse" />
+                    </div>
+                    <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  </div>
+                </div>
+                <div className="p-8 lg:p-12 flex flex-col justify-center space-y-4">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
           ) : blogs.length > 0 && (
             <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
               <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -182,7 +203,7 @@ export default function BlogPage() {
                     {blogs[0].title}
                   </h3>
                   <p className="text-gray-600 mb-6 line-clamp-3">
-                    {blogs[0].summary}
+                    {parser(blogs[0].summary)}
                   </p>
                   <div className="flex items-center gap-4 mb-6">
                     <Image
@@ -197,7 +218,7 @@ export default function BlogPage() {
                     </div>
                   </div>
                   <Link 
-                    href={`/blog/${blogs[0].title.toLowerCase().replace(/ /g, '-')}`}
+                    href={`/blog/${blogs[0].id}`}
                     className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
                       transition-colors group"
                   >
@@ -220,7 +241,11 @@ export default function BlogPage() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Latest Posts</h2>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <BlogCardSkeleton key={i} />
+              ))}
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogs.slice(1).map((post) => (
@@ -245,7 +270,7 @@ export default function BlogPage() {
                       {post.title}
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-2">
-                      {post.summary}
+                      {parser(post.summary)}
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">

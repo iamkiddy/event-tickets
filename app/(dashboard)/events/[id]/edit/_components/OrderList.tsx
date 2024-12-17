@@ -22,7 +22,7 @@ interface OrderListProps {
 }
 
 export function OrderList({ eventId, initialOrders = [] }: OrderListProps) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders] = useState<Order[]>(initialOrders);
   const [searchTerm, setSearchTerm] = useState('');
 
   const getStatusColor = (status: Order['status']) => {

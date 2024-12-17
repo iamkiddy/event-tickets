@@ -5,6 +5,8 @@ import { Calendar, MapPin, Search, Filter, Clock, Tag, Globe, ArrowRight } from 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import {navLinks} from "@/app/(main)/codepass/EventickPage"
+
 
 interface Event {
   id: string;

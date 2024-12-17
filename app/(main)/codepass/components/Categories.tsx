@@ -1,6 +1,6 @@
 'use client';
 
-import { Music, Moon, Palette, Gift, Heart, Gamepad2, Briefcase, Lollipop } from 'lucide-react';
+import { Music, Moon, Palette, Gift, Heart, Gamepad2, Briefcase, Lollipop, LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface CategoryProps {
@@ -12,7 +12,7 @@ interface CategoryProps {
 }
 
 // Map of icon names to Lucide components
-const iconMap: { [key: string]: any } = {
+const iconMap: Record<string, LucideIcon> = {
   Music,
   Moon,
   Palette,

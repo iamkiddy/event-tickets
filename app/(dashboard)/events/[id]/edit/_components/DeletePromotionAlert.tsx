@@ -31,7 +31,7 @@ export function DeletePromotionAlert({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the promotion "{promotionCode}". This action cannot be undone.
+              This will permanently delete the promotion &quot;{promotionCode}&quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Button

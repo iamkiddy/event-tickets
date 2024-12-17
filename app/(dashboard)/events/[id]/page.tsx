@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Event } from '@/lib/models/_events_models';
-import { Calendar, Clock, MapPin, Users, DollarSign, Share2, Tag, ImageIcon } from 'lucide-react';
+import { Calendar, Clock, Users, DollarSign, Share2, Tag, ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
@@ -64,7 +63,7 @@ export const dummyEvent = {
 export default function EventPage() {
   const params = useParams();
   const router = useRouter();
-  const [event, setEvent] = useState(dummyEvent);
+  const [event] = useState(dummyEvent);
   const [isLoading, setIsLoading] = useState(false);
 
   const formatDate = (dateString: string) => {
@@ -87,7 +86,7 @@ export default function EventPage() {
         // TODO: Add getEventById to your events actions
         // const response = await getEventById(params.id as string);
         // setEvent(response);
-      } catch (error) {
+      } catch  {
         toast.error('Failed to fetch event details');
       } finally {
         setIsLoading(false);

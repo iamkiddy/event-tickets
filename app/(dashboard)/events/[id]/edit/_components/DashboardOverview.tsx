@@ -28,7 +28,7 @@ export function DashboardOverview({ eventId, initialStats }: DashboardOverviewPr
   const [stats] = useState<DashboardStats>(initialStats || {
     totalSales: 0,
     ticketsSold: 0,
-    totalViews: 0,
+    totalViews: 0,  
     revenue: 0
   });
 
