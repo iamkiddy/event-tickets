@@ -265,11 +265,14 @@ export const getUserProfile = async () => {
 
 // update user profile
 export const updateUserProfile = async (data: UserProfileUpdateModel) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     try {
         const response = await apiController<ResponseModel>({
             method: 'PUT',
             url: APIUrls.userProfile,
             data,
+            token,
             contentType: 'application/json',
         });
         await getUserProfile();

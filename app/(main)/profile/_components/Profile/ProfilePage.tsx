@@ -38,7 +38,12 @@ export default function ProfilePage({ data }: ProfilePageProps) {
     setLoading(true)
     try {
       const response = await updateUserProfile(formData)
-      toast.success(response?.message, { position: 'top-center' })
+      if (response?.error){
+        toast.error(response.error, { position: 'top-center' })
+        return;
+      }else{
+        toast.success('Profile updated successfully', { position: 'top-center' })
+      }
     } catch (error) {
       toast.error((error as Error).message, { position: 'top-center' })
     } finally {
@@ -111,7 +116,7 @@ export default function ProfilePage({ data }: ProfilePageProps) {
             <div className='flex items-center gap-2'>
               <span className={cn('text-lg text-gray-400', formData.messageType === 'email' && 'text-secondaryColor')}>Email</span>
               <Switch
-                checked={formData.messageType === 'email'}
+                checked={formData.messageType === 'email' ? true : false}
                 onCheckedChange={(checked) => 
                   setFormData(prev => ({ ...prev, messageType: checked ? 'sms' : 'email' }))
                 }
