@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
@@ -15,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import PhoneNumberField from '@/components/custom/PhoneNumberField.tsx/PhoneNumberField';
 
 // List of African countries
 const africanCountries = [
@@ -71,7 +73,7 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
     try {
       const response = await completeSignup({ 
         fullname: fullname.trim(), 
-        phone: phone.trim(), 
+        phone: phone, 
         isAgree,
         country
       });
@@ -84,7 +86,7 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
       } else {
         setError(response.message || 'Failed to complete signup');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Complete signup error:', error);
       setError('Failed to complete signup. Please try again.');
     } finally {
@@ -124,13 +126,14 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
             className="w-full"
             required
           />
-          <Input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Phone Number"
-            className="w-full"
-            required
+          <PhoneNumberField
+            name='phone'
+            label='Phone Number'
+            phoneValue={phone}
+            onChange={(value) => setPhone(value)}
+            required={true}
+            disabled={loading}
+            className='w-full'
           />
           <Select
             value={country}
