@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { LoginEmail, LoginEmailResponse, SignupCompleteData, VerifyCode, VerifyCodeResponse, LoginWithGmailResponse, UserProfileModel, UserProfileUpdateModel } from "../models/_auth_models";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import { cookies } from 'next/headers';
+import { ResponseModel } from "../models/_util_models";
 
 interface ApiError extends Error {
     message: string;
@@ -264,7 +266,7 @@ export const getUserProfile = async () => {
 // update user profile
 export const updateUserProfile = async (data: UserProfileUpdateModel) => {
     try {
-        const response = await apiController({
+        const response = await apiController<ResponseModel>({
             method: 'PUT',
             url: APIUrls.userProfile,
             data,
