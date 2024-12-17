@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import * as React from 'react';
@@ -16,6 +17,7 @@ import { GetCategoryUtilsResponse, GetEventTypeUtilsResponse, GetHomepageUtilsRe
 import { getCategoryUtils, getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
 import { EventCardSkeleton, BlogCardSkeleton, CategorySkeleton, EventsBannerSkeleton, SectionHeaderSkeleton } from './components/skeletons';
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from 'next/image';
 
 const navLinks = [
   { label: 'Schedule' },
@@ -24,7 +26,7 @@ const navLinks = [
   { label: 'Contact' }
 ];
 
-export default function EventickPage() {
+export default function EventPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
@@ -143,11 +145,14 @@ export default function EventickPage() {
               type="video/mp4"
             />
             {/* Fallback for browsers that don't support video */}
-            <img
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070"
-              alt="Event background"
-              className="object-cover w-full h-full"
-            />
+            <div className='relative h-full w-full'>
+              <Image
+                src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070"
+                alt="Event background"
+                fill
+                className="object-cover"
+              />
+            </div>
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/50 to-black/80" />
         </div>
@@ -258,7 +263,7 @@ export default function EventickPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {homeData.upcomingEvents.map((event, index) => (
+                {homeData.upcomingEvents.map((event) => (
                   <EventCard 
                     key={event.id}
                     id={event.id}

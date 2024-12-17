@@ -12,7 +12,7 @@ export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
   image,
 }) => {
   return (
-    <Link href={`/codepass/${id}`}>
+    <Link href={`/event/${id}`}>
       <article className="group flex flex-col bg-white rounded-2xl overflow-hidden 
         hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div className="relative h-48 overflow-hidden">

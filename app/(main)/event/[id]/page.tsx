@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { Calendar, Clock, MapPin, Users, Tag, Share2, Globe, DollarSign, Heart } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { dummyEvent } from '@/app/(dashboard)/events/[id]/page';
 
