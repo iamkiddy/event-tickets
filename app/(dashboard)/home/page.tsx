@@ -11,7 +11,7 @@ export default function DashboardHome() {
     <div className="space-y-12 max-w-5xl mx-auto">
       {/* Welcome & Getting Started */}
       <div className="space-y-8">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-gray-900r">
           Welcome, {userProfile?.fullname || 'User'}
         </h1>
         
