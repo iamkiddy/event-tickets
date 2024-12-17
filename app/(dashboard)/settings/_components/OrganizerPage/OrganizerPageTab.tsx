@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,7 @@ export default function OrganizerPageTab() {
     queryKey: ['orgs'], 
     queryFn: () => getAllOrgProfiles()
   })
-
+  
   return (
     <section className='w-full flex flex-col gap-4'>
         <Sheet>
