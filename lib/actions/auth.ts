@@ -272,6 +272,7 @@ export const updateUserProfile = async (data: UserProfileUpdateModel) => {
             data,
             contentType: 'application/json',
         });
+        await getUserProfile();
         return response;
     } catch (error: unknown) {
         const apiError = error as ApiError;
