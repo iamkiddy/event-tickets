@@ -224,10 +224,6 @@ export interface CreateEventTicket {
     price: number;
     quantity: number;
     currency: string;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
     isActive: boolean;
 }
 
@@ -290,10 +286,6 @@ export interface UpdateEventTicket {
     price: number;
     quantity: number;
     currency: string;
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
     isActive: boolean;
   }
   

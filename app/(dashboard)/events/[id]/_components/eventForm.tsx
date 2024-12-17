@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -6,9 +7,7 @@ import { useRouter } from 'next/navigation';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { Image } from 'lucide-react';
-import { updateEventImage, updateEventVideo, updateEventFAQ, updateEventAgenda } from '@/lib/actions/events';
-import dynamic from 'next/dynamic';
+import { updateEventFAQ, updateEventAgenda } from '@/lib/actions/events';
 import { Editor } from '@/components/ui/editor';
 interface EventFAQ {
   question: string;
@@ -153,8 +152,6 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
         toast.error('Event ID is missing');
         return;
       }
-
-      console.log('Updating Agenda:', { eventId, agendaId: agenda.id }); // Debug log
       
       await updateEventAgenda({
         id: agenda.id,

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -43,7 +45,6 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
       }
 
       const transformedTickets = response.map(ticket => {
-        console.log('Processing ticket:', ticket);
         return {
           id: ticket.id || 'unknown',
           type: ticket.name || 'Unnamed Ticket',
@@ -58,10 +59,8 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
         };
       });
       
-      console.log('Transformed tickets:', transformedTickets);
       setTickets(transformedTickets);
     } catch (err) {
-      console.error('Error details:', err);
       setError('Failed to load tickets');
     }
   };
@@ -69,7 +68,6 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
   const fetchPromotions = async () => {
     try {
       const response = await getEventTicketPromotions(eventId);
-      console.log('Raw promotions response:', response);
       
       // Check if response exists
       if (!response) {
@@ -135,22 +133,7 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
   };
 
   // Helper function to get promotion details for a ticket
-  const getTicketPromotion = (ticketId: string) => {
-    return promotions.find(promo => 
-      promo.isActive && promo.tickets.includes(ticketId)
-    );
-  };
 
-  const calculateDiscountedPrice = (
-    originalPrice: number,
-    discountValue: number,
-    discountType: 'percentage' | 'amount'
-  ): number => {
-    if (discountType === 'percentage') {
-      return originalPrice * (1 - discountValue / 100);
-    }
-    return Math.max(0, originalPrice - discountValue);
-  };
 
   // Add this helper function to format promotion details
   const formatPromotionDetails = (promotion: EventTicketPromotion) => {
@@ -261,8 +244,8 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
               tickets={tickets}
               eventId={eventId}
               onCreatePromotion={fetchPromotions}
-              onEditPromotion={(id) => {/* Add edit handler */}}
-              onDeletePromotion={(id) => {/* Add delete handler */}}
+              onEditPromotion={() => {/* Add edit handler */}}
+              onDeletePromotion={() => {/* Add delete handler */}}
             />
           </TabsContent>
         </div>

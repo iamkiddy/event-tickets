@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { createEvent } from '@/lib/actions/events';
 import { EventForm } from '@/app/(dashboard)/events/[id]/_components/eventForm';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { CreateEventResponse } from '@/lib/models/_events_models';
 
 export default function CreateEventPage() {
   const router = useRouter();

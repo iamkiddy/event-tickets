@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useParams } from 'next/navigation';
 import { EventForm } from '@/app/(dashboard)/events/[id]/_components/eventForm';
 import { updateEventFAQ, updateEventAgenda, getEventById } from '@/lib/actions/events';
 import { toast } from 'sonner';
-import { Check, Image as ImageIcon, Info, MapPin, Calendar, Tag, Users, LayoutDashboard, ShoppingCart } from 'lucide-react';
+import { Check, Image as ImageIcon, Info, Tag, Users, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { GetEventByIdResponse } from '@/lib/models/_events_models';
