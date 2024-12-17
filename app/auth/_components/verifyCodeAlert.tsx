@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { CompleteSignupAlert } from './completeSignupAlert';
 import { useAuth } from '@/lib/context/AuthContext';
+import { toast } from 'sonner';
 import {
   InputOTP,
   InputOTPGroup,
@@ -47,6 +48,10 @@ export const VerifyCodeAlert: React.FC<VerifyCodeAlertProps> = ({ open, onClose,
             
             try {
                 await getUserProfile();
+                toast.success('Welcome back to CodePass!', {
+                    duration: 4000,
+                    position: 'top-center'
+                });
                 onSuccess('Old');
                 onClose();
             } catch (profileError) {

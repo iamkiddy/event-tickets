@@ -9,6 +9,7 @@ import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAuth } from '@/lib/context/AuthContext';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -70,6 +71,10 @@ export const CompleteSignupAlert: React.FC<CompleteSignupAlertProps> = ({
       if (response.success && response.token) {
         // For new users, set the token and proceed with login
         login(response.token);
+        toast.success('Signup completed successfully! Welcome to EventSphere!', {
+          duration: 4000,
+          position: 'top-center'
+        });
         onSuccess();
         onClose();
       } else {

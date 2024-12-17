@@ -31,7 +31,7 @@ export interface GetNewsletterUtilsResponse {
 
 export interface GetHomepageUtilsResponse {
     featuredCategories: {
-        image: string;
+        icon: string;
         name: string;
         totalEvents: number;
     }[];

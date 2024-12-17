@@ -14,6 +14,8 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { EventsBanner } from './components/EventsBanner';
 import { GetCategoryUtilsResponse, GetEventTypeUtilsResponse, GetHomepageUtilsResponse } from '@/lib/models/_main_models';
 import { getCategoryUtils, getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
+import { EventCardSkeleton, BlogCardSkeleton, CategorySkeleton, EventsBannerSkeleton, SectionHeaderSkeleton } from './components/skeletons';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const navLinks = [
   { label: 'Schedule' },
@@ -30,6 +32,7 @@ export default function EventickPage() {
   const [categories, setCategories] = React.useState<GetCategoryUtilsResponse[]>([]);
   const [eventTypes, setEventTypes] = React.useState<GetEventTypeUtilsResponse[]>([]);
   const [homeData, setHomeData] = React.useState<GetHomepageUtilsResponse | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -46,42 +49,26 @@ export default function EventickPage() {
   }, []);
 
   React.useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const categoriesData = await getCategoryUtils();
+        const [categoriesData, eventTypesData, homeData] = await Promise.all([
+          getCategoryUtils(),
+          getEventTypeUtils(),
+          getHomepageUtils()
+        ]);
+        
         setCategories(categoriesData);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  React.useEffect(() => {
-    const fetchEventTypes = async () => {
-      try {
-        const eventTypesData = await getEventTypeUtils();
         setEventTypes(eventTypesData);
+        setHomeData(homeData);
       } catch (error) {
-        console.error('Error fetching event types:', error);
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchEventTypes();
-  }, []);
-
-  React.useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        const data = await getHomepageUtils();
-        setHomeData(data);
-      } catch (error) {
-        console.error('Error fetching homepage data:', error);
-      }
-    };
-
-    fetchHomeData();
+    fetchData();
   }, []);
 
   return (
@@ -185,88 +172,137 @@ export default function EventickPage() {
       <Sponsors />
 
       {/* Categories Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <Categories categories={homeData?.featuredCategories || []} />
-      </div>
+      {isLoading ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <CategorySkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      ) : (
+        homeData?.featuredCategories && homeData.featuredCategories.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+            <Categories categories={homeData.featuredCategories} />
+          </div>
+        )
+      )}
 
       {/* Rest of the content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <EventsBanner />
+        {/* Events Banner */}
+        {isLoading ? (
+          <EventsBannerSkeleton />
+        ) : (
+          homeData?.upcomingEvents && homeData.upcomingEvents.length > 0 && <EventsBanner />
+        )}
         
-        <section className="mt-16">
-          <div className="flex flex-col mb-8">
-            <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
-            
-            <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-              <select 
-                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                  text-primaryColor border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-              >
-                <option value="">Any Category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-
-              <select 
-                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                  text-primaryColor border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-              >
-                <option value="any">Event Type</option>
-                {eventTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-
-              <select 
-                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                  text-primaryColor border border-indigo-100 focus:outline-none 
-                  focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-              >
-                <option value="any">Any Time</option>
-                <option value="today">Today</option>
-                <option value="tomorrow">Tomorrow</option>
-                <option value="thisWeek">This Week</option>
-              </select>
+        {/* Upcoming Events Section */}
+        {isLoading ? (
+          <section className="mt-16">
+            <SectionHeaderSkeleton className="mb-8" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <EventCardSkeleton key={i} />
+              ))}
             </div>
-          </div>
+          </section>
+        ) : (
+          homeData?.upcomingEvents && homeData.upcomingEvents.length > 0 && (
+            <section className="mt-16">
+              <div className="flex flex-col mb-8">
+                <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
+                
+                <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+                  {categories.length > 0 && (
+                    <select 
+                      className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
+                        text-primaryColor border border-indigo-100 focus:outline-none 
+                        focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
+                    >
+                      <option value="">Any Category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {homeData?.upcomingEvents.map((event, index) => (
-              <EventCard 
-                key={event.id}
-                id={event.id}
-                month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                day={new Date(event.startDate).getDate().toString()}
-                title={event.title}
-                description={event.summary}
-                image={event.image}
-              />
-            ))}
-          </div>
-        </section>
+                  {eventTypes.length > 0 && (
+                    <select 
+                      className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
+                        text-primaryColor border border-indigo-100 focus:outline-none 
+                        focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
+                    >
+                      <option value="any">Event Type</option>
+                      {eventTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">Latest Blog Posts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {homeData?.pageBlogs.map((post) => (
-              <BlogCard 
-                key={post.id}
-                image={post.image}
-                title={post.title}
-                description={post.summary}
-                date={post.date}
-                author={post.author}
-              />
-            ))}
-          </div>
-        </section>
+                  <select 
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
+                      text-primaryColor border border-indigo-100 focus:outline-none 
+                      focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
+                  >
+                    <option value="any">Any Time</option>
+                    <option value="today">Today</option>
+                    <option value="tomorrow">Tomorrow</option>
+                    <option value="thisWeek">This Week</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {homeData.upcomingEvents.map((event, index) => (
+                  <EventCard 
+                    key={event.id}
+                    id={event.id}
+                    month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
+                    day={new Date(event.startDate).getDate().toString()}
+                    title={event.title}
+                    description={event.summary}
+                    image={event.image}
+                  />
+                ))}
+              </div>
+            </section>
+          )
+        )}
+
+        {/* Latest Blog Posts Section */}
+        {isLoading ? (
+          <section className="mt-16">
+            <SectionHeaderSkeleton className="mb-8" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <BlogCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+        ) : (
+          homeData?.pageBlogs && homeData.pageBlogs.length > 0 && (
+            <section className="mt-16">
+              <h2 className="text-2xl font-bold mb-8">Latest Blog Posts</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {homeData.pageBlogs.map((post) => (
+                  <BlogCard 
+                    key={post.id}
+                    image={post.image}
+                    title={post.title}
+                    description={post.summary}
+                    date={post.date}
+                    author={post.author}
+                  />
+                ))}
+              </div>
+            </section>
+          )
+        )}
 
         <section className="mt-16 mb-16 max-w-xl mx-auto">
           <Newsletter />
@@ -276,4 +312,3 @@ export default function EventickPage() {
     </div>
   );
 }
-
