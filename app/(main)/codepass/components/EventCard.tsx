@@ -15,7 +15,10 @@ export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
   return (
     <Link href={`/event/${id}`}>
       <article className="group flex flex-col bg-white rounded-2xl overflow-hidden 
-        hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        border border-gray-100 shadow-sm
+        hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
+        hover:border-primaryColor/20
+        transition-all duration-300 transform hover:-translate-y-1">
         <div className="relative h-48 overflow-hidden">
           <Image
             src={image}
@@ -26,7 +29,7 @@ export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-4 left-4 flex items-center gap-2">
             <div className="flex flex-col items-center justify-center bg-white/90 
-              backdrop-blur-sm rounded-lg p-2 w-16 h-16">
+              backdrop-blur-sm rounded-lg p-2 w-16 h-16 shadow-sm">
               <span className="text-xs font-semibold text-primaryColor">{month}</span>
               <span className="text-2xl font-bold text-gray-900">{day}</span>
             </div>
@@ -35,7 +38,7 @@ export const EventCard: React.FC<EventCardProps & { id?: string }> = ({
         
         <div className="p-5 flex flex-col flex-1">
           <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 
-            group-hover:text-pr transition-colors">
+            group-hover:text-primaryColor transition-colors">
             {title}
           </h3>
           <p className="text-sm text-gray-600 line-clamp-2 mb-4">
