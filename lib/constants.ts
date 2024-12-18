@@ -4,3 +4,8 @@ export const currency = [
     'EUR',
     'GBP'
 ]
+
+
+export const eventFilterTime = [
+    'Upcoming', 'Weekend', 'Today', 'Tomorrow'
+];
