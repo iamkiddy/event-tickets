@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar, MapPin, Search, Filter, Clock, Tag, Globe, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Search, Filter, Clock, Tag, Globe, ArrowRight, DollarSign, Layout, ChevronDown, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -100,6 +100,30 @@ export default function EventsPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const clearFilters = () => {
+    // Reset all filters to their default values
+    const defaultFilters = {
+      search: '',
+      category: '',
+      type: '',
+      time: '',
+      where: '',
+      date: '',
+      price: '',
+      page: 1
+    };
+    
+    // Update the state and URL
+    setFilters(defaultFilters);
+    
+    // Clear URL parameters
+    const params = new URLSearchParams();
+    router.push('/event', { scroll: false });
+    
+    // Fetch events with cleared filters
+    fetchEvents();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {!isAuthenticated ? (
@@ -147,7 +171,7 @@ export default function EventsPage() {
         onLoginSuccess={() => setShowLoginDialog(false)}
       />
       {/* Hero Section with Search */}
-      <div className="relative h-[600px] mb-16">
+      <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] mb-8 sm:mb-16">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
@@ -159,120 +183,186 @@ export default function EventsPage() {
         </div>
 
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-full flex flex-col items-center justify-center pt-20">
-            <span className="inline-block px-4 py-1 bg-indigo-600/90 text-white text-sm font-medium rounded-full mb-6">
+          <div className="h-full flex flex-col items-center justify-center pt-24 sm:pt-20">
+            <span className="hidden sm:inline-block px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-4 sm:mb-6">
               Find Your Next Event
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-8 max-w-4xl leading-tight">
+            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white text-center mb-4 sm:mb-8 max-w-4xl leading-tight mt-8 sm:mt-0">
               Find Your Next Experience
             </h1>
-            <p className="text-lg md:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-12">
+            <p className="text-base sm:text-lg lg:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-8 sm:mb-12 px-4">
               Discover amazing events happening around you
             </p>
 
-            {/* Enhanced Search Bar */}
-            <div className="w-full max-w-4xl">
-              <div className="bg-white/95 backdrop-blur-lg rounded-full shadow-xl p-3 md:p-4">
-                <div className="flex flex-col lg:flex-row gap-3">
+            {/* Enhanced Search Bar - Responsive */}
+            <div className="w-full max-w-4xl px-4 sm:px-6">
+              <div className="bg-white/95 backdrop-blur-lg rounded-2xl sm:rounded-full shadow-xl">
+                {/* Mobile Layout */}
+                <div className="block lg:hidden p-4 space-y-4">
                   {/* Search Input */}
-                  <div className="flex-1 relative group border-r border-gray-200">
-                    <div className="px-8 h-full">
-                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
-                        Search Events
-                      </label>
-                      <div className="flex items-center">
-                        <Search className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
-                        <input
-                          placeholder="Search events..."
-                          value={filters.search}
-                          onChange={(e) => updateFilters({ search: e.target.value })}
-                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0"
-                        />
-                      </div>
-                    </div>
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      placeholder="Search events..."
+                      value={filters.search}
+                      onChange={(e) => updateFilters({ search: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-full bg-transparent text-sm focus:outline-none focus:ring-0"
+                    />
                   </div>
 
                   {/* Location */}
-                  <div className="flex-1 relative group border-r border-gray-200">
-                    <div className="px-8 h-full">
-                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
-                        Location
-                      </label>
-                      <div className="flex items-center">
-                        <MapPin className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
-                        <select
-                          value={filters.where}
-                          onChange={(e) => updateFilters({ where: e.target.value })}
-                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0 w-full appearance-none cursor-pointer"
-                        >
-                          <option value="">Where to?</option>
-                          <option value="nearby">Nearby</option>
-                          <option value="online">Online</option>
-                        </select>
-                      </div>
-                    </div>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <select
+                      value={filters.where}
+                      onChange={(e) => updateFilters({ where: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 appearance-none cursor-pointer bg-transparent"
+                    >
+                      <option value="">Where to?</option>
+                      <option value="nearby">Nearby</option>
+                      <option value="online">Online</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
                   </div>
 
                   {/* Date */}
-                  <div className="flex-1 relative group">
-                    <div className="px-8 h-full">
-                      <label className="block text-xs font-semibold text-gray-800 mb-1 pt-2">
-                        When
-                      </label>
-                      <div className="flex items-center">
-                        <Calendar className="absolute left-8 top-8 text-gray-400 h-4 w-4" />
-                        <select
-                          value={filters.date}
-                          onChange={(e) => updateFilters({ date: e.target.value })}
-                          className="border-0 p-0 pl-6 h-6 text-sm bg-transparent focus:ring-0 w-full appearance-none cursor-pointer"
-                        >
-                          <option value="">Add dates</option>
-                          <option value="today">Today</option>
-                          <option value="tomorrow">Tomorrow</option>
-                          <option value="weekend">This Weekend</option>
-                          <option value="week">This Week</option>
-                          <option value="month">This Month</option>
-                        </select>
-                      </div>
-                    </div>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <select
+                      value={filters.date}
+                      onChange={(e) => updateFilters({ date: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 appearance-none cursor-pointer bg-transparent"
+                    >
+                      <option value="">Add dates</option>
+                      <option value="today">Today</option>
+                      <option value="tomorrow">Tomorrow</option>
+                      <option value="weekend">This Weekend</option>
+                      <option value="week">This Week</option>
+                      <option value="month">This Month</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
                   </div>
 
-                  <div className="px-2">
-                    <button 
-                      onClick={handleSearch}
-                      className="h-12 px-8 bg-gradient-to-r from-primaryColor to-indigo-700 
-                        hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full 
-                        font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      <Search className="h-4 w-4 mr-2 inline-block" />
-                      Search
-                    </button>
+                  {/* Search Button */}
+                  <button 
+                    onClick={handleSearch}
+                    className="w-full py-3 bg-gradient-to-r from-primaryColor to-indigo-700 
+                      hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full 
+                      font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <Search className="h-4 w-4 mr-2 inline-block" />
+                    Search
+                  </button>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden lg:block p-3 md:p-4">
+                  <div className="flex gap-3">
+                    {/* Search Input */}
+                    <div className="flex-1 relative group border-r border-gray-200">
+                      <div className="px-6">
+                        <label className="block text-xs font-semibold text-gray-800 mb-1">
+                          Search Events
+                        </label>
+                        <div className="flex items-center">
+                          <Search className="text-gray-400 h-4 w-4" />
+                          <input
+                            placeholder="Search events..."
+                            value={filters.search}
+                            onChange={(e) => updateFilters({ search: e.target.value })}
+                            className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="flex-1 relative group border-r border-gray-200">
+                      <div className="px-6">
+                        <label className="block text-xs font-semibold text-gray-800 mb-1">
+                          Location
+                        </label>
+                        <div className="flex items-center">
+                          <MapPin className="text-gray-400 h-4 w-4" />
+                          <select
+                            value={filters.where}
+                            onChange={(e) => updateFilters({ where: e.target.value })}
+                            className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none appearance-none cursor-pointer"
+                          >
+                            <option value="">Where to?</option>
+                            <option value="nearby">Nearby</option>
+                            <option value="online">Online</option>
+                          </select>
+                          <ChevronDown className="text-gray-400 h-4 w-4 ml-auto pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Date */}
+                    <div className="flex-1 relative group">
+                      <div className="px-6">
+                        <label className="block text-xs font-semibold text-gray-800 mb-1">
+                          When
+                        </label>
+                        <div className="flex items-center">
+                          <Calendar className="text-gray-400 h-4 w-4" />
+                          <select
+                            value={filters.date}
+                            onChange={(e) => updateFilters({ date: e.target.value })}
+                            className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none appearance-none cursor-pointer"
+                          >
+                            <option value="">Add dates</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="weekend">This Weekend</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                          </select>
+                          <ChevronDown className="text-gray-400 h-4 w-4 ml-auto pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Search Button */}
+                    <div className="px-2">
+                      <button 
+                        onClick={handleSearch}
+                        className="h-12 px-8 bg-gradient-to-r from-primaryColor to-indigo-700 
+                          hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full 
+                          font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                      >
+                        <Search className="h-4 w-4 mr-2 inline-block" />
+                        Search
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Quick Links */}
-            <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-3 px-4">
               <button 
                 onClick={() => {
                   updateFilters({ type: 'popular' });
                   handleSearch();
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full 
-                  bg-white/10 hover:bg-white/20 transition-colors text-sm text-white"
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full 
+                  bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm text-white"
               >
-                <Tag className="w-4 h-4" />
+                <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Popular Events</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full 
-                bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
-                <MapPin className="w-4 h-4" />
+              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full 
+                bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm text-white"
+              >
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Near Me</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full 
-                bg-white/10 hover:bg-white/20 transition-colors text-sm text-white">
-                <Calendar className="w-4 h-4" />
+              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full 
+                bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm text-white"
+              >
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>This Weekend</span>
               </button>
             </div>
@@ -280,33 +370,77 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Quick Filters - Enhanced */}
+      {/* Enhanced Filters Section */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 py-4 overflow-x-auto scrollbar-hide">
-            <div className="flex-1 flex items-center gap-3">
-              {['Category', 'Date', 'Price', 'Type'].map((filter) => {
-                const key = filter.toLowerCase() as FilterKey;
+          <div className="py-4 sm:py-6">
+            {/* Center aligned filters with better spacing */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              {[
+                { name: 'Category', icon: <Tag className="w-4 h-4" /> },
+                { name: 'Date', icon: <Calendar className="w-4 h-4" /> },
+                { name: 'Price', icon: <DollarSign className="w-4 h-4" /> },
+                { name: 'Type', icon: <Layout className="w-4 h-4" /> }
+              ].map((filter) => {
+                const key = filter.name.toLowerCase() as FilterKey;
                 const filterValue = filters[key];
                 
                 return (
-                  <select
-                    key={filter}
-                    value={filterValue}
-                    onChange={(e) => updateFilters({ [key]: e.target.value })}
-                    className="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm hover:border-primaryColor/30 focus:outline-none focus:ring-2 focus:ring-primaryColor/20 transition-all whitespace-nowrap"
-                  >
-                    <option value="">{filter}</option>
-                    {/* Add your filter options here */}
-                  </select>
+                  <div key={filter.name} className="relative group">
+                    <select
+                      value={filterValue}
+                      onChange={(e) => updateFilters({ [key]: e.target.value })}
+                      className="appearance-none pl-10 pr-10 py-2.5 rounded-full bg-gray-50 
+                        border border-gray-200 text-sm font-medium text-gray-700
+                        hover:border-primaryColor/30 focus:outline-none focus:ring-2 
+                        focus:ring-primaryColor/20 transition-all cursor-pointer
+                        min-w-[140px] sm:min-w-[160px]"
+                    >
+                      <option value="">{filter.name}</option>
+                      {/* Add your filter options here */}
+                    </select>
+                    {/* Icon */}
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">
+                      {filter.icon}
+                    </div>
+                    {/* Custom arrow */}
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                  </div>
                 );
               })}
             </div>
-            
-            <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-primaryColor transition-colors">
-              <Filter className="w-4 h-4" />
-              More Filters
-            </button>
+
+            {/* Active Filters */}
+            {Object.entries(filters).some(([key, value]) => value && key !== 'page') && (
+              <div className="flex items-center justify-center gap-2 mt-3">
+                {Object.entries(filters).map(([key, value]) => {
+                  if (!value || key === 'page') return null;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => updateFilters({ [key]: '' })}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
+                        bg-primaryColor/10 text-primaryColor text-sm hover:bg-primaryColor/15 
+                        transition-colors"
+                    >
+                      {value}
+                      <X className="w-3 h-3" />
+                    </button>
+                  );
+                })}
+                {/* Clear all filters - Only show if there are active filters */}
+                {Object.values(filters).some(value => value && typeof value !== 'number') && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-gray-500 hover:text-gray-700 ml-2"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

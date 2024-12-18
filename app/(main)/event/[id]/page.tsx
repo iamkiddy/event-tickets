@@ -160,7 +160,7 @@ export default function EventPage() {
       />
 
       {/* Hero Section with Image */}
-      <div className="relative h-[50vh] min-h-[400px]">
+      <div className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px]">
         {event?.images && event.images[0] ? (
           <Image
             src={event.images[0]}
@@ -181,15 +181,15 @@ export default function EventPage() {
         
         {/* Hero Content */}
         <div className="absolute bottom-0 left-0 right-0">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex items-center gap-2 text-white/80 mb-4">
-              <Calendar className="w-5 h-5" />
+          <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+            <div className="flex items-center gap-2 text-white/80 mb-2 sm:mb-4 text-sm sm:text-base">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{formatDate(event?.startDate).fullDate}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4">
               {parser(event?.title || '')}
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl">
+            <p className="text-base sm:text-xl text-white/90 max-w-3xl">
               {parser(event?.summary || '')}
             </p>
           </div>
@@ -199,43 +199,45 @@ export default function EventPage() {
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-6">
-              <h2 className="text-lg font-semibold text-gray-900 truncate">{event?.title}</h2>
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center gap-2 sm:gap-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate max-w-[150px] sm:max-w-xs">
+                {event?.title}
+              </h2>
               <button 
                 onClick={() => setIsLiked(!isLiked)}
-                className={`flex items-center gap-2 text-sm ${isLiked ? 'text-red-500' : 'text-gray-600'}`}
+                className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${isLiked ? 'text-red-500' : 'text-gray-600'}`}
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                <span>Save</span>
+                <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <span className="hidden sm:inline">Save</span>
               </button>
-              <button className="flex items-center gap-2 text-sm text-gray-600">
-                <Share2 className="w-5 h-5" />
-                <span>Share</span>
+              <button className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Share</span>
               </button>
             </div>
-            <button className="px-6 py-2 bg-primaryColor text-white rounded-lg hover:bg-indigo-700 transition-colors">
+            <button className="px-3 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base bg-primaryColor text-white rounded-lg hover:bg-indigo-700 transition-colors">
               Get Tickets
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-8">
             {/* About Section */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">About This Event</h2>
-              <div className="prose max-w-none text-gray-600">
+            <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">About This Event</h2>
+              <div className="prose max-w-none text-gray-600 text-sm sm:text-base">
                 {parser(event?.overview || '')}
               </div>
             </div>
 
             {/* Date and Location */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-              <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
                 <div>
                   <div className="flex items-center gap-2 text-gray-900 font-medium mb-4">
                     <Calendar className="w-6 h-6 text-primaryColor" />
@@ -304,8 +306,8 @@ export default function EventPage() {
           </div>
 
           {/* Sidebar - Tickets Section */}
-          <div className="lg:sticky lg:top-20 space-y-6 h-fit">
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+          <div className="lg:sticky lg:top-20 space-y-4 sm:space-y-6 h-fit">
+            <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Tickets</h2>
               <div className="space-y-4">
                 {event?.tickets?.map((ticket: any) => (
