@@ -173,11 +173,7 @@ export default function EventPage() {
       </div>
 
       <Sponsors />
-      {/* Banner Section */}
-      <div className="px-16">
-      <EventsBanner />
-      </div>
-      
+    
       {isLoading ? (
         <EventPageLoader />
       ): (
@@ -186,7 +182,25 @@ export default function EventPage() {
           <Categories categories={homeData?.featuredCategories || []} />
 
           {/* Upcoming Events Section with Filters */}
-          <section className="my-8">
+          
+          <section className="my-8 mt-10">
+          <div className="flex gap-4 mb-5">
+              <FilterCard
+                title='Any Category'
+                prefix='category'
+                data={homeData?.featuredCategories.map((category) => category.name) || []}
+              />
+              <FilterCard
+                title='Event Type'
+                prefix='type'
+                data={eventTypes.map((type) => type.name) || []}
+              />
+              <FilterCard
+                title='Any Time'
+                prefix='time'
+                data={eventFilterTime}
+              />
+            </div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Upcoming Events</h2>
               <Link 
@@ -211,23 +225,6 @@ export default function EventPage() {
                   />
                 </svg>
               </Link>
-            </div>
-            <div className="flex gap-4 mb-8">
-              <FilterCard
-                title='Any Category'
-                prefix='category'
-                data={homeData?.featuredCategories.map((category) => category.name) || []}
-              />
-              <FilterCard
-                title='Event Type'
-                prefix='type'
-                data={eventTypes.map((type) => type.name) || []}
-              />
-              <FilterCard
-                title='Any Time'
-                prefix='time'
-                data={eventFilterTime}
-              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {homeData?.upcomingEvents.map((event) => (
@@ -261,6 +258,11 @@ export default function EventPage() {
               ))}
             </div>
           </section>
+
+            {/* Banner Section */}
+      <div className="px-16">
+      <EventsBanner />
+      </div>
 
 
           {/* Blog Section */}
