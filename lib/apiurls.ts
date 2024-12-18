@@ -147,4 +147,10 @@ export default class APIUrls {
     // get all blogs
     static readonly getAllBlogs = `${APIUrls.BASE_URL}/api/v1/blogs`;
 
+    // get all events
+    static readonly getAllMainEvents = `${APIUrls.BASE_URL}/api/v1/main/events`;
+
+    // get event by id
+    static readonly getMainEventById = `${APIUrls.BASE_URL}/api/v1/main/event`;
+
 }
