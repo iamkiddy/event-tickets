@@ -31,7 +31,7 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
   // Icon styles - Adjusted for better alignment
   const iconClasses = isCompact
     ? "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4"
-    : "absolute left-3 top-[50%] -translate-y-[50%] text-gray-400 h-4 w-4";
+    : "absolute left-3 top-[50%] -translate-y-[50%] text-primaryColor h-4 w-4";
 
   // Input field styles - Removed ring and adjusted padding
   const inputClasses = isCompact
