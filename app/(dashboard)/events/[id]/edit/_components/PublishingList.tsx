@@ -6,8 +6,8 @@ import { Globe, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories } from '@/lib/actions/events';
-import { GetOrganizerUtils, UtilsCategoriesResponse } from '@/lib/models/_events_models';
+import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories, getUtilsEventTypes } from '@/lib/actions/events';
+import { GetOrganizerUtils, UtilsCategoriesResponse, UtilsEventTypesResponse } from '@/lib/models/_events_models';
 
 interface PublishingListProps {
   eventId: string;
@@ -53,11 +53,13 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   const [isLoading, setIsLoading] = useState(true);
   const [organisers, setOrganisers] = useState<GetOrganizerUtils[]>([]);
   const [categories, setCategories] = useState<UtilsCategoriesResponse[]>([]);
+  const [eventTypes, setEventTypes] = useState<UtilsEventTypesResponse[]>([]);
   const [subCategories, setSubCategories] = useState<string[]>([]);
   const [publishData, setPublishData] = useState({
     organizer: '',
     category: '',
     subcategory: '',
+    eventType: '',
     isPublished: true,
     isRefundable: true,
     daysBefore: 7
@@ -67,9 +69,10 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     const fetchData = async () => {
       try {
         const eventData = await getEventFinalStage(eventId);
-        const [organiserData, categoryData] = await Promise.all([
+        const [organiserData, categoryData, eventTypeData] = await Promise.all([
           getOrganiserUtils(),
-          getUtilsCategories()
+          getUtilsCategories(),
+          getUtilsEventTypes()
         ]);
 
         if (Array.isArray(organiserData)) {
@@ -86,10 +89,18 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
           setCategories([]);
         }
 
+        if (Array.isArray(eventTypeData)) {
+          setEventTypes(eventTypeData);
+        } else {
+          console.error('Expected eventTypeData to be an array:', eventTypeData);
+          setEventTypes([]);
+        }
+
         setPublishData({
           organizer: eventData.organiser || '',
           category: eventData.category || '',
           subcategory: eventData.subCategories?.[0] || '',
+          eventType: eventData.eventType || '',
           isPublished: true,
           isRefundable: eventData.isRefundable,
           daysBefore: eventData.daysBefore
@@ -202,6 +213,26 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                   {organisers.map((org) => (
                     <SelectItem key={org.id} value={org.id}>
                       {org.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Event Type *
+              </label>
+              <Select
+                value={publishData.eventType}
+                onValueChange={(value) => setPublishData({ ...publishData, eventType: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select event type (e.g., Conference, Workshop)" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {eventTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

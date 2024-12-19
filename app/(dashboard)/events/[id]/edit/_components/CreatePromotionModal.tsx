@@ -6,7 +6,7 @@ import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { CreateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
-import { createEventTicketPromotion, getEventsUtils } from '@/lib/actions/events';
+import { createEventTicketPromotion, getEventsUtils, getEventTicketPromotions } from '@/lib/actions/events';
 import {SelectItem} from "@/components/ui/select";
 import InputField from '@/components/custom/InputField';
 import SelectField from '@/components/custom/SelectField';
@@ -31,10 +31,23 @@ export function CreatePromotionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
   const [promotionTab, setPromotionTab] = useState<'promo' | 'discount'>('promo');
+  const [existingPromotions, setExistingPromotions] = useState<any[]>([]);
+  const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
+    code: '',
+    promotionType: 'discount',
+    value: 0,
+    valueType: 'percentage',
+    endDate: '',
+    endTime: '',
+    quantity: 0,
+    isActive: true,
+    tickets: []
+  });
 
   useEffect(() => {
     if (isOpen) {
       fetchEventUtils();
+      fetchExistingPromotions();
     }
   }, [isOpen]);
 
@@ -48,20 +61,29 @@ export function CreatePromotionModal({
     }
   };
 
-  const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
-    code: '',
-    promotionType: 'discount',
-    value: 0,
-    valueType: 'percentage',
-    endDate: '',
-    endTime: '',
-    quantity: 0,
-    isActive: true,
-    tickets: []
-  });
+  const fetchExistingPromotions = async () => {
+    try {
+      const response = await getEventTicketPromotions(eventId);
+      setExistingPromotions(response.promotions || []);
+    } catch (error) {
+      console.error('Error fetching promotions:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (promotionTab === 'discount') {
+      const existingDiscount = existingPromotions.find(
+        (promo) => promo.promotionType === 'discount'
+      );
+      
+      if (existingDiscount) {
+        toast.error('Only one discount is allowed. Please edit the existing discount instead.');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -115,9 +137,12 @@ export function CreatePromotionModal({
                       : "text-gray-600"
                   )}
                 >
-                  <div className="flex items-center justify-center gap-3">
-                    <PercentIcon className="w-5 h-5" />
-                    Direct Discount
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center gap-3">
+                      <PercentIcon className="w-5 h-5" />
+                      Direct Discount
+                    </div>
+                    <span className="text-xs text-gray-500 mt-1">(Only one discount allowed)</span>
                   </div>
                 </button>
               </div>

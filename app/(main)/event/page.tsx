@@ -14,11 +14,6 @@ import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> a677d5371cf329b6c3a3c8892e22145d5cecc309
 interface EventPageProps {
   searchParams: {
     search?: string;

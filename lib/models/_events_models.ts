@@ -349,6 +349,7 @@ export interface GetEventFinalStage{
     organiser:string,
     category:string,
     subCategories: string[];
+    eventType:string;
     isPublished:boolean;
     isRefundable:boolean;
     daysBefore:number;
