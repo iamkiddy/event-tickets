@@ -14,10 +14,12 @@ import { LoginAlert } from '@/app/auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
 import { EventsBanner } from './components/EventsBanner';
 import { GetCategoryUtilsResponse, GetEventTypeUtilsResponse, GetHomepageUtilsResponse } from '@/lib/models/_main_models';
-import { getCategoryUtils, getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
-import { EventCardSkeleton, BlogCardSkeleton, CategorySkeleton, EventsBannerSkeleton, SectionHeaderSkeleton } from './components/skeletons';
-import { Skeleton } from "@/components/ui/skeleton";
+import { getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
+import { EventCardSkeleton, BlogCardSkeleton, EventsBannerSkeleton, SectionHeaderSkeleton } from './components/skeletons';
 import Image from 'next/image';
+import EventPageLoader from './components/Pageloader';
+import FilterCard from './components/FilterCard';
+import { eventFilterTime } from '@/lib/constants';
 
 export const navLinks = [
   { label: 'Schedule' },
@@ -54,13 +56,10 @@ export default function EventPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [categoriesData, eventTypesData, homeData] = await Promise.all([
-          getCategoryUtils(),
+        const [eventTypesData, homeData] = await Promise.all([
           getEventTypeUtils(),
           getHomepageUtils()
         ]);
-        
-        setCategories(categoriesData);
         setEventTypes(eventTypesData);
         setHomeData(homeData);
       } catch (error) {
@@ -175,123 +174,75 @@ export default function EventPage() {
       </div>
 
       <Sponsors />
-
-      {/* Categories Section */}
+      
       {isLoading ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <CategorySkeleton key={i} />
-            ))}
-          </div>
-        </div>
-      ) : (
-        homeData?.featuredCategories && homeData.featuredCategories.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-            <Categories categories={homeData.featuredCategories} />
-          </div>
-        )
-      )}
+        <EventPageLoader />
+      ): (
+        <div className='h-full flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16'>
+          {/* Categories Section */}
+          <Categories categories={homeData?.featuredCategories || []} />
 
-      {/* Rest of the content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Events Banner */}
-        {isLoading ? (
-          <EventsBannerSkeleton />
-        ) : (
-          homeData?.upcomingEvents && homeData.upcomingEvents.length > 0 && <EventsBanner />
-        )}
-        
-        {/* Upcoming Events Section */}
-        {isLoading ? (
-          <section className="mt-16">
-            <SectionHeaderSkeleton className="mb-8" />
+          {/* Filter Section */}
+          <div className='flex flex-col gap-4 md:flex-row mt-16'>
+              <FilterCard
+                title='Any Category'
+                prefix='category'
+                data={homeData?.featuredCategories.map((category) => category.name) || []}
+              />
+              <FilterCard
+                title='Event Type'
+                prefix='type'
+                data={eventTypes.map((type) => type.name) || []}
+              />
+              <FilterCard
+                title='Any Time'
+                prefix='time'
+                data={eventFilterTime}
+              />
+          </div>
+
+          {/* Upcoming Events Section */}
+          <section className="my-8">
+            <h2 className="text-2xl font-bold mb-8">Upcoming Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <EventCardSkeleton key={i} />
+              {homeData?.upcomingEvents.map((event) => (
+                <EventCard 
+                  key={event.id}
+                  id={event.id}
+                  month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
+                  day={new Date(event.startDate).getDate().toString()}
+                  title={event.title}
+                  description={event.summary}
+                  image={event.image}
+                />
               ))}
             </div>
           </section>
-        ) : (
-          homeData?.upcomingEvents && homeData.upcomingEvents.length > 0 && (
-            <section className="mt-16">
-              <div className="flex flex-col mb-8">
-                <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
-                
-                <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-                  {categories.length > 0 && (
-                    <select 
-                      className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                        text-primaryColor border border-indigo-100 focus:outline-none 
-                        focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-                    >
-                      <option value="">Any Category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
 
-                  {eventTypes.length > 0 && (
-                    <select 
-                      className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                        text-primaryColor border border-indigo-100 focus:outline-none 
-                        focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-                    >
-                      <option value="any">Event Type</option>
-                      {eventTypes.map((type) => (
-                        <option key={type.id} value={type.id}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-
-                  <select 
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full bg-indigo-50 
-                      text-primaryColor border border-indigo-100 focus:outline-none 
-                      focus:ring-2 focus:ring-indigo-200 whitespace-nowrap flex-shrink-0"
-                  >
-                    <option value="any">Any Time</option>
-                    <option value="today">Today</option>
-                    <option value="tomorrow">Tomorrow</option>
-                    <option value="thisWeek">This Week</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {homeData.upcomingEvents.map((event) => (
-                  <EventCard 
-                    key={event.id}
-                    id={event.id}
-                    month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                    day={new Date(event.startDate).getDate().toString()}
-                    title={event.title}
-                    description={event.summary}
-                    image={event.image}
-                  />
-                ))}
-              </div>
-            </section>
-          )
-        )}
-
-        {/* Latest Blog Posts Section */}
-        {isLoading ? (
-          <section className="mt-16">
-            <SectionHeaderSkeleton className="mb-8" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[...Array(3)].map((_, i) => (
-                <BlogCardSkeleton key={i} />
+          {/* Most Viewed Events Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Most Viewed Events</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {homeData?.mostViewedEvents.map((event) => (
+                <EventCard 
+                  key={event.id}
+                  id={event.id}
+                  month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
+                  day={new Date(event.startDate).getDate().toString()}
+                  title={event.title}
+                  description={event.summary}
+                  image={event.image}
+                />
               ))}
             </div>
           </section>
-        ) : (
-          homeData?.pageBlogs && homeData.pageBlogs.length > 0 && (
-            <section className="mt-16">
+
+          {/* Banner Section */}
+          <EventsBanner />
+
+          {/* Blog Section */}
+          {homeData?.pageBlogs && homeData.pageBlogs.length > 0 && (
+            <section className="my-16">
               <h2 className="text-2xl font-bold mb-8">Latest Blog Posts</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {homeData.pageBlogs.map((post) => (
@@ -306,13 +257,13 @@ export default function EventPage() {
                 ))}
               </div>
             </section>
-          )
-        )}
+          )}
 
-        <section className="mt-16 mb-16 max-w-xl mx-auto">
+          {/* Newsletter Section */}
           <Newsletter />
-        </section>
-      </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
