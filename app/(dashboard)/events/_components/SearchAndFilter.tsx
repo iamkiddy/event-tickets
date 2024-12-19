@@ -28,10 +28,10 @@ export function SearchAndFilter({
   const [isLoading, setIsLoading] = React.useState(true);
 
   const containerClasses = "w-full bg-white rounded-xl shadow-sm border border-gray-200 mb-5";
-  const inputContainerClasses = "flex-1 relative group";
+  const inputContainerClasses = "flex-1 relative group min-w-[200px]";
   const iconClasses = "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4";
-  const inputClasses = "pl-9 h-10 text-sm bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus-visible:border-indigo-300 focus-visible:ring-2 focus-visible:ring-indigo-100 focus-visible:ring-offset-0 transition-all";
-  const selectClasses = "h-10 px-4 text-sm rounded-lg bg-white border border-gray-200 text-gray-600 hover:border-gray-300 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all cursor-pointer outline-none";
+  const inputClasses = "w-full pl-9 h-10 text-sm bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus-visible:border-indigo-300 focus-visible:ring-2 focus-visible:ring-indigo-100 focus-visible:ring-offset-0 transition-all";
+  const selectClasses = "w-full h-10 px-4 text-sm rounded-lg bg-white border border-gray-200 text-gray-600 hover:border-gray-300 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all cursor-pointer outline-none";
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +55,7 @@ export function SearchAndFilter({
 
   return (
     <div className={containerClasses}>
-      <div className="flex items-center gap-4 p-3">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 p-3">
         <div className={inputContainerClasses}>
           <Search className={iconClasses} />
           <Input 
@@ -66,9 +66,9 @@ export function SearchAndFilter({
           />
         </div>
 
-        <div className="h-8 w-px bg-gray-200" />
+        <div className="hidden md:block h-8 w-px bg-gray-200" />
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch gap-3 min-w-[200px]">
           <select 
             className={selectClasses}
             onChange={(e) => onCategoryChange?.(e.target.value)}

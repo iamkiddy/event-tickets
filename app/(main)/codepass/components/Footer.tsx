@@ -42,12 +42,12 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 mt-5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-white font-semibold mb-4">Use CodePass</h3>
-            <ul className="space-y-2">
+    <footer className="bg-gray-900 text-gray-300 mt-3 xs:mt-5">
+      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-8 xs:py-10 sm:py-12">
+        <div className="grid grid-cols-2 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 xs:gap-8">
+          <div className="col-span-2 xs:col-span-1">
+            <h3 className="text-white font-semibold text-sm xs:text-base mb-3 xs:mb-4">Use CodePass</h3>
+            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.useEventick.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="hover:text-white transition-colors">
@@ -59,8 +59,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-4">Plan Events</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm xs:text-base mb-3 xs:mb-4">Plan Events</h3>
+            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.planEvents.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="hover:text-white transition-colors">
@@ -72,8 +72,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-4">Top Locations</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm xs:text-base mb-3 xs:mb-4">Top Locations</h3>
+            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.locations.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="hover:text-white transition-colors">
@@ -85,8 +85,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-4">Support</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm xs:text-base mb-3 xs:mb-4">Support</h3>
+            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.support.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="hover:text-white transition-colors">
@@ -98,14 +98,14 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-6">
+        <div className="mt-8 xs:mt-10 sm:mt-12 pt-6 xs:pt-8 border-t border-gray-800">
+          <div className="flex flex-col xs:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap justify-center xs:justify-start items-center gap-4 xs:gap-6">
               {socialLinks.map((social) => (
                 <Link
                   key={social.label}
                   href={social.href}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition-colors text-xs xs:text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -113,7 +113,7 @@ export const Footer = () => {
                 </Link>
               ))}
             </div>
-            <div className="text-sm">
+            <div className="text-xs xs:text-sm text-center xs:text-left">
               © {new Date().getFullYear()} Eventick. All rights reserved.
             </div>
           </div>

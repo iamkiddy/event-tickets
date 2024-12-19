@@ -9,7 +9,8 @@ import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesR
    DeleteEventTicketResponse, GetEventTicketPromotionResponse, UpdateEventTicketPromotionResponse, 
    UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse,
   getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,
-  GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse
+  GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse,
+  DeleteEventResponse
 } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
@@ -58,6 +59,9 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
       throw new Error('Authentication required');
     }
     
+    console.log('API URL:', APIUrls.createEvent);
+    console.log('Creating event with data:', data);
+
     const response = await apiController<CreateEventResponse, CreateEvent>({
       method: 'POST',
       url: APIUrls.createEvent,
@@ -67,11 +71,46 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
     });
     
     return response;
-  } catch (error: unknown) {
-    console.error('API Error:', error); // Debug log
-    const apiError = error as ApiError;
-    const errorMessage = apiError.message || "An unexpected error occurred";
-    throw new Error(errorMessage);
+  } catch (error: any) {
+    console.error('Create Event Error:', {
+      url: APIUrls.createEvent,
+      error: error,
+      message: error.message,
+      response: error.response,
+      stack: error.stack
+    });
+
+    // If it's an API error with a response
+    if (error.response) {
+      throw new Error(error.response.message || 'API Error');
+    }
+
+    // If it's a network error
+    if (error.message === 'Failed to fetch') {
+      throw new Error('Network error - Could not connect to the server');
+    }
+
+    // For other errors
+    throw new Error(error.message || 'An unexpected error occurred');
+  }
+};
+
+export const deleteEvent = async (eventId: string): Promise<DeleteEventResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<DeleteEventResponse>({
+      method: 'DELETE',
+      url: `${APIUrls.deleteEvent}/${eventId}`,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    throw new Error('Failed to delete event');
   }
 };
 

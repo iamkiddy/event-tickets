@@ -170,10 +170,10 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-8 max-w-full mx-auto">
       {/* Basic Info */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Basic Info</h2>
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Basic Info</h2>
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -203,60 +203,86 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Overview
             </label>
-            <Editor
+            <textarea
               value={formData.overview}
-              onChange={handleOverviewChange}
+              onChange={(e) => handleOverviewChange(e.target.value)}
               placeholder="Enter event overview..."
+              rows={4}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Total Capacity
+            </label>
+            <input
+              type="number"
+              name="totalCapacity"
+              value={formData.totalCapacity === 0 ? '' : formData.totalCapacity}
+              onChange={(e) => {
+                const value = e.target.value === '' ? 0 : Math.max(0, parseInt(e.target.value));
+                setFormData({ ...formData, totalCapacity: value });
+              }}
+              min="0"
+              placeholder="Enter total capacity"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
             />
           </div>
         </div>
       </div>
 
       {/* Date and Time */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Date and Time</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <DateTimePicker
-            label="Start Date and Time"
-            date={formData.startDate && formData.startTime ? 
-              new Date(`${formData.startDate}T${formData.startTime}`) : undefined}
-            setDate={(date) => {
-              if (date) {
-                setFormData({
-                  ...formData,
-                  startDate: format(date, 'yyyy-MM-dd'),
-                  startTime: format(date, 'HH:mm')
-                });
-              }
-            }}
-          />
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Date and Time</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-4">
+            <DateTimePicker
+              label="Start Date and Time"
+              date={formData.startDate && formData.startTime ? 
+                new Date(`${formData.startDate}T${formData.startTime}`) : undefined}
+              setDate={(date) => {
+                if (date) {
+                  setFormData({
+                    ...formData,
+                    startDate: format(date, 'yyyy-MM-dd'),
+                    startTime: format(date, 'HH:mm')
+                  });
+                }
+              }}
+            />
+          </div>
 
-          <DateTimePicker
-            label="End Date and Time"
-            date={formData.endDate && formData.endTime ? 
-              new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
-            setDate={(date) => {
-              if (date) {
-                setFormData({
-                  ...formData,
-                  endDate: format(date, 'yyyy-MM-dd'),
-                  endTime: format(date, 'HH:mm')
-                });
-              }
-            }}
-          />
+          <div className="space-y-4">
+            <DateTimePicker
+              label="End Date and Time"
+              date={formData.endDate && formData.endTime ? 
+                new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
+              setDate={(date) => {
+                if (date) {
+                  setFormData({
+                    ...formData,
+                    endDate: format(date, 'yyyy-MM-dd'),
+                    endTime: format(date, 'HH:mm')
+                  });
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
 
       {/* Location */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Location</h2>
-        <div className="space-y-6">
-          <div className="flex gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Location</h2>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <button
               type="button"
               onClick={() => setFormData({ ...formData, locationType: 'venue' })}
-              className={`flex-1 p-4 border rounded-lg text-center hover:border-primaryColor
+              className={`flex-1 p-3 sm:p-4 border rounded-lg text-center hover:border-primaryColor
                 ${formData.locationType === 'venue' ? 'border-primaryColor bg-indigo-50' : 'border-gray-200'}`}
             >
               <MapPin className="mx-auto h-6 w-6 text-gray-400 mb-2" />
@@ -265,7 +291,7 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
             <button
               type="button"
               onClick={() => setFormData({ ...formData, locationType: 'online' })}
-              className={`flex-1 p-4 border rounded-lg text-center hover:border-primaryColor
+              className={`flex-1 p-3 sm:p-4 border rounded-lg text-center hover:border-primaryColor
                 ${formData.locationType === 'online' ? 'border-primaryColor bg-indigo-50' : 'border-gray-200'}`}
             >
               <Info className="mx-auto h-6 w-6 text-gray-400 mb-2" />
@@ -291,7 +317,7 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
                 placeholder="Address Line 2"
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg"
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input
                   type="text"
                   name="city"
@@ -309,7 +335,7 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input
                   type="text"
                   name="country"
@@ -332,14 +358,14 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
         </div>
       </div>
 
-      {/* FAQ Section - Now available in both create and edit modes */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Frequently Asked Questions</h2>
+      {/* FAQ Section */}
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Frequently Asked Questions</h2>
           <button
             type="button"
             onClick={addFAQ}
-            className="px-4 py-2 text-sm text-primaryColor hover:bg-indigo-50 rounded-lg border border-indigo-200"
+            className="w-full sm:w-auto px-4 py-2 text-sm text-primaryColor hover:bg-indigo-50 rounded-lg border border-indigo-200"
           >
             <Plus className="w-4 h-4 inline-block mr-1" />
             Add FAQ
@@ -390,14 +416,14 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
         </div>
       </div>
 
-      {/* Agenda Section - Now available in both create and edit modes */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Event Agenda</h2>
+      {/* Agenda Section */}
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Event Agenda</h2>
           <button
             type="button"
             onClick={addAgendaItem}
-            className="px-4 py-2 text-sm text-primaryColor hover:bg-indigo-50 rounded-lg border border-indigo-200"
+            className="w-full sm:w-auto px-4 py-2 text-sm text-primaryColor hover:bg-indigo-50 rounded-lg border border-indigo-200"
           >
             <Plus className="w-4 h-4 inline-block mr-1" />
             Add Agenda Item
@@ -470,18 +496,18 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
       </div>
 
       {/* Submit Button */}
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
+          className="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-primaryColor text-white rounded-lg hover:bg-indigo-700 
+          className="w-full sm:w-auto px-6 py-2 bg-primaryColor text-white rounded-lg hover:bg-indigo-700 
             disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Saving...' : mode === 'create' ? 'Create Event' : 'Save Changes'}

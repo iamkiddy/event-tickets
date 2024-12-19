@@ -79,10 +79,10 @@ export function PromotionsSection({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center px-4">
+      <div className="flex justify-end items-center px-2 sm:px-4">
         <Button
           onClick={handleCreatePromotion}
-          className="flex items-center gap-2 bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
+          className="w-full sm:w-auto flex items-center gap-2 bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           Create Promotion
@@ -90,7 +90,7 @@ export function PromotionsSection({
       </div>
 
       {promotions.length === 0 ? (
-        <div className="text-center py-16 bg-gradient-to-b from-indigo-50/50 to-white rounded-2xl border border-indigo-100/50">
+        <div className="text-center py-8 sm:py-16 bg-gradient-to-b from-indigo-50/50 to-white rounded-2xl border border-indigo-100/50 mx-2 sm:mx-0">
           <div className="max-w-md mx-auto space-y-6 px-4">
             <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto transform transition-transform hover:scale-110 duration-200">
               <Tag className="w-8 h-8 text-primaryColor" />
@@ -112,7 +112,7 @@ export function PromotionsSection({
           </div>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 px-2 sm:px-0">
           {promotions.map((promotion) => {
             const isExpired = new Date(promotion.endDate) < new Date();
             const appliedTickets = tickets.filter(ticket => promotion.tickets.includes(ticket.id));
@@ -124,42 +124,42 @@ export function PromotionsSection({
                   ${isExpired ? 'bg-gray-50' : 'bg-white'}`}
                 onClick={() => handleCardClick(promotion.id)}
               >
-                <div className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-4 flex-1">
-                      {/* Header Section */}
-                      <div className="flex items-center gap-3 flex-wrap">
+                <div className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
+                    <div className="space-y-4 flex-1 w-full">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-wrap">
                         <div className="flex items-center gap-2">
                           <PercentIcon className={`w-5 h-5 ${isExpired ? 'text-gray-400' : 'text-primaryColor'}`} />
-                          <h3 className={`text-xl font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-900'} 
+                          <h3 className={`text-lg sm:text-xl font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-900'} 
                             group-hover:text-primaryColor transition-colors`}>
                             {promotion.code}
                           </h3>
                         </div>
-                        <span className={`px-4 py-1.5 text-sm font-medium rounded-full
-                          ${isExpired 
-                            ? 'bg-gray-100 text-gray-600' 
-                            : 'bg-green-50 text-green-600'}`}>
-                          {promotion.valueType === 'percentage' ? `${promotion.value}% OFF` : `$${promotion.value} OFF`}
-                        </span>
-                        {isExpired && (
-                          <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">
-                            Expired
+                        <div className="flex flex-wrap gap-2">
+                          <span className={`px-3 py-1 text-sm font-medium rounded-full
+                            ${isExpired 
+                              ? 'bg-gray-100 text-gray-600' 
+                              : 'bg-green-50 text-green-600'}`}>
+                            {promotion.valueType === 'percentage' ? `${promotion.value}% OFF` : `$${promotion.value} OFF`}
                           </span>
-                        )}
+                          {isExpired && (
+                            <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">
+                              Expired
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Details Section */}
-                      <div className="flex flex-wrap gap-4 text-sm">
+                      <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 text-xs sm:text-sm">
                             Valid: {new Date(promotion.startDate).toLocaleDateString()} - {new Date(promotion.endDate).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Tag className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 text-xs sm:text-sm">
                             {promotion.quantity > 0 ? (
                               <span className="text-green-600 font-medium">{promotion.quantity} remaining</span>
                             ) : (
@@ -169,18 +169,17 @@ export function PromotionsSection({
                         </div>
                       </div>
 
-                      {/* Applied Tickets Section */}
                       {appliedTickets.length > 0 && (
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <Ticket className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-700">Applied to:</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">Applied to:</span>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {appliedTickets.map(ticket => (
                               <span
                                 key={ticket.id}
-                                className="px-3 py-1 bg-indigo-50 text-primaryColor text-sm font-medium rounded-full"
+                                className="px-2 sm:px-3 py-1 bg-indigo-50 text-primaryColor text-xs sm:text-sm font-medium rounded-full"
                               >
                                 {ticket.type}
                               </span>
@@ -190,8 +189,7 @@ export function PromotionsSection({
                       )}
                     </div>
 
-                    {/* Actions Section */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 sm:self-start w-full sm:w-auto justify-end">
                       <Button
                         variant="ghost"
                         size="sm"

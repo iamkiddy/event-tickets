@@ -14,8 +14,11 @@ import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> a677d5371cf329b6c3a3c8892e22145d5cecc309
 interface EventPageProps {
   searchParams: {
     search?: string;
@@ -75,25 +78,26 @@ export default function EventsPage({ searchParams }: EventPageProps) {
       
       {(isMainLoading && isLoading ) ? (<div>...loading</div>): (
         <>
-          {/* Enhanced Filters Section */}
-          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm pb-2">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          {/* Enhanced Filters Section - Made more responsive */}
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm pb-2 overflow-x-auto">
+            <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+              <div className="flex flex-nowrap items-center gap-2 sm:gap-3 md:gap-4 py-2 md:justify-center">
                 <EventFilterCard 
-                  icon={<Tag className="w-4 h-4 text-primaryColor mr-2" />}
+                  icon={<Tag className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Category" 
                   activeName={searchParams.category} 
-                  query="category" data={categories?.map((category) => category.name) as string[]} 
+                  query="category"
+                  data={categories?.map((category) => category.name) as string[]} 
                 />
                 <EventFilterCard 
-                  icon={<Dice3 className="w-4 h-4 text-primaryColor mr-2" />}
+                  icon={<Dice3 className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Any Time" 
                   activeName={searchParams.time} 
                   query="time" 
                   data={eventFilterTime}
                 />
                 <EventFilterCard 
-                  icon={<Layout className="w-4 h-4 text-primaryColor mr-2" />}
+                  icon={<Layout className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Event Type" 
                   activeName={searchParams.type} 
                   query="type" 
@@ -104,26 +108,26 @@ export default function EventsPage({ searchParams }: EventPageProps) {
             </div>
           </div>
 
-          {/* Events Grid - Enhanced */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Events Grid - Enhanced responsiveness */}
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="animate-pulse">
                     <div className="bg-gray-200 aspect-[4/3] rounded-t-xl" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded w-1/2" />
+                    <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                      <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 {events?.data.map((event) => (
                   <EventCard 
                     key={event.id} 
-                   data={event}
+                    data={event}
                   />
                 ))}
               </div>

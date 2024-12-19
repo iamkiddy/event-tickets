@@ -14,6 +14,7 @@ import { GetAllBlogsResponse } from '@/lib/models/_blogs_models';
 import { BlogCardSkeleton } from '../codepass/components/skeletons';
 import parser from 'html-react-parser';
 import {navLinks} from "@/app/(main)/codepass/EventickPage"
+import { BlogCard } from '../codepass/components/BlogCard';
 
 const categories = [
   'All',
@@ -106,7 +107,7 @@ export default function BlogPage() {
         onLoginSuccess={() => setShowLoginDialog(false)}
       />
 
-      <div className="relative h-[600px] mb-16">
+      <div className="relative h-[400px] sm:h-[500px] md:h-[600px] mb-8 sm:mb-16">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
@@ -118,14 +119,14 @@ export default function BlogPage() {
         </div>
         
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-full flex flex-col items-center justify-center pt-20">
-            <span className="inline-block px-4 py-1 bg-indigo-600/90 text-white text-sm font-medium rounded-full mb-6">
+          <div className="h-full flex flex-col items-center justify-center pt-16 sm:pt-20">
+            <span className="inline-block px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-4 sm:mb-6">
               The Event Planning Blog
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-8 max-w-4xl leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-4 sm:mb-8 max-w-4xl leading-tight px-4">
               Insights and Stories from the World of Events
             </h1>
-            <p className="text-lg md:text-xl text-white/90 text-center max-w-2xl leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 text-center max-w-2xl leading-relaxed px-4">
               Expert tips, industry trends, and success stories to help you create unforgettable experiences
             </p>
           </div>
@@ -133,7 +134,7 @@ export default function BlogPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-16">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-8 sm:mb-16">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
             Browse by Category
           </h2>
@@ -148,13 +149,13 @@ export default function BlogPage() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category)}
-                className="rounded-full px-6 py-2 text-sm"
+                className="rounded-full px-3 sm:px-6 py-1 sm:py-2 text-xs sm:text-sm"
               >
                 {category}
               </Button>
@@ -162,8 +163,8 @@ export default function BlogPage() {
           </div>
         </div>
 
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Post</h2>
+        <div className="mb-8 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8">Featured Post</h2>
           {isLoading ? (
             <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
               <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -194,126 +195,74 @@ export default function BlogPage() {
               </div>
             </article>
           ) : blogs.length > 0 && (
-            <article className="bg-white rounded-2xl overflow-hidden shadow-xl">
+            <article className="bg-white rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01] group">
               <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="relative h-[400px] lg:h-full">
+                <div className="relative h-[300px] lg:h-[400px]">
                   <Image
                     fill
                     src={blogs[0].image}
                     alt={blogs[0].title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute top-6 left-6">
-                    <span className="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                      {blogs[0].title}
-                    </span>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
-                <div className="p-8 lg:p-12 flex flex-col justify-center">
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                    <span>{new Date(blogs[0].date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                    {blogs[0].title}
-                  </h3>
-                  <p className="text-gray-600 mb-6 line-clamp-3">
-                    {parser(blogs[0].summary)}
-                  </p>
-                  <div className="flex items-center gap-4 mb-6">
-                    <Image
-                      fill
-                      src="https://ui-avatars.com/api/?name=John+Doe"
-                      alt={blogs[0].author}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">{blogs[0].author}</div>
-                      <div className="text-sm text-gray-500">Event Specialist</div>
-                    </div>
-                  </div>
-                  <Link 
-                    href={`/blog/${blogs[0].id}`}
-                    className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
-                      transition-colors group"
-                  >
-                    Read Full Article 
-                    <svg 
-                      className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor"
+                <div className="p-6 lg:p-8 flex flex-col justify-center relative">
+                  <div className="space-y-4">
+                    <span className="text-sm text-indigo-600 font-medium">
+                      {new Date(blogs[0].date).toLocaleDateString('en-US', { 
+                        day: 'numeric', 
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </span>
+                    <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+                      {blogs[0].title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed line-clamp-3">
+                      {parser(blogs[0].summary)}
+                    </p>
+                    <Link 
+                      href={`/blog/${blogs[0].id}`}
+                      className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 
+                        transition-colors group/link pt-2"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+                      Read More 
+                      <svg 
+                        className="w-4 h-4 transform group-hover/link:translate-x-1 transition-transform" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </article>
           )}
         </div>
 
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Latest Posts</h2>
+        <div className="mb-8 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8">Latest Posts</h2>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {[...Array(6)].map((_, i) => (
                 <BlogCardSkeleton key={i} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {blogs.slice(1).map((post) => (
-                <article
+                <BlogCard
                   key={post.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl 
-                    transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <div className="relative h-56">
-                    <Image
-                      fill
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                      <span>{new Date(post.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {parser(post.summary)}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          fill
-                          src="https://ui-avatars.com/api/?name=John+Doe"
-                          alt={post.author}
-                          className="w-8 h-8 rounded-full"
-                        />
-                        <span className="text-sm font-medium text-gray-900">{post.author}</span>
-                      </div>
-                      <Link 
-                        href={`/blog/${post.id}`}
-                        className="text-indigo-600 font-medium hover:text-indigo-700 
-                          transition-colors inline-flex items-center gap-1 group"
-                      >
-                        Read More 
-                        <svg 
-                          className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                </article>
+                  id={post.id}
+                  image={post.image}
+                  title={post.title}
+                  description={post.summary}
+                  date={post.date}
+                  author={post.author}
+                />
               ))}
             </div>
           )}

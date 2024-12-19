@@ -182,11 +182,11 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Publishing Details</h2>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Organizer *
@@ -227,7 +227,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Subcategory *
               </label>
@@ -253,10 +253,9 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 </div>
               )}
             </div>
-            
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -267,7 +266,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
               <span className="text-sm text-gray-700">Allow Refunds</span>
             </label>
             {publishData.isRefundable && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Input
                   type="number"
                   value={publishData.daysBefore}
@@ -281,7 +280,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
           </div>
 
           <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="mt-1">
+            <div className="mt-1 flex-shrink-0">
               {status === 'draft' ? (
                 <AlertCircle className="w-5 h-5 text-yellow-500" />
               ) : (
@@ -300,7 +299,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
             </div>
           </div>
 
-          <div>
+          <div className="mt-6">
             <Button
               onClick={handlePublish}
               disabled={isSubmitting}
@@ -312,9 +311,9 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Publishing Steps</h2>
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <ChecklistItem
             title="Basic Information"
             description="Add event title, date, time, and description"

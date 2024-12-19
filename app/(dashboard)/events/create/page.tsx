@@ -11,13 +11,20 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (data: any) => {
     try {
+      console.log('Submitting event data:', data);
       const response = await createEvent(data);
+      console.log('Create event response:', response);
       toast.success('Event created successfully');
-      // Navigate to the upload page with the new event ID
       router.push(`/events/${response.eventId}/upload`);
-    } catch (error) {
-      toast.error('Failed to create event');
-      console.error('Error creating event:', error);
+    } catch (error: any) {
+      const errorMessage = typeof error === 'object' ? 
+        error.message || JSON.stringify(error) : 
+        'Failed to create event';
+      console.error('Error details:', {
+        originalError: error,
+        formattedMessage: errorMessage
+      });
+      toast.error(errorMessage);
     }
   };
 

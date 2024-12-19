@@ -40,19 +40,19 @@ export const Sponsors = () => {
   ];
 
   return (
-    <section className="bg-white py-16 border-b border-gray-100">
+    <section className="bg-white py-8 sm:py-12 md:py-16 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-gray-600 text-sm font-medium mb-10">
+        <p className="text-xs sm:text-sm text-center text-gray-600 font-medium mb-6 sm:mb-8 md:mb-10">
           TRUSTED BY WORLD-CLASS COMPANIES
         </p>
-        <div className="flex justify-center items-center flex-wrap gap-x-16 gap-y-12">
+        <div className="flex justify-center items-center flex-wrap gap-x-8 sm:gap-x-12 md:gap-x-16 gap-y-8 sm:gap-y-10 md:gap-y-12">
           {sponsors.map((sponsor) => (
             <div 
               key={sponsor.name}
-              className="group relative"
+              className="group relative w-24 sm:w-28 md:w-32"
             >
-              <div className="absolute -inset-4 bg-gradient-to-r from-indigo-100 to-pink-100 
-                rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
+              <div className="absolute -inset-2 sm:-inset-3 md:-inset-4 bg-gradient-to-r from-indigo-100 to-pink-100 
+                rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
               <div className="relative opacity-90 hover:opacity-100 
                 transition-all duration-300 transform hover:scale-110">
                 <Image
@@ -60,7 +60,7 @@ export const Sponsors = () => {
                   alt={`${sponsor.name} logo`}
                   width={sponsor.width}
                   height={40}
-                  className="h-8 w-auto object-contain"
+                  className="h-6 sm:h-7 md:h-8 w-auto object-contain"
                   priority
                 />
               </div>

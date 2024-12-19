@@ -54,7 +54,7 @@ export default function HeroSection() {
 
 
   return (
-    <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] mb-8 sm:mb-16">
+    <div className="relative h-[350px] xs:h-[400px] sm:h-[500px] lg:h-[600px] mb-6 xs:mb-8 sm:mb-16">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
@@ -65,31 +65,31 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         </div>
 
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-full flex flex-col items-center justify-center pt-24 sm:pt-20">
-            <span className="hidden sm:inline-block px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-4 sm:mb-6">
+        <div className="relative h-full max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+          <div className="h-full flex flex-col items-center justify-center pt-16 xs:pt-20 sm:pt-24">
+            <span className="hidden xs:inline-block px-2 xs:px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-3 xs:mb-4 sm:mb-6">
               Find Your Next Event
             </span>
-            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white text-center mb-4 sm:mb-8 max-w-4xl leading-tight mt-8 sm:mt-0">
+            <h1 className="text-xl xs:text-2xl sm:text-4xl lg:text-6xl font-bold text-white text-center mb-3 xs:mb-4 sm:mb-8 max-w-4xl leading-tight mt-6 xs:mt-8 sm:mt-0">
               Find Your Next Experience
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-8 sm:mb-12 px-4">
+            <p className="text-sm xs:text-base sm:text-lg lg:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-6 xs:mb-8 sm:mb-12 px-3 xs:px-4">
               Discover amazing events happening around you
             </p>
 
             {/* Enhanced Search Bar - Responsive */}
-            <div className="w-full max-w-4xl px-4 sm:px-6">
-              <div className="bg-white/95 backdrop-blur-lg rounded-2xl sm:rounded-full shadow-xl">
+            <div className="w-full max-w-4xl px-3 xs:px-4 sm:px-6">
+              <div className="bg-white/95 backdrop-blur-lg rounded-xl xs:rounded-2xl sm:rounded-full shadow-xl">
                 {/* Mobile Layout */}
-                <div className="block lg:hidden p-4 space-y-4">
+                <div className="block lg:hidden p-3 xs:p-4 space-y-3 xs:space-y-4">
                   {/* Search Input */}
                   <div className="relative flex items-center">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-2 xs:left-3 top-1/2 -translate-y-1/2 text-gray-400 h-3 w-3 xs:h-4 xs:w-4" />
                     <input
                       placeholder="Search events..."
                       value={searchParams.get("search")?.toString() || ""}
                       onChange={handleSearch}
-                      className="w-full pl-10 pr-4 py-3 rounded-full bg-transparent text-sm focus:outline-none focus:ring-0"
+                      className="w-full pl-8 xs:pl-10 pr-3 xs:pr-4 py-2 xs:py-3 rounded-full bg-transparent text-xs xs:text-sm focus:outline-none focus:ring-0"
                     />
                   </div>
 

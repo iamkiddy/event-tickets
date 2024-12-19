@@ -29,42 +29,63 @@ export default async function <T, D = unknown>({
   contentType,
   data,
 }: IController<D>): Promise<T> {
-  const headers: HeadersInit = {
-    Authorization: `Bearer ${token}`,
-  };
+  try {
+    const headers: HeadersInit = {
+      Authorization: `Bearer ${token}`,
+    };
 
-  let body: BodyInit | null = null;
+    let body: BodyInit | null = null;
 
-  if (data) {
-    if (contentType === "application/json") {
-      headers["Content-Type"] = "application/json";
-      body = JSON.stringify(data);
-    } else if (contentType === "multipart/form-data") {
-      // Don't set Content-Type for multipart/form-data
-      body = data instanceof FormData ? data : Object.assign(new FormData(), data);
-    } else {
-      headers["Content-Type"] = contentType || "application/x-www-form-urlencoded";
-      body = new URLSearchParams(data as Record<string, string>).toString();
+    if (data) {
+      if (contentType === "application/json") {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(data);
+      } else if (contentType === "multipart/form-data") {
+        // Don't set Content-Type for multipart/form-data
+        body = data instanceof FormData ? data : Object.assign(new FormData(), data);
+      } else {
+        headers["Content-Type"] = contentType || "application/x-www-form-urlencoded";
+        body = new URLSearchParams(data as Record<string, string>).toString();
+      }
     }
-  }
-  
 
-  const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {
-    method,
-    headers,
-    body,
-  });
+    console.log('Request details:', {
+      url: `${url}?${new URLSearchParams(params).toString()}`,
+      method,
+      headers,
+      body: body ? JSON.parse(body.toString()) : null
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    console.error('Response error:', {
+    const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {
+      method,
+      headers,
+      body,
+    });
+
+    const responseData = await response.json();
+    
+    console.log('Response details:', {
       status: response.status,
       statusText: response.statusText,
-      errorData
+      data: responseData
     });
-    throw new Error(errorData?.detail || errorData?.message || "An error occurred");
-  }
 
-  const result = await response.json().catch(() => null);
-  return result as T;
+    if (!response.ok) {
+      throw {
+        status: response.status,
+        message: responseData.message || responseData.detail || "An error occurred",
+        data: responseData
+      };
+    }
+
+    return responseData as T;
+  } catch (error: any) {
+    console.error('API Controller Error:', {
+      error,
+      message: error.message,
+      status: error.status,
+      data: error.data
+    });
+    throw error;
+  }
 }

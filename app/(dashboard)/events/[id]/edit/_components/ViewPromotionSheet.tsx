@@ -75,10 +75,10 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="block text-sm font-medium text-gray-500">
-                        Promotion Code
+                        {promotion.promotionType === 'discount' ? 'Discount' : 'Promotion Code'}
                       </label>
                       <p className="mt-1 text-lg font-semibold text-primaryColor">
-                        {promotion.code}
+                        {promotion.promotionType === 'discount' ? 'Discount' : promotion.code}
                       </p>
                     </div>
                     <Badge
