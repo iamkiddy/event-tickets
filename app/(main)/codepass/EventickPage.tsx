@@ -33,7 +33,6 @@ export default function EventPage() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [showSearchInNav, setShowSearchInNav] = React.useState(false);
-  const [categories, setCategories] = React.useState<GetCategoryUtilsResponse[]>([]);
   const [eventTypes, setEventTypes] = React.useState<GetEventTypeUtilsResponse[]>([]);
   const [homeData, setHomeData] = React.useState<GetHomepageUtilsResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
