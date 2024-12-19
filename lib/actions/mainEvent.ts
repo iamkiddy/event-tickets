@@ -3,7 +3,7 @@
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import { ApiError } from 'next/dist/server/api-utils';
-import { EventListResponse, MainEventResponse,OrganisedEventResponse,RelatedEventResponse } from '../models/_main_event_models';
+import { EventListResponse, EventDetails,OrganisedEventResponse,RelatedEventResponse } from '../models/_main_event_models';
 
 export interface GetMainEventsParams {
   search?: string;
@@ -42,21 +42,6 @@ export const getAllMainEvents = async (params?: GetMainEventsParams): Promise<Ev
   }
 };
 
-export const getMainEventById = async (id: string): Promise<MainEventResponse> => {
-  try {
-    const response = await apiController<MainEventResponse>({
-      method: 'GET',
-      url: `${APIUrls.getMainEventById}/${id}`,
-      contentType: 'application/json',
-    });
-    return response;
-  } catch (error) {
-    console.error('Error fetching event by ID:', error);
-    const apiError = error as ApiError;
-    const errorMessage = apiError.message || "Failed to fetch event";
-    throw new Error(errorMessage);
-  }
-};
 
 export const getRelatedEvents = async (eventId: string): Promise<RelatedEventResponse[]> => {
   try {
@@ -89,3 +74,20 @@ export const getOrganisedEvents = async (organizerId: string): Promise<Organised
     throw new Error(errorMessage);
   }
 };
+
+export async function getEventDetails(eventId: string): Promise<EventDetails> {
+  try {
+    const response = await apiController<EventDetails, void>({
+      method: 'GET',
+      url: `${APIUrls.getMainEventById}/${eventId}`,
+      contentType: 'application/json'
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error fetching event details:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to fetch event details";
+    throw new Error(errorMessage);
+  }
+}

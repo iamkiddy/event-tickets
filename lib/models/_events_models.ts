@@ -52,7 +52,7 @@ export interface CreateEvent {
     endTime: string;
     totalCapacity: number;
     tags: string[];
-    locationType: string;
+    locationType: 'venue' | 'online';
     address1: string;
     address2: string;
     city: string;
@@ -346,9 +346,9 @@ export interface UpdateEventTicket {
     }
 
 export interface GetEventFinalStage{
-    organiser:string,
-    category:string,
-    subCategories: string[];
+    organizer: string;
+    category: string;
+    subcategory: string;
     eventType:string;
     isPublished:boolean;
     isRefundable:boolean;

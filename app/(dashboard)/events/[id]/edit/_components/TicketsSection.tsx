@@ -101,10 +101,7 @@ export function TicketsSection({
                           <Users className="w-4 h-4 text-gray-400" />
                           <span>{ticket.available} tickets available</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-gray-400" />
-                          <span>{ticket.description}</span>
-                        </div>
+                       
                       </div>
 
                       {ticketPromotions.length > 0 && (

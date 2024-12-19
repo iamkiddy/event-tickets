@@ -56,10 +56,10 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   const [eventTypes, setEventTypes] = useState<UtilsEventTypesResponse[]>([]);
   const [subCategories, setSubCategories] = useState<string[]>([]);
   const [publishData, setPublishData] = useState({
-    organizer: '',
-    category: '',
-    subcategory: '',
-    eventType: '',
+    organizer: "",
+    category: "",
+    subcategory: "",
+    eventType: "",
     isPublished: true,
     isRefundable: true,
     daysBefore: 7
@@ -68,58 +68,49 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventData = await getEventFinalStage(eventId);
-        const [organiserData, categoryData, eventTypeData] = await Promise.all([
+        setIsLoading(true);
+        
+        // Fetch all data in parallel for better performance
+        const [eventData, organiserData, categoryData, eventTypeData] = await Promise.all([
+          getEventFinalStage(eventId),
           getOrganiserUtils(),
           getUtilsCategories(),
           getUtilsEventTypes()
         ]);
 
-        if (Array.isArray(organiserData)) {
-          setOrganisers(organiserData);
-        } else {
-          console.error('Expected organiserData to be an array:', organiserData);
-          setOrganisers([]);
-        }
+        // Set the utils data
+        setOrganisers(Array.isArray(organiserData) ? organiserData : []);
+        setCategories(Array.isArray(categoryData) ? categoryData : []);
+        setEventTypes(Array.isArray(eventTypeData) ? eventTypeData : []);
 
-        if (Array.isArray(categoryData)) {
-          setCategories(categoryData);
-        } else {
-          console.error('Expected categoryData to be an array:', categoryData);
-          setCategories([]);
-        }
-
-        if (Array.isArray(eventTypeData)) {
-          setEventTypes(eventTypeData);
-        } else {
-          console.error('Expected eventTypeData to be an array:', eventTypeData);
-          setEventTypes([]);
-        }
-
-        setPublishData({
-          organizer: eventData.organiser || '',
-          category: eventData.category || '',
-          subcategory: eventData.subCategories?.[0] || '',
-          eventType: eventData.eventType || '',
-          isPublished: true,
-          isRefundable: eventData.isRefundable,
-          daysBefore: eventData.daysBefore
-        });
-
+        // Set subcategories based on the category from server
         if (eventData.category) {
           const selectedCategory = categoryData.find(cat => cat.id === eventData.category);
-          if (selectedCategory && Array.isArray(selectedCategory.subCategories)) {
+          if (selectedCategory?.subCategories) {
             setSubCategories(selectedCategory.subCategories);
-          } else {
-            setSubCategories([]);
           }
         }
 
+        // Set all form data from server using the exact field names from the API response
+        const formData = {
+          organizer: eventData.organizer || '',
+          category: eventData.category || '',
+          subcategory: eventData.subcategory || '',
+          eventType: eventData.eventType || '',
+          isPublished: eventData.isPublished ?? true,
+          isRefundable: eventData.isRefundable ?? true,
+          daysBefore: eventData.daysBefore ?? 7
+        };
+        
+        console.log('Setting form data:', formData); // Debug log
+        setPublishData(formData);
+
+        // Set publication status
         setStatus(eventData.isPublished ? 'published' : 'draft');
-        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to fetch event details');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -130,17 +121,19 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
   }, [eventId]);
 
   const handleCategoryChange = (categoryId: string) => {
+    const selectedCategory = categories.find((category) => category.id === categoryId);
+    
     setPublishData({
       ...publishData,
       category: categoryId,
-      subcategory: '' // Reset subcategory when category changes
+      subcategory: selectedCategory?.subCategories?.includes(publishData.subcategory) 
+        ? publishData.subcategory 
+        : selectedCategory?.subCategories?.[0] || ''
     });
 
-    const selectedCategory = categories.find((category) => category.id === categoryId);
-    if (selectedCategory && Array.isArray(selectedCategory.subCategories)) {
+    if (selectedCategory?.subCategories) {
       setSubCategories(selectedCategory.subCategories);
     } else {
-      // If no subcategories or invalid data, set empty array
       setSubCategories([]);
     }
   };
@@ -157,7 +150,6 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
       const dataToPublish = {
         ...publishData,
         isPublished: true,
-        // If no subcategories available, send an empty string
         subcategory: subCategories.length === 0 ? '' : publishData.subcategory
       };
       

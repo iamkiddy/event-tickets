@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast';
 import { deleteEventTicketPromotion } from '@/lib/actions/events';
 import { DeletePromotionAlert } from './DeletePromotionAlert';
 import { ViewPromotionSheet } from './ViewPromotionSheet';
+import { format } from 'date-fns';
 
 interface PromotionsSectionProps {
   promotions: EventTicketPromotion[];
@@ -154,7 +155,9 @@ export function PromotionsSection({
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
                           <span className="text-gray-600 text-xs sm:text-sm">
-                            Valid: {new Date(promotion.startDate).toLocaleDateString()} - {new Date(promotion.endDate).toLocaleDateString()}
+                            {promotion.endDate && promotion.endTime
+                              ? `Expired on ${format(new Date(`${promotion.endDate}T${promotion.endTime}`), 'PPP p')}`
+                              : ''}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">

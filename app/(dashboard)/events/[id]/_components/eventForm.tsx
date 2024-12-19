@@ -7,14 +7,23 @@ import { useRouter } from 'next/navigation';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { updateEventFAQ, updateEventAgenda } from '@/lib/actions/events';
+import { 
+  updateEventFAQ, 
+  updateEventAgenda, 
+  deleteEventFAQ,
+  deleteEventAgenda 
+} from '@/lib/actions/events';
 import { Editor } from '@/components/ui/editor';
+import { CreateEvent } from '@/lib/models/_events_models';
+
 interface EventFAQ {
+  id: string;
   question: string;
   answer: string;
 }
 
 interface EventAgendaItem {
+  id: string;
   title: string;
   description: string;
   startTime: string;
@@ -23,16 +32,16 @@ interface EventAgendaItem {
 }
 
 interface EventFormProps {
-  initialData?: any;
+  initialData?: Partial<CreateEvent>;
   mode: 'create' | 'edit';
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: CreateEvent) => Promise<void>;
   eventId?: string;
 }
 
 export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateEvent>({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
     overview: initialData?.overview || '',
@@ -51,8 +60,6 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     postalCode: initialData?.postalCode || '',
     eventFAQ: initialData?.eventFAQ || [],
     eventAgenda: initialData?.eventAgenda || [],
-    image: initialData?.image || '',
-    video: initialData?.video || '',
   });
 
   const addFAQ = () => {
@@ -66,10 +73,25 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     });
   };
 
-  const removeFAQ = (index: number) => {
+  const removeFAQ = async (index: number) => {
+    const faq = formData.eventFAQ[index];
     const newFAQ = [...formData.eventFAQ];
     newFAQ.splice(index, 1);
     setFormData({ ...formData, eventFAQ: newFAQ });
+
+    // If in edit mode and FAQ has an ID, delete it from the server
+    if (mode === 'edit' && eventId && faq.id) {
+      try {
+        await deleteEventFAQ({
+          eventId,
+          faqId: faq.id
+        });
+        toast.success('FAQ deleted successfully');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to delete FAQ');
+        console.error('Error deleting FAQ:', error);
+      }
+    }
   };
 
   const updateFAQ = (index: number, field: 'question' | 'answer', value: string) => {
@@ -92,10 +114,25 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     });
   };
 
-  const removeAgendaItem = (index: number) => {
+  const removeAgendaItem = async (index: number) => {
+    const agenda = formData.eventAgenda[index];
     const newAgenda = [...formData.eventAgenda];
     newAgenda.splice(index, 1);
     setFormData({ ...formData, eventAgenda: newAgenda });
+
+    // If in edit mode and agenda item has an ID, delete it from the server
+    if (mode === 'edit' && eventId && agenda.id) {
+      try {
+        await deleteEventAgenda({
+          eventId,
+          agendaId: agenda.id
+        });
+        toast.success('Agenda item deleted successfully');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to delete agenda item');
+        console.error('Error deleting agenda item:', error);
+      }
+    }
   };
 
   const updateAgendaItem = (index: number, field: string, value: any) => {
@@ -108,20 +145,68 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      // Create a copy of formData without FAQs and Agenda for the main submit
+      const mainFormData = {
+        ...formData,
+        eventFAQ: formData.eventFAQ.filter(faq => faq.id), // Only include existing FAQs
+        eventAgenda: formData.eventAgenda.filter(agenda => agenda.id) // Only include existing agenda items
+      };
+
+      // First submit the main form data
+      await onSubmit(mainFormData);
+
+      // If we're in edit mode and have an eventId, handle FAQ and Agenda updates
+      if (mode === 'edit' && eventId) {
+        // Handle new FAQs
+        const faqPromises = formData.eventFAQ.map(async faq => {
+          if (!faq.id) { // New FAQ
+            await updateEventFAQ({
+              eventId,
+              question: faq.question,
+              answer: faq.answer
+            });
+          }
+        });
+
+        // Handle new Agenda Items
+        const agendaPromises = formData.eventAgenda.map(async agenda => {
+          if (!agenda.id) { // New Agenda Item
+            await updateEventAgenda({
+              eventId,
+              title: agenda.title,
+              description: agenda.description,
+              startTime: agenda.startTime,
+              endTime: agenda.endTime,
+              host: agenda.host || [] // Ensure host is always an array
+            });
+          }
+        });
+
+        // Wait for all updates to complete
+        await Promise.all([
+          ...faqPromises,
+          ...agendaPromises
+        ]);
+      }
+
+      toast.success(`Event ${mode === 'create' ? 'created' : 'updated'} successfully`);
+      if (mode === 'create') {
+        router.push('/events');
+      }
     } catch (error: any) {
       toast.error(error.message || `Failed to ${mode} event`);
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleSummaryChange = (value: string) => {
-    setFormData({ ...formData, summary: value });
+  const handleSummaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, summary: e.target.value }));
   };
 
   const handleOverviewChange = (value: string) => {
-    setFormData({ ...formData, overview: value });
+    setFormData(prev => ({ ...prev, overview: value }));
   };
 
   const handleFAQUpdate = async (faq: EventFAQ & { id: string }) => {
@@ -169,68 +254,126 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     }
   };
 
+  const handleTagsChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const value = (e.target as HTMLInputElement).value.trim();
+      if (value) {
+        const tag = value.startsWith('#') ? value : `#${value}`;
+        if (!formData.tags.includes(tag)) {
+          setFormData(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+        }
+        (e.target as HTMLInputElement).value = '';
+      }
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-8 max-w-full mx-auto">
-      {/* Basic Info */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Basic Info</h2>
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Event Title
-            </label>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-6">
+        {/* Title */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Enter event title..."
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+              focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+          />
+        </div>
+
+        {/* Summary */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Summary
+          </label>
+          <input
+            type="text"
+            name="summary"
+            value={formData.summary}
+            onChange={handleSummaryChange}
+            placeholder="Enter event summary..."
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+              focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+          />
+        </div>
+
+        {/* Overview */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Overview
+          </label>
+          <Editor
+            value={formData.overview}
+            onChange={handleOverviewChange}
+            placeholder="Enter event overview..."
+          />
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tags
+          </label>
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.tags.map((tag: string, index: number) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm 
+                    bg-primaryColor/10 text-primaryColor"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="ml-2 text-primaryColor hover:text-primaryColor/80"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
             <input
               type="text"
-              name="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Type a tag and press Enter (e.g., #hiphop)"
+              onKeyDown={handleTagsChange}
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
                 focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Summary
-            </label>
-            <Editor
-              value={formData.summary}
-              onChange={handleSummaryChange}
-              placeholder="Enter event summary..."
-            />
-          </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Overview
-            </label>
-            <textarea
-              value={formData.overview}
-              onChange={(e) => handleOverviewChange(e.target.value)}
-              placeholder="Enter event overview..."
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Total Capacity
-            </label>
-            <input
-              type="number"
-              name="totalCapacity"
-              value={formData.totalCapacity === 0 ? '' : formData.totalCapacity}
-              onChange={(e) => {
-                const value = e.target.value === '' ? 0 : Math.max(0, parseInt(e.target.value));
-                setFormData({ ...formData, totalCapacity: value });
-              }}
-              min="0"
-              placeholder="Enter total capacity"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
-            />
-          </div>
+        {/* Total Capacity */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Total Capacity
+          </label>
+          <input
+            type="number"
+            name="totalCapacity"
+            value={formData.totalCapacity === 0 ? '' : formData.totalCapacity}
+            onChange={(e) => {
+              const value = e.target.value === '' ? 0 : Math.max(0, parseInt(e.target.value));
+              setFormData({ ...formData, totalCapacity: value });
+            }}
+            min="0"
+            placeholder="Enter total capacity"
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+              focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor"
+          />
         </div>
       </div>
 

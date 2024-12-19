@@ -30,50 +30,6 @@ export interface EventListResponse {
   data: EventListItem[];
 }
 
-// Main Event Response Model
-export interface MainEventResponse {
-  id: string;
-  title: string;
-  summary: string;
-  overview: string;
-  startDate: string;
-  mainImage: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  state: string;
-  country: string;
-  postalCode: string;
-  images: string[];
-  organiser: string;
-  isRefundable?: boolean;
-  refundDaysBefore?: number;
-  eventAgenda?: {
-    id: string;
-    title: string;
-    description: string;
-    startTime: string;
-    endTime: string;
-    host: string[];
-  }[];
-  eventFAQ?: {
-    id: string;
-    question: string;
-    answer: string;
-  }[];
-  tickets?: {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    currency: string;
-    discountValue: number;
-    discountType: string;
-  }[];
-}
 
 
 // Organised Event Response Model
@@ -98,4 +54,69 @@ export interface RelatedEventResponse{
   author: string;
   date: string;
   image: string;
+}
+
+// Event Organizer Model
+export interface EventOrganizer {
+  name: string;
+  profileImage: string;
+  phone1: string;
+  phone2: string;
+  website: string;
+  bio: string;
+  country: string;
+}
+
+// Event Ticket Model
+export interface EventTicket {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  currency: string;
+  discountValue: number;
+  discountType: string;
+}
+
+// Event FAQ Model
+export interface EventFAQ {
+  question: string;
+  answer: string;
+}
+
+// Event Agenda Model
+export interface EventAgenda {
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  host: string[];
+}
+
+// Event Details Model
+export interface EventDetails {
+  id: string;
+  images: string[];
+  title: string;
+  summary: string;
+  overview: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  country: string;
+  city: string;
+  state: string;
+  address1: string;
+  address2: string;
+  totalCapacity: number;
+  videoUrl: string;
+  tags: string[];
+  locationType: string;
+  isRefundable: boolean;
+  refundDaysBefore: number;
+  faqs: EventFAQ[];
+  agendas: EventAgenda[];
+  tickets: EventTicket[];
+  organizer: EventOrganizer;
 }

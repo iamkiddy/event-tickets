@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Download, Filter } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -23,7 +21,7 @@ interface OrderListProps {
 
 export function OrderList({ eventId, initialOrders = [] }: OrderListProps) {
   const [orders] = useState<Order[]>(initialOrders);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
@@ -41,34 +39,16 @@ export function OrderList({ eventId, initialOrders = [] }: OrderListProps) {
   return (
     <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900">Orders</h2>
-        <Button
-          onClick={() => {/* Add export handler */}}
-          variant="outline"
-          className="w-full sm:w-auto flex items-center justify-center gap-2"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </Button>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">Recent Orders</h2>
+        <div className="flex items-center gap-2">
           <Input
-            type="search"
             placeholder="Search orders..."
-            className="pl-10 w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 max-w-[200px]"
           />
         </div>
-        <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
-          <Filter className="w-4 h-4" />
-          Filter
-        </Button>
       </div>
 
       {/* Orders Table */}

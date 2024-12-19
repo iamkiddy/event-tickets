@@ -9,7 +9,9 @@ import {
   Users, 
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  CheckCircle,
+  ShieldCheck
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -63,8 +65,42 @@ export function DashboardOverview({ eventId, initialStats }: DashboardOverviewPr
     }
   ];
 
+  const handleVerifyEvent = () => {
+    // Add your logic here
+  };
+
+  const event = {
+    isVerified: false,
+    isPublished: false
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <h2 className="text-2xl font-bold tracking-tight">Overview</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleVerifyEvent}
+            className="bg-green-600 hover:bg-green-700 text-white"
+            disabled={event.isVerified}
+          >
+            {event.isVerified ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Verified
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="h-4 w-4 mr-2" />
+                Verify Event
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {statsCards.map((stat) => {

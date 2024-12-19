@@ -1,20 +1,14 @@
-'use client';
-
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { 
-  CreditCard, 
-  Plus,
+import { format } from "date-fns";
+import {
+  CreditCard,
   Wallet,
-  Trash2,
+  Plus,
   Edit,
-  Lock
+  Trash2,
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
 
 interface PaymentMethod {
   id: string;
@@ -27,75 +21,80 @@ interface PaymentMethod {
 
 interface Transaction {
   id: string;
-  date: Date;
-  amount: number;
   description: string;
+  amount: number;
+  date: Date;
   paymentMethod: string;
-  status: 'successful' | 'failed' | 'pending';
+  status: 'successful' | 'pending' | 'failed';
 }
 
 const mockPaymentMethods: PaymentMethod[] = [
   {
-    id: 'pm_1',
+    id: '1',
     type: 'credit_card',
     last4: '4242',
-    expiryDate: '12/25',
+    expiryDate: '12/24',
     isDefault: true,
-    status: 'active'
+    status: 'active',
   },
   {
-    id: 'pm_2',
+    id: '2',
     type: 'paypal',
     isDefault: false,
-    status: 'active'
+    status: 'active',
   },
   {
-    id: 'pm_3',
+    id: '3',
     type: 'credit_card',
     last4: '1234',
-    expiryDate: '09/24',
+    expiryDate: '06/23',
     isDefault: false,
-    status: 'expired'
-  }
+    status: 'expired',
+  },
 ];
 
 const mockTransactions: Transaction[] = [
   {
-    id: 'tx_1',
+    id: '1',
+    description: 'Concert Tickets',
+    amount: 150,
     date: new Date(),
-    amount: 49.99,
-    description: 'Monthly Subscription',
-    paymentMethod: 'Visa •••• 4242',
-    status: 'successful'
+    paymentMethod: '**** 4242',
+    status: 'successful',
   },
   {
-    id: 'tx_2',
-    date: new Date(Date.now() - 86400000),
-    amount: 99.99,
-    description: 'Premium Plan Upgrade',
+    id: '2',
+    description: 'Festival Pass',
+    amount: 299,
+    date: new Date(),
     paymentMethod: 'PayPal',
-    status: 'successful'
-  }
+    status: 'pending',
+  },
 ];
 
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(price);
+};
+
+const getStatusColor = (status: Transaction['status'] | PaymentMethod['status']) => {
+  switch (status) {
+    case 'successful':
+    case 'active':
+      return 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400';
+    case 'failed':
+    case 'expired':
+      return 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
+
 export default function PaymentMethodsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const getStatusColor = (status: Transaction['status'] | PaymentMethod['status']) => {
-    switch (status) {
-      case 'successful':
-      case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400';
-      case 'failed':
-      case 'expired':
-        return 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
@@ -111,7 +110,7 @@ export default function PaymentMethodsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Payment Methods Section */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader className="p-4 sm:p-6">
               <CardTitle>Saved Payment Methods</CardTitle>
@@ -171,33 +170,10 @@ export default function PaymentMethodsPage() {
               ))}
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Security</CardTitle>
-              <CardDescription>Payment security settings and preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Lock className="w-6 h-6 text-gray-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Two-Factor Authentication</div>
-                    <div className="text-sm text-gray-500">
-                      Additional security for payments over $1000
-                    </div>
-                  </div>
-                </div>
-                <Button variant="outline">Configure</Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Recent Transactions Section */}
-        <div className="space-y-4 sm:space-y-6">
+        <div>
           <Card>
             <CardHeader className="p-4 sm:p-6">
               <CardTitle>Recent Transactions</CardTitle>
@@ -219,7 +195,7 @@ export default function PaymentMethodsPage() {
                     </div>
                   </div>
                   <div className="text-left sm:text-right w-full sm:w-auto">
-                    <div className="font-medium">${transaction.amount}</div>
+                    <div className="font-medium">{formatPrice(transaction.amount)}</div>
                     <Badge className={getStatusColor(transaction.status)}>
                       {transaction.status}
                     </Badge>
@@ -228,28 +204,6 @@ export default function PaymentMethodsPage() {
               ))}
               <Button variant="outline" className="w-full">
                 View All Transactions
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Limits</CardTitle>
-              <CardDescription>Your current payment thresholds</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Single Transaction</span>
-                  <span className="font-medium">$5,000</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Monthly Limit</span>
-                  <span className="font-medium">$20,000</span>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full">
-                Request Limit Increase
               </Button>
             </CardContent>
           </Card>

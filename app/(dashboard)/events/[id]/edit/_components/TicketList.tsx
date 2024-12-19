@@ -15,6 +15,7 @@ import { UpdateTicketModal } from './UpdateTicketModal';
 import { DeleteTicketAlert } from './DeleteTicketAlert';
 import { toast } from 'react-hot-toast';
 import { deleteEventTicket } from '@/lib/actions/events';
+import { format } from 'date-fns';
 
 interface TicketListProps {
   eventId: string;
@@ -51,8 +52,8 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
           price: Number(ticket.price) || 0,
           available: Number(ticket.quantity) || 0,
           description: ticket.startDate && ticket.endDate 
-            ? `Valid from ${new Date(ticket.startDate).toLocaleDateString()} to ${new Date(ticket.endDate).toLocaleDateString()}`
-            : 'Date range not specified',
+            ? `${format(new Date(`${ticket.startDate}T00:00:00`), 'PPP')} - ${format(new Date(`${ticket.endDate}T00:00:00`), 'PPP')}`
+            : '',
           isPromotion: ticket.isPromotion,
           originalPrice: ticket.originalPrice,
           promotionLabel: ticket.promotionLabel,
