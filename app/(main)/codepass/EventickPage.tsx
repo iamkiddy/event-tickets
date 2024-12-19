@@ -13,13 +13,13 @@ import { Footer } from './components/Footer';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
 import { EventsBanner } from './components/EventsBanner';
-import { GetCategoryUtilsResponse, GetEventTypeUtilsResponse, GetHomepageUtilsResponse } from '@/lib/models/_main_models';
+import {  GetEventTypeUtilsResponse, GetHomepageUtilsResponse } from '@/lib/models/_main_models';
 import { getEventTypeUtils, getHomepageUtils } from '@/lib/actions/main';
-import { EventCardSkeleton, BlogCardSkeleton, EventsBannerSkeleton, SectionHeaderSkeleton } from './components/skeletons';
 import Image from 'next/image';
 import EventPageLoader from './components/Pageloader';
 import FilterCard from './components/FilterCard';
 import { eventFilterTime } from '@/lib/constants';
+import Link from 'next/link';
 
 export const navLinks = [
   { label: 'Schedule' },
@@ -173,7 +173,7 @@ export default function EventPage() {
       </div>
 
       <Sponsors />
-      
+    
       {isLoading ? (
         <EventPageLoader />
       ): (
@@ -181,8 +181,10 @@ export default function EventPage() {
           {/* Categories Section */}
           <Categories categories={homeData?.featuredCategories || []} />
 
-          {/* Filter Section */}
-          <div className='flex flex-col gap-4 md:flex-row mt-16'>
+          {/* Upcoming Events Section with Filters */}
+          
+          <section className="my-8 mt-10">
+          <div className="flex gap-4 mb-5">
               <FilterCard
                 title='Any Category'
                 prefix='category'
@@ -198,11 +200,32 @@ export default function EventPage() {
                 prefix='time'
                 data={eventFilterTime}
               />
-          </div>
-
-          {/* Upcoming Events Section */}
-          <section className="my-8">
-            <h2 className="text-2xl font-bold mb-8">Upcoming Events</h2>
+            </div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Upcoming Events</h2>
+              <Link 
+                href="/event" 
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg 
+                  text-primaryColor hover:bg-primaryColor/10 font-medium 
+                  transition-all duration-300 group"
+              >
+                View All Events
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                  />
+                </svg>
+              </Link>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {homeData?.upcomingEvents.map((event) => (
                 <EventCard 
@@ -236,27 +259,58 @@ export default function EventPage() {
             </div>
           </section>
 
-          {/* Banner Section */}
-          <EventsBanner />
+            {/* Banner Section */}
+      <div className="px-16">
+      <EventsBanner />
+      </div>
+
 
           {/* Blog Section */}
-          {homeData?.pageBlogs && homeData.pageBlogs.length > 0 && (
-            <section className="my-16">
-              <h2 className="text-2xl font-bold mb-8">Latest Blog Posts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {homeData.pageBlogs.map((post) => (
-                  <BlogCard 
-                    key={post.id}
-                    image={post.image}
-                    title={post.title}
-                    description={post.summary}
-                    date={post.date}
-                    author={post.author}
+          <section className="my-16">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Latest Blog Posts</h2>
+              <Link 
+                href="/blog" 
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg 
+                  text-primaryColor hover:bg-primaryColor/10 font-medium 
+                  transition-all duration-300 group"
+              >
+                View All Blog Posts
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 7l5 5m0 0l-5 5m5-5H6" 
                   />
-                ))}
-              </div>
-            </section>
-          )}
+                </svg>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {homeData?.pageBlogs?.map((post) => (
+                <BlogCard 
+                  key={post.id}
+                  id={post.id}
+                  image={post.image}
+                  title={post.title}
+                  description={post.summary}
+                  date={post.date}
+                  author={post.author}
+                />
+              )) || (
+                // Fallback content when no blogs are available
+                <div className="col-span-3 text-center py-8">
+                  <p className="text-gray-500">No blog posts available at the moment.</p>
+                </div>
+              )}
+            </div>
+          </section>
 
           {/* Newsletter Section */}
           <Newsletter />
