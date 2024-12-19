@@ -6,6 +6,9 @@ import { NavLink } from '@/app/(main)/codepass/components/NavLink';
 import { SearchBar } from '@/app/(main)/codepass/components/SearchBar';
 import { Tag } from 'lucide-react';
 import { UserDropdown } from '@/components/userDropdown';
+import { navLinks } from '@/app/(main)/codepass/EventickPage';
+import { LoginAlert } from '@/app/auth/_components/loginAlert';
+
 interface AuthenticatedNavProps {
   isScrolled: boolean;
   showSearchInNav: boolean;
@@ -63,3 +66,63 @@ export const AuthenticatedNav = ({ isScrolled, showSearchInNav }: AuthenticatedN
     </nav>
   );
 };
+
+
+export const UnauthenticatedNav = ({ isScrolled }: { isScrolled: boolean }) => {
+  const [mounted, setMounted] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+        ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
+            <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
+              CodePass
+            </div>
+            
+            <div className="hidden md:flex items-center gap-4 lg:gap-8">
+              {navLinks.map((link) => (
+                <NavLink 
+                  key={link.label}
+                  {...link} 
+                  isScrolled={isScrolled}
+                  onLoginClick={() => setShowLoginDialog(true)}
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-4">
+              <NavLink 
+                label="Create Event"
+                isCreate={true}
+                isScrolled={isScrolled}
+              />
+              <NavLink 
+                label="Login"
+                isButton={true}
+                isScrolled={isScrolled}
+                onLoginClick={() => setShowLoginDialog(true)}
+              />
+            </div>
+          </div>
+        </div>
+      </nav>
+      <LoginAlert 
+        open={showLoginDialog} 
+        onClose={() => setShowLoginDialog(false)}
+        onLoginSuccess={() => setShowLoginDialog(false)}
+      />
+    </>
+    
+  )
+}

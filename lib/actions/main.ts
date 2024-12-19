@@ -1,7 +1,6 @@
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { cookies } from 'next/headers';
-import { GetEventTypeUtilsResponse, GetCategoryUtilsResponse, GetBannerUtilsResponse, GetFaqUtilsResponse, GetNewsletterUtilsRequest, GetNewsletterUtilsResponse, GetHomepageUtilsResponse } from "../models/_main_models";
+import { GetEventTypeUtilsResponse, GetCategoryUtilsResponse, GetBannerUtilsResponse, GetNewsletterUtilsRequest, GetNewsletterUtilsResponse, GetHomepageUtilsResponse } from "../models/_main_models";
 
 
 interface ApiError extends Error {
@@ -16,7 +15,7 @@ export const getCategoryUtils = async (): Promise<GetCategoryUtilsResponse[]> =>
       url: APIUrls.categoryUtils,
       contentType: 'application/json',
     });
-    return response;
+    return response || [];
   } catch (error) {
     console.error('Error fetching category utils:', error);
     const apiError = error as ApiError;
