@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { getMainEventById } from '@/lib/actions/mainEvent';
+import { getMainEventById, getRelatedEvents, getOrganisedEvents } from '@/lib/actions/mainEvent';
 import { useAuth } from '@/lib/context/AuthContext';
 import { NavLink } from '../../codepass/components/NavLink';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
@@ -13,13 +13,29 @@ import { AuthenticatedNav } from '@/components/ui/authNavbar';
 import { navLinks } from "@/app/(main)/codepass/EventickPage";
 import { SearchBar } from '../../codepass/components/SearchBar';
 import parser from 'html-react-parser';
-import { MainEventResponse } from '@/lib/models/_main_event_models';
+import { MainEventResponse, OrganisedEventResponse, RelatedEventResponse } from '@/lib/models/_main_event_models';
+import { EventCard } from '../../codepass/components/EventCard';
 
 interface FormattedDate {
   fullDate: string;
   month: string;
   day: string;
 }
+
+const formatTime = (timeString: string | undefined): string => {
+  if (!timeString) return '';
+  
+  // Remove the +00 if present and split into hours and minutes
+  const time = timeString.replace('+00', '').split(':');
+  const hours = parseInt(time[0]);
+  const minutes = time[1];
+  
+  // Convert to 12-hour format
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+  
+  return `${displayHours}:${minutes} ${period}`;
+};
 
 export default function EventPage() {
   const params = useParams();
@@ -30,6 +46,8 @@ export default function EventPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
+  const [relatedEvents, setRelatedEvents] = useState<RelatedEventResponse[]>([]);
+  const [organiserEvents, setOrganiserEvents] = useState<OrganisedEventResponse[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,6 +115,33 @@ export default function EventPage() {
     fetchEvent();
   }, [params.id]);
 
+  useEffect(() => {
+    const fetchRelatedAndOrganiserEvents = async () => {
+      if (!event?.id || !event?.organiser) return;
+
+      try {
+        const [relatedData, organiserData] = await Promise.all([
+          getRelatedEvents(event.id),
+          getOrganisedEvents(event.organiser)
+        ]);
+
+        if (Array.isArray(relatedData)) {
+          setRelatedEvents(relatedData);
+        }
+        
+        if (Array.isArray(organiserData)) {
+          setOrganiserEvents(organiserData);
+        }
+      } catch (error) {
+        console.error('Error fetching related/organiser events:', error);
+      }
+    };
+
+    if (event) {
+      fetchRelatedAndOrganiserEvents();
+    }
+  }, [event]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -161,11 +206,11 @@ export default function EventPage() {
       />
 
       {/* Hero Section with Image */}
-      <div className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px]">
-        {event?.images?.[0] ? (
+      <div className="relative h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] min-h-[250px] sm:min-h-[350px] md:min-h-[400px]">
+        {event?.mainImage ? (
           <>
             <img
-              src={event.images[0]}
+              src={event.mainImage}
               alt={event?.title || 'Event Image'}
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -181,15 +226,15 @@ export default function EventPage() {
         
         {/* Hero Content */}
         <div className="absolute bottom-0 left-0 right-0">
-          <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
-            <div className="flex items-center gap-2 text-white/80 mb-2 sm:mb-4 text-sm sm:text-base">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+            <div className="flex items-center gap-2 text-white/80 mb-2 sm:mb-3 lg:mb-4 text-xs sm:text-sm">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{formatDate(event?.startDate).fullDate}</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4">
+            <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
               {parser(event?.title || '')}
             </h1>
-            <p className="text-base sm:text-xl text-white/90 max-w-3xl">
+            <p className="text-sm sm:text-base lg:text-xl text-white/90 max-w-3xl line-clamp-2 sm:line-clamp-none">
               {parser(event?.summary || '')}
             </p>
           </div>
@@ -198,10 +243,10 @@ export default function EventPage() {
 
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-14 sm:h-16">
-            <div className="flex items-center gap-2 sm:gap-6">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate max-w-[150px] sm:max-w-xs">
+        <div className="max-w-7xl mx-auto px-3 xs:px-4">
+          <div className="flex justify-between items-center h-12 xs:h-14 sm:h-16">
+            <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-6">
+              <h2 className="text-sm xs:text-base sm:text-lg font-semibold text-gray-900 truncate max-w-[120px] xs:max-w-[150px] sm:max-w-xs">
                 {event?.title}
               </h2>
               <button 
@@ -212,32 +257,34 @@ export default function EventPage() {
                 <span className="hidden sm:inline">Save</span>
               </button>
               <button className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
-                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-primaryColor" />
                 <span className="hidden sm:inline">Share</span>
               </button>
             </div>
-            <button className="px-3 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base bg-primaryColor text-white rounded-lg hover:bg-indigo-700 transition-colors">
+            <button className="px-2.5 xs:px-3 sm:px-6 py-1.5 sm:py-2 text-xs xs:text-sm sm:text-base bg-primaryColor text-white rounded-lg hover:bg-indigo-700 transition-colors">
               Get Tickets
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
             {/* About Section */}
-            <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">About This Event</h2>
-              <div className="prose max-w-none text-gray-600 text-sm sm:text-base">
+            <div className="bg-white p-3 xs:p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <h2 className="text-lg xs:text-xl sm:text-2xl font-semibold text-gray-900 mb-3 xs:mb-4 sm:mb-6">
+                About This Event
+              </h2>
+              <div className="prose max-w-none text-gray-600 text-xs xs:text-sm sm:text-base">
                 {parser(event?.overview || '')}
               </div>
             </div>
 
             {/* Date and Location */}
-            <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
-              <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+            <div className="bg-white p-3 xs:p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <div className="grid xs:grid-cols-2 gap-4 xs:gap-6 sm:gap-8">
                 <div>
                   <div className="flex items-center gap-2 text-gray-900 font-medium mb-4">
                     <Calendar className="w-6 h-6 text-primaryColor" />
@@ -246,8 +293,8 @@ export default function EventPage() {
                   <div className="space-y-2 text-gray-600">
                     <p>{formatDate(event?.startDate).fullDate}</p>
                     <p className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      {event?.startTime} - {event?.endTime}
+                      <Clock className="w-4 h-4 text-primaryColor" />
+                      {formatTime(event?.startTime)} - {formatTime(event?.endTime)}
                     </p>
                   </div>
                 </div>
@@ -306,7 +353,7 @@ export default function EventPage() {
           </div>
 
           {/* Sidebar - Tickets Section */}
-          <div className="lg:sticky lg:top-20 space-y-4 sm:space-y-6 h-fit">
+          <div className="lg:sticky lg:top-24 space-y-4 sm:space-y-6">
             <div className="bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Tickets</h2>
               <div className="space-y-4">
@@ -339,7 +386,7 @@ export default function EventPage() {
 
               {event?.isRefundable && (
                 <p className="mt-4 text-sm text-gray-600 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
+                  <DollarSign className="w-4 h-4 text-primaryColor" />
                   Refundable up to {event.refundDaysBefore} days before the event
                 </p>
               )}
@@ -347,6 +394,54 @@ export default function EventPage() {
           </div>
         </div>
       </div>
+
+      {/* Related Events Section */}
+      {relatedEvents.length > 0 && (
+        <div className="max-w-7xl mx-auto px-3 xs:px-4 py-8 sm:py-12">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+            Similar Events You Might Like
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {relatedEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                data={{
+                  id: event.id,
+                  image: event.mainImage || event.image,
+                  title: event.title,
+                  startDate: event.startDate,
+                  summary: event.summary,
+                  isPublish: true
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Organizer's Other Events Section */}
+      {organiserEvents.length > 0 && (
+        <div className="max-w-7xl mx-auto px-3 xs:px-4 py-8 sm:py-12">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+            More Events by This Organizer
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {organiserEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                data={{
+                  id: event.id,
+                  image: event.mainImage || event.image,
+                  title: event.title,
+                  startDate: event.startDate,
+                  summary: event.summary,
+                  isPublish: true
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

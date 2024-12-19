@@ -156,18 +156,18 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full max-w-full overflow-x-hidden">
       <Tabs defaultValue="tickets" className="w-full">
-        <TabsList className="inline-flex h-14 items-center justify-center rounded-lg bg-indigo-50/50 p-1 text-gray-600">
+        <TabsList className="inline-flex h-auto min-h-[3.5rem] w-full flex-wrap items-center justify-center rounded-lg bg-indigo-50/50 p-1 text-gray-600 gap-2">
           <TabsTrigger 
             value="tickets" 
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-primaryColor data-[state=active]:shadow-sm hover:bg-indigo-50 hover:text-primaryColor"
+            className="flex-1 min-w-[150px] inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-primaryColor data-[state=active]:shadow-sm hover:bg-indigo-50 hover:text-primaryColor"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
               <Plus className="w-4 h-4" />
               <span className="font-semibold">Tickets</span>
               {tickets.length > 0 && (
-                <span className="ml-1 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-primaryColor">
+                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-primaryColor">
                   {tickets.length}
                 </span>
               )}
@@ -175,13 +175,13 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
           </TabsTrigger>
           <TabsTrigger 
             value="promotions"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-primaryColor data-[state=active]:shadow-sm hover:bg-indigo-50 hover:text-primaryColor"
+            className="flex-1 min-w-[150px] inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-primaryColor data-[state=active]:shadow-sm hover:bg-indigo-50 hover:text-primaryColor"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
               <Tag className="w-4 h-4" />
               <span className="font-semibold">Promotions</span>
               {promotions.length > 0 && (
-                <span className="ml-1 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-primaryColor">
+                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-primaryColor">
                   {promotions.length}
                 </span>
               )}
@@ -189,8 +189,8 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-8">
-          <TabsContent value="tickets" className="space-y-6">
+        <div className="mt-4 sm:mt-8">
+          <TabsContent value="tickets" className="space-y-4 sm:space-y-6">
             {isLoading ? (
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primaryColor"></div>
@@ -238,7 +238,7 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
             )}
           </TabsContent>
 
-          <TabsContent value="promotions" className="space-y-6">
+          <TabsContent value="promotions" className="space-y-4 sm:space-y-6">
             <PromotionsSection
               promotions={promotions}
               tickets={tickets}

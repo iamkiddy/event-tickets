@@ -164,27 +164,27 @@ export default function UploadEventMedia() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Upload Event Media</h1>
-          <div className="text-sm text-gray-500">
+    <div className="max-w-4xl mx-auto py-4 sm:py-6 md:py-8 px-2 sm:px-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Upload Event Media</h1>
+          <div className="text-xs sm:text-sm text-gray-500">
             {uploadedMedia.filter(m => m.type === 'image').length} images, 
             {uploadedMedia.filter(m => m.type === 'video').length} video
           </div>
         </div>
 
         {/* Image Upload Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <h4 className="text-sm font-medium text-gray-900">Images</h4>
             <button
               type="button"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primaryColor text-white 
-                rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-primaryColor text-white 
+                rounded-lg hover:bg-indigo-700 transition-colors text-xs sm:text-sm font-medium w-full sm:w-auto"
               onClick={() => document.getElementById('image-upload')?.click()}
             >
-              <ImageIcon className="w-4 h-4" />
+              <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4" />
               Add Images
             </button>
           </div>
@@ -269,16 +269,16 @@ export default function UploadEventMedia() {
         </div>
 
         {/* Video Upload Section */}
-        <div className="space-y-4 mt-8">
-          <div className="flex items-center justify-between">
+        <div className="space-y-3 sm:space-y-4 mt-6 sm:mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
             <h4 className="text-sm font-medium text-gray-900">Video</h4>
             <button
               type="button"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primaryColor text-white 
-                rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-primaryColor text-white 
+                rounded-lg hover:bg-indigo-700 transition-colors text-xs sm:text-sm font-medium w-full sm:w-auto"
               onClick={() => document.getElementById('video-upload')?.click()}
             >
-              <Video className="w-4 h-4" />
+              <Video className="w-3 h-3 sm:w-4 sm:h-4" />
               Add Video
             </button>
           </div>
@@ -344,10 +344,10 @@ export default function UploadEventMedia() {
 
         {/* Uploaded Media Display */}
         {uploadedMedia.length > 0 && (
-          <div className="space-y-4 mt-8">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3 sm:space-y-4 mt-6 sm:mt-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
               <h4 className="text-sm font-medium text-gray-900">Uploaded Media</h4>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 {uploadedMedia.filter(m => m.type === 'image').length} images, 
                 {uploadedMedia.filter(m => m.type === 'video').length} video
               </p>
@@ -357,7 +357,7 @@ export default function UploadEventMedia() {
             {uploadedMedia.some(m => m.type === 'image') && (
               <div>
                 <h5 className="text-sm font-medium text-gray-700 mb-2">Images</h5>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   {uploadedMedia
                     .filter(media => media.type === 'image')
                     .map((media) => (
@@ -375,7 +375,7 @@ export default function UploadEventMedia() {
                           className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full 
                             shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <X className="h-4 w-4 text-gray-600" />
+                          <X className="h-3 h-3 sm:h-4 sm:w-4 text-gray-600" />
                         </button>
                         {uploadedMedia[0].id === media.id && (
                           <div className="absolute bottom-2 left-2 px-2 py-1 bg-white/90 rounded-md 
@@ -392,11 +392,11 @@ export default function UploadEventMedia() {
         )}
 
         {/* Upload Progress and Actions */}
-        <div className="mt-8 flex justify-end gap-4">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
           <Button
             variant="secondary"
             onClick={() => router.push(`/events/${params.id}/edit`)}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 sm:px-6 w-full sm:w-auto"
           >
             Skip & Continue
           </Button>
@@ -404,6 +404,7 @@ export default function UploadEventMedia() {
             variant="outline"
             onClick={() => router.back()}
             disabled={isUploading}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -411,11 +412,11 @@ export default function UploadEventMedia() {
             <Button
               onClick={handleUpload}
               disabled={isUploading}
-              className="bg-primaryColor hover:bg-indigo-700 text-white"
+              className="bg-primaryColor hover:bg-indigo-700 text-white w-full sm:w-auto"
             >
               {isUploading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
                   Uploading...
                 </>
               ) : (

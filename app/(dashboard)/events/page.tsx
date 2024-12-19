@@ -6,7 +6,7 @@ import { getAllEvents } from '@/lib/actions/events';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Event } from '@/lib/models/_events_models';
 import { toast } from 'sonner';
-import { columns } from './_components/columns';
+import { createColumns } from './_components/columns';
 import { DataTable } from '@/components/ui/data-table';
 import { SearchAndFilter } from './_components/SearchAndFilter';
 
@@ -68,28 +68,38 @@ export default function EventsPage() {
   const handleCategoryChange = (value: string) => updateFilters('category', value);
   const handleTypeChange = (value: string) => updateFilters('eventType', value);
 
+  const eventColumns = createColumns({
+    onRefresh: () => fetchEvents({
+      search: searchParams.get('search') || undefined,
+      category: searchParams.get('category') || undefined,
+      eventType: searchParams.get('eventType') || undefined,
+    })
+  });
+
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Events</h1>
-        <p className="text-sm text-gray-600">Manage your events and track their performance</p>
+    <div className="p-2 sm:p-4 md:p-6">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Events</h1>
+        <p className="text-xs sm:text-sm text-gray-600">Manage your events and track their performance</p>
       </div>
 
-      <SearchAndFilter 
-        onSearch={handleSearch}
-        onCategoryChange={handleCategoryChange}
-        onTypeChange={handleTypeChange}
-        initialSearch={searchParams.get('search') || ''}
-        initialCategory={searchParams.get('category') || ''}
-        initialEventType={searchParams.get('eventType') || ''}
-      />
+      <div className="space-y-4 sm:space-y-6">
+        <SearchAndFilter 
+          onSearch={handleSearch}
+          onCategoryChange={handleCategoryChange}
+          onTypeChange={handleTypeChange}
+          initialSearch={searchParams.get('search') || ''}
+          initialCategory={searchParams.get('category') || ''}
+          initialEventType={searchParams.get('eventType') || ''}
+        />
 
-      <DataTable 
-        columns={columns}
-        data={events}
-        isLoading={isLoading}
-        total={events.length}
-      />
+        <DataTable 
+          columns={eventColumns}
+          data={events}
+          isLoading={isLoading}
+          total={events.length}
+        />
+      </div>
     </div>
   );
 }

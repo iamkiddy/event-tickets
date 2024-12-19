@@ -43,10 +43,10 @@ export function DataTable<TData, TValue>({
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-2 sm:space-y-4">
         <div className="border rounded-[10px] border-gray-300">
           <div className="overflow-x-auto">
-            <div className="max-h-[600px] overflow-y-auto min-w-full">
+            <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto min-w-full">
               <Table>
                 <TableHeader>
                   {columns.map((column, index) => (
@@ -70,8 +70,8 @@ export function DataTable<TData, TValue>({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-48" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+          <Skeleton className="h-4 w-36 sm:w-48" />
           <div className="flex items-center space-x-2">
             <Skeleton className="h-8 w-8 rounded-full" />
             <div className="flex items-center space-x-1">
@@ -87,10 +87,10 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 sm:space-y-4">
       <div className="border rounded-[10px] border-gray-300">
         <div className="overflow-x-auto">
-          <div className="max-h-[600px] overflow-y-auto min-w-full">
+          <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto min-w-full">
             <Table>
               <TableHeader className="bg-gray-200">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
                       return (
                         <TableHead 
                           key={header.id} 
-                          className="bg-gray-200 text-gray-600 font-semibold py-3 px-4"
+                          className="bg-gray-200 text-gray-600 font-semibold py-2 px-2 sm:py-3 sm:px-4 text-xs sm:text-sm"
                         >
                           {header.isPlaceholder
                             ? null
@@ -122,7 +122,7 @@ export function DataTable<TData, TValue>({
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="py-3 px-4">
+                        <TableCell key={cell.id} className="py-2 px-2 sm:py-3 sm:px-4 text-xs sm:text-sm">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
@@ -132,11 +132,11 @@ export function DataTable<TData, TValue>({
                   <TableRow className="border-b border-gray-100">
                     <TableCell 
                       colSpan={columns.length} 
-                      className="h-[200px] text-center py-3 px-4"
+                      className="h-[150px] sm:h-[200px] text-center py-2 px-2 sm:py-3 sm:px-4"
                     >
-                      <div className="flex flex-col items-center justify-center space-y-3">
-                        <FolderSearch className="w-12 h-12 text-primaryColor opacity-40" />
-                        <p className="text-lg font-medium text-gray-500">
+                      <div className="flex flex-col items-center justify-center space-y-2 sm:space-y-3">
+                        <FolderSearch className="w-8 h-8 sm:w-12 sm:h-12 text-primaryColor opacity-40" />
+                        <p className="text-base sm:text-lg font-medium text-gray-500">
                           No results found
                         </p>
                       </div>
@@ -149,8 +149,8 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <p className="text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+        <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
           Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
           {Math.min(
             (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -164,9 +164,9 @@ export function DataTable<TData, TValue>({
             size="icon"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="rounded-full hover:bg-gray-100"
+            className="rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <div className="flex items-center space-x-1">
             {[...Array(3)].map((_, i) => (
@@ -175,7 +175,7 @@ export function DataTable<TData, TValue>({
                 variant="ghost"
                 size="sm"
                 onClick={() => table.setPageIndex(i)}
-                className={`rounded-full hover:bg-gray-100 ${
+                className={`rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10 text-xs sm:text-sm ${
                   i === 0 
                     ? "text-primaryColor"
                     : ""
@@ -190,9 +190,9 @@ export function DataTable<TData, TValue>({
             size="icon"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="rounded-full hover:bg-gray-100"
+            className="rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
       </div>

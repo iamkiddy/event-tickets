@@ -97,33 +97,33 @@ export default function PaymentMethodsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Payment Methods</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Payment Methods</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your payment methods and view transactions</p>
         </div>
-        <Button className="bg-primaryColor hover:bg-primaryColor/90 text-white">
+        <Button className="w-full sm:w-auto bg-primaryColor hover:bg-primaryColor/90 text-white">
           <Plus className="w-4 h-4 mr-2" />
           Add Payment Method
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Payment Methods Section */}
-        <div className="md:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="p-4 sm:p-6">
               <CardTitle>Saved Payment Methods</CardTitle>
               <CardDescription>Your saved cards and payment accounts</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 sm:p-6">
               {mockPaymentMethods.map((method) => (
                 <div
                   key={method.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:border-primaryColor transition-colors"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:border-primaryColor transition-colors gap-4 sm:gap-0"
                 >
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 w-full sm:w-auto">
                     {method.type === 'credit_card' ? (
                       <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <CreditCard className="w-6 h-6 text-gray-600" />
@@ -151,7 +151,7 @@ export default function PaymentMethodsPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
                     {method.status === 'active' ? (
                       <>
                         <Button variant="ghost" size="sm" className="text-gray-500 hover:text-primaryColor">
@@ -197,17 +197,17 @@ export default function PaymentMethodsPage() {
         </div>
 
         {/* Recent Transactions Section */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="p-4 sm:p-6">
               <CardTitle>Recent Transactions</CardTitle>
               <CardDescription>Last 30 days of activity</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 sm:p-6">
               {mockTransactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3 sm:gap-0"
                 >
                   <div>
                     <div className="font-medium">{transaction.description}</div>
@@ -218,7 +218,7 @@ export default function PaymentMethodsPage() {
                       {transaction.paymentMethod}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right w-full sm:w-auto">
                     <div className="font-medium">${transaction.amount}</div>
                     <Badge className={getStatusColor(transaction.status)}>
                       {transaction.status}

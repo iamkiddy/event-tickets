@@ -28,11 +28,13 @@ export interface GetEventsParams {
 }
 
 export interface EventFAQ {
+    id: string;
     question: string;
     answer: string;
 }
 
 export interface EventAgendaItem {
+    id: string;
     title: string;
     description: string;
     startTime: string;
@@ -57,17 +59,12 @@ export interface CreateEvent {
     state: string;
     country: string;
     postalCode: string;
-    eventFAQ: {
-        question: string;
-        answer: string;
-    }[];
-    eventAgenda: {
-        title: string;
-        description: string;
-        startTime: string;
-        endTime: string;
-        host: string[];
-    }[];
+    eventFAQ: EventFAQ[];
+    eventAgenda: EventAgendaItem[];
+}
+
+export interface DeleteEventResponse{
+    message: string;
 }
 
 export interface Event extends CreateEvent {

@@ -101,14 +101,16 @@ export function UpdatePromotionModal({
         </SheetHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
-            <InputField
-              label="Promotion Code"
-              value={formData.code}
-              setValue={(value) => setFormData({ ...formData, code: value })}
-              required
-              placeholder="e.g., SUMMER2024"
-              disabled={isSubmitting}
-            />
+            {formData.promotionType !== 'discount' && (
+              <InputField
+                label="Promotion Code"
+                value={formData.code}
+                setValue={(value) => setFormData({ ...formData, code: value })}
+                required
+                placeholder="e.g., SUMMER2024"
+                disabled={isSubmitting}
+              />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SelectField

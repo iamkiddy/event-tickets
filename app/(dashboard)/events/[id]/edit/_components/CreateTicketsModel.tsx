@@ -44,21 +44,22 @@ export function CreateTicketModal({ isOpen, onClose, eventId, onSuccess }: Creat
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-xl md:max-w-2xl overflow-y-auto bg-white">
-        <SheetHeader className="mb-6">
-          <SheetTitle className="text-2xl font-semibold text-gray-900">Create New Ticket</SheetTitle>
+      <SheetContent className="w-[95%] p-4 sm:p-6 sm:max-w-xl md:max-w-2xl overflow-y-auto bg-white">
+        <SheetHeader className="mb-4 sm:mb-6">
+          <SheetTitle className="text-xl sm:text-2xl font-semibold text-gray-900">Create New Ticket</SheetTitle>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <InputField
               label="Title"
               value={formData.name}
               setValue={(value) => setFormData({ ...formData, name: value })}
               required
               disabled={isSubmitting}
+              className="w-full"
             />
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <InputField
                 label="Price"
                 type="number"
@@ -66,6 +67,7 @@ export function CreateTicketModal({ isOpen, onClose, eventId, onSuccess }: Creat
                 setValue={(value) => setFormData({ ...formData, price: Number(value) })}
                 required
                 disabled={isSubmitting}
+                className="w-full"
               />
               <InputField
                 label="Quantity"
@@ -74,6 +76,7 @@ export function CreateTicketModal({ isOpen, onClose, eventId, onSuccess }: Creat
                 setValue={(value) => setFormData({ ...formData, quantity: Number(value) })}
                 required
                 disabled={isSubmitting}
+                className="w-full"
               />
             </div>
             <SelectField
@@ -82,28 +85,23 @@ export function CreateTicketModal({ isOpen, onClose, eventId, onSuccess }: Creat
               setValue={(value) => setFormData({ ...formData, currency: value })}
               required
               disabled={isSubmitting}
-            >
-              {currency.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
-                </SelectItem>
-              ))}
-            </SelectField>
+              className="w-full"
+            />
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end mt-6 sm:mt-10">
             <Button 
               type="button" 
               variant="outline" 
               onClick={onClose} 
-              className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
+              className="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-6 py-2 bg-primaryColor text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-2 bg-primaryColor text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Creating...' : 'Create Ticket'}
             </Button>

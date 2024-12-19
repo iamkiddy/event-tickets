@@ -16,32 +16,33 @@ export const EventsBanner: React.FC = () => {
         />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <div className="text-left">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
             Discover Amazing Events
           </h2>
           
-          <p className="mt-3 text-lg max-w-2xl">
+          <p className="mt-2 sm:mt-3 text-base sm:text-lg max-w-2xl">
             Find and book tickets for concerts, festivals, conferences, and more exciting events happening near you.
           </p>
           
-          <div className="mt-8 flex flex-wrap gap-4">
-            <div className="flex items-center text-sm">
-              <MapPin className="mr-2 h-5 w-5" />
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex items-center text-xs sm:text-sm">
+              <MapPin className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               <span>Events in your city</span>
             </div>
-            <div className="flex items-center text-sm">
-              <Calendar className="mr-2 h-5 w-5" />
+            <div className="flex items-center text-xs sm:text-sm">
+              <Calendar className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               <span>Upcoming this month</span>
             </div>
           </div>
           
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link href="/event">
               <Button
-                className="bg-white text-indigo-600 hover:bg-gray-100"
-                size="lg"
+                className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-gray-100"
+                size="default"
+                variant="default"
               >
                 Browse Events
               </Button>
@@ -49,8 +50,8 @@ export const EventsBanner: React.FC = () => {
             <Link href="/dashboard/events/create">
               <Button
                 variant="outline"
-                className="border-white text-white hover:bg-white/10"
-                size="lg"
+                className="w-full sm:w-auto border-white text-white hover:bg-white/10"
+                size="default"
               >
                 Create Event
               </Button>

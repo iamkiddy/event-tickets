@@ -41,13 +41,13 @@ export function DateTimePicker({ date, setDate, label }: DateTimePickerProps) {
           {label}
         </label>
       )}
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={'outline'}
               className={cn(
-                'w-[240px] justify-start text-left font-normal',
+                'w-full sm:w-[240px] justify-start text-left font-normal',
                 !date && 'text-muted-foreground'
               )}
             >
@@ -65,13 +65,13 @@ export function DateTimePicker({ date, setDate, label }: DateTimePickerProps) {
           </PopoverContent>
         </Popover>
 
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="time"
             value={selectedTime}
             onChange={(e) => handleTimeChange(e.target.value)}
-            className="pl-10"
+            className="pl-10 w-full"
           />
         </div>
       </div>

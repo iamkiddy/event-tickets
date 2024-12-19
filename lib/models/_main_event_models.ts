@@ -37,6 +37,7 @@ export interface MainEventResponse {
   summary: string;
   overview: string;
   startDate: string;
+  mainImage: string;
   startTime: string;
   endDate: string;
   endTime: string;
@@ -47,6 +48,7 @@ export interface MainEventResponse {
   country: string;
   postalCode: string;
   images: string[];
+  organiser: string;
   isRefundable?: boolean;
   refundDaysBefore?: number;
   eventAgenda?: {
@@ -71,4 +73,29 @@ export interface MainEventResponse {
     discountValue: number;
     discountType: string;
   }[];
+}
+
+
+// Organised Event Response Model
+export interface OrganisedEventResponse {
+  id: string;
+  title: string;
+  summary: string;
+  startDate: string;
+  mainImage: string;
+  author: string;
+  date: string;
+  image: string;
+}
+
+// Related Event Response Model
+export interface RelatedEventResponse{
+  id: string;
+  title: string;
+  summary: string;
+  startDate: string;
+  mainImage: string;
+  author: string;
+  date: string;
+  image: string;
 }

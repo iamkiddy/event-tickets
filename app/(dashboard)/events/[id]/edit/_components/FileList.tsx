@@ -102,12 +102,23 @@ export function FileList({ eventId }: FileListProps) {
 
   if (files.length === 0) {
     return (
-      <div className="text-center p-8">
-        <File className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-        <h3 className="text-lg font-medium text-gray-900">No files uploaded</h3>
-        <p className="text-sm text-gray-500 mt-1">
-          Upload files to make them available for event attendees
-        </p>
+      <div className="space-y-6">
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleUploadClick}
+            className="flex items-center gap-2 bg-primaryColor hover:bg-indigo-700 text-white"
+          >
+            <Plus className="w-4 h-4" />
+            Add Media
+          </Button>
+        </div>
+        <div className="text-center p-8">
+          <File className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+          <h3 className="text-lg font-medium text-gray-900">No files uploaded</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Upload files to make them available for event attendees
+          </p>
+        </div>
       </div>
     );
   }

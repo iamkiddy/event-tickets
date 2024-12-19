@@ -29,22 +29,27 @@ export default function EventFilterCard({ name, activeName, query, data, icon }:
     }
 
   return (
-    <div className="relative group">
+    <div className="relative">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger>
                 <div className={cn(
-                    "flex flex-row border border-gray-200 items-center appearance-none pl-3 pr-3 py-2.5 rounded-full bg-gray-50",
-                    "text-sm font-medium text-gray-700 min-w-[140px] sm:min-w-[160px] hover:border-primaryColor/30 focus:outline-none focus:ring-2",
-                    "focus:ring-primaryColor/20 transition-all"
+                    "flex flex-row border border-gray-200 items-center appearance-none px-2 sm:px-3 py-2 sm:py-2.5 rounded-full bg-gray-50",
+                    "text-xs sm:text-sm font-medium text-gray-700 min-w-[100px] sm:min-w-[140px] md:min-w-[160px] hover:border-primaryColor/30",
+                    "focus:outline-none focus:ring-2 focus:ring-primaryColor/20 transition-all"
                 )}>
                     {icon}
-                    <span>{activeName ? activeName : name}</span>
-                    <ChevronDown className="w-4 h-4 ml-10" />
+                    <span className="truncate">{activeName ? activeName : name}</span>
+                    <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-auto" />
                 </div>
             </PopoverTrigger>
-            <PopoverContent className="w-full flex flex-col bg-white shadow-lg rounded-lg px-2 gap-1">
+            <PopoverContent className="w-[200px] sm:w-full max-h-[300px] overflow-y-auto flex flex-col bg-white shadow-lg rounded-lg px-1 sm:px-2 gap-0.5 sm:gap-1">
                 {data.map((item) => (
-                    <Button key={item} onClick={() => handleFilterChange(item)} variant='ghost' className="hover:bg-primaryColor/20">
+                    <Button 
+                        key={item} 
+                        onClick={() => handleFilterChange(item)} 
+                        variant='ghost' 
+                        className="text-xs sm:text-sm py-1.5 h-auto hover:bg-primaryColor/20"
+                    >
                         {item}
                     </Button>
                 ))}
@@ -84,18 +89,20 @@ export const EventFilterList = ({params}: EventFilterListProps) => {
         replace(`${pathName}?${params.toString()}`);
     }
     return (
-        <div className="flex items-center justify-center gap-2 mt-3">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 px-2">
             {params.category && <EventFilterCardButton name={params.category} remove={() => removeFilter("category")} />}
             {params.type && <EventFilterCardButton name={params.type} remove={() => removeFilter("eventType")} />}
             {params.time && <EventFilterCardButton name={params.time} remove={() => removeFilter("time")} />}
-            {(params.category || params.type || params.time) && <button
-                onClick={clearAllFilters}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
-                bg-primaryColor/10 text-red-500 text-sm hover:bg-red-500/15 
-                transition-colors"
-            >
-                CLEAR ALL
-            </button>}
+            {(params.category || params.type || params.time) && (
+                <button
+                    onClick={clearAllFilters}
+                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full 
+                    bg-primaryColor/10 text-red-500 text-xs sm:text-sm hover:bg-red-500/15 
+                    transition-colors"
+                >
+                    CLEAR ALL
+                </button>
+            )}
         </div>
     )
 }
@@ -105,12 +112,12 @@ const EventFilterCardButton = ({remove, name}: {name: string, remove: ()=> void}
     return (
         <button
             onClick={remove}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
-            bg-primaryColor/10 text-primaryColor text-sm hover:bg-primaryColor/15 
-            transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full 
+            bg-primaryColor/10 text-primaryColor text-xs sm:text-sm hover:bg-primaryColor/15 
+            transition-colors truncate max-w-[150px] sm:max-w-none"
         >
-            {name}
-            <X className="w-3 h-3" />
+            <span className="truncate">{name}</span>
+            <X className="w-3 h-3 flex-shrink-0" />
         </button>
     )
 }

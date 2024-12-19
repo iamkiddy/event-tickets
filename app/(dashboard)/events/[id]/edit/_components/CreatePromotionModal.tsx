@@ -10,6 +10,8 @@ import { createEventTicketPromotion, getEventsUtils } from '@/lib/actions/events
 import {SelectItem} from "@/components/ui/select";
 import InputField from '@/components/custom/InputField';
 import SelectField from '@/components/custom/SelectField';
+import { cn } from "@/lib/utils";
+import { Tag, PercentIcon } from 'lucide-react';
 
 interface CreatePromotionModalProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ export function CreatePromotionModal({
 }: CreatePromotionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
+  const [promotionTab, setPromotionTab] = useState<'promo' | 'discount'>('promo');
 
   useEffect(() => {
     if (isOpen) {
@@ -82,22 +85,62 @@ export function CreatePromotionModal({
           <SheetTitle className="text-2xl font-semibold text-gray-900">Create New Promotion</SheetTitle>
         </SheetHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mb-6">
+            <div className="bg-gray-50/50 p-2 rounded-2xl">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPromotionTab('promo')}
+                  className={cn(
+                    "flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-medium transition-all duration-300",
+                    "text-lg hover:text-primaryColor/80",
+                    promotionTab === 'promo' 
+                      ? "bg-white text-primaryColor shadow-lg scale-[1.02]" 
+                      : "text-gray-600"
+                  )}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <Tag className="w-5 h-5" />
+                    Promo Code
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPromotionTab('discount')}
+                  className={cn(
+                    "flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-medium transition-all duration-300",
+                    "text-lg hover:text-primaryColor/80",
+                    promotionTab === 'discount' 
+                      ? "bg-white text-primaryColor shadow-lg scale-[1.02]" 
+                      : "text-gray-600"
+                  )}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <PercentIcon className="w-5 h-5" />
+                    Direct Discount
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-6">
-            <InputField
-              label="Promotion Code"
-              value={formData.code}
-              setValue={(value) => setFormData({ ...formData, code: value })}
-              required
-              placeholder="e.g., SUMMER2024"
-              disabled={isSubmitting}
-            />
+            {promotionTab === 'promo' && (
+              <InputField
+                label="Promotion Code"
+                value={formData.code}
+                setValue={(value) => setFormData({ ...formData, code: value })}
+                required
+                placeholder="e.g., SUMMER2024"
+                disabled={isSubmitting}
+              />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SelectField
                 label='Discount Type'
                 value={formData.valueType}
                 setValue={(value) => setFormData({ ...formData, valueType: value as 'percentage' | 'amount' })}
-
               >
                 <SelectItem value="percentage">Percentage</SelectItem>
                 <SelectItem value="amount">Fixed Amount</SelectItem>
@@ -173,7 +216,7 @@ export function CreatePromotionModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2 mt-3">End Date</label>
                 <DateTimePicker
                   date={formData.endDate ? new Date(formData.endDate) : undefined}
                   setDate={(date) => {

@@ -51,6 +51,9 @@ export default class APIUrls {
     // Create Event
     static readonly createEvent = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/create`;
 
+    // Delete Event
+    static readonly deleteEvent = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/delete`;
+
     // Update Event Images
     static readonly updateEventImages = `${APIUrls.BASE_URL_ORG}/api/v1/org/events/image`;
 
@@ -152,5 +155,11 @@ export default class APIUrls {
 
     // get event by id
     static readonly getMainEventById = `${APIUrls.BASE_URL}/api/v1/main/event`;
+
+    // get related event by id
+    static readonly getRelatedEventById = `${APIUrls.BASE_URL}/api/v1/main/related-events`;
+
+    // get organised event
+    static readonly getOrganisedEvent = `${APIUrls.BASE_URL}/api/v1/main/organizer-events`;
 
 }

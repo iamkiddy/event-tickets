@@ -65,20 +65,19 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-2 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Orders</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your event ticket orders</p>
         </div>
-        <Button className="bg-primaryColor hover:bg-primaryColor/90 text-white shadow-sm">
+        <Button className="w-full sm:w-auto bg-primaryColor hover:bg-primaryColor/90 text-white shadow-sm">
           <Download className="w-4 h-4 mr-2" />
           Export Orders
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="border-primaryColor/10 shadow-sm hover:border-primaryColor/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -117,8 +116,7 @@ export default function OrdersPage() {
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 space-y-4 md:space-y-0 md:flex md:gap-4">
+      <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3 flex flex-col sm:flex-row sm:space-y-0 sm:gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
@@ -128,45 +126,46 @@ export default function OrdersPage() {
             className="pl-10 border-gray-200 dark:border-gray-700 focus:border-primaryColor focus:ring-primaryColor"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full md:w-[180px] border-gray-200 dark:border-gray-700">
-            <Filter className="w-4 h-4 mr-2 text-gray-400" />
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={dateFilter} onValueChange={setDateFilter}>
-          <SelectTrigger className="w-full md:w-[180px] border-gray-200 dark:border-gray-700">
-            <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-            <SelectValue placeholder="Filter by date" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Time</SelectItem>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px] border-gray-200 dark:border-gray-700">
+              <Filter className="w-4 h-4 mr-2 text-gray-400" />
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger className="w-full sm:w-[180px] border-gray-200 dark:border-gray-700">
+              <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+              <SelectValue placeholder="Filter by date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-800/50">
-              <TableHead className="font-semibold">Order ID</TableHead>
-              <TableHead className="font-semibold">Event</TableHead>
-              <TableHead className="font-semibold">Date</TableHead>
-              <TableHead className="font-semibold">Customer</TableHead>
-              <TableHead className="font-semibold">Quantity</TableHead>
-              <TableHead className="font-semibold">Total</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="text-right font-semibold">Actions</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Order ID</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Event</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Date</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Customer</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Quantity</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Total</TableHead>
+              <TableHead className="font-semibold whitespace-nowrap">Status</TableHead>
+              <TableHead className="text-right font-semibold whitespace-nowrap">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
