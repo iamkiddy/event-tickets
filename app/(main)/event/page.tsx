@@ -11,7 +11,11 @@ import { formatDate } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import HeroSection from './_components/HeroSection';
 import EventFilterCard, { EventFilterList } from './_components/EventFilter';
+<<<<<<< HEAD
 import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
+=======
+import { getCategoryUtils } from '@/lib/actions/main';
+>>>>>>> 612757dd03ce7af9b26da683fd21e7b47b883ea2
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
 
