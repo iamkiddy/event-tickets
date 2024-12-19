@@ -249,15 +249,8 @@ export default function EventPage() {
             </div>
           </section>
 
-<<<<<<< HEAD
-            {/* Banner Section */}
-      <div className="px-16 sm:px-5">
-      <EventsBanner />
-      </div>
-=======
           {/* Banner Section */}
           <EventsBanner />
->>>>>>> 612757dd03ce7af9b26da683fd21e7b47b883ea2
 
 
           {/* Blog Section */}
