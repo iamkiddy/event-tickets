@@ -84,6 +84,7 @@ export default function EventPage() {
       try {
         setIsLoading(true);
         const response = await getMainEventById(eventId);
+        console.log('Raw image URL from server:', response.images[0]);
         setEvent(response);
       } catch (error) {
         toast.error('Failed to fetch event details');
@@ -161,23 +162,22 @@ export default function EventPage() {
 
       {/* Hero Section with Image */}
       <div className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px]">
-        {event?.images && event.images[0] ? (
-          <Image
-            src={event.images[0]}
-            alt={event?.title || 'Event Image'}
-            fill
-            priority
-            className="object-cover"
-          />
+        {event?.images?.[0] ? (
+          <>
+            <img
+              src={event.images[0]}
+              alt={event?.title || 'Event Image'}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primaryColor via-indigo-600 to-purple-700">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80">
-              <ImageIcon className="w-20 h-20 mb-4" />
-              <span className="text-lg font-medium">No Image Available</span>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <ImageIcon className="h-20 w-20 text-white/50" />
             </div>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         
         {/* Hero Content */}
         <div className="absolute bottom-0 left-0 right-0">

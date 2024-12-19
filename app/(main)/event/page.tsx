@@ -11,11 +11,14 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { NavLink } from '../codepass/components/NavLink';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
 import { AuthenticatedNav } from '@/components/ui/authNavbar';
-import { getAllMainEvents } from '@/lib/actions/mainEvent';
+import { getAllMainEvents, GetMainEventsParams } from '@/lib/actions/mainEvent';
 import { EventListItem, EventListResponse } from '@/lib/models/_main_event_models';
 import parser from 'html-react-parser';
-
-type FilterKey = 'category' | 'date' | 'price' | 'type';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { getUtilsCategories, getUtilsEventTypes } from '@/lib/actions/events';
+import { UtilsCategoriesResponse, UtilsEventTypesResponse } from '@/lib/models/_events_models';
+type FilterKey = 'category' | 'date' | 'type';
 
 export default function EventsPage() {
   const router = useRouter();
@@ -25,6 +28,8 @@ export default function EventsPage() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [events, setEvents] = useState<EventListResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<UtilsCategoriesResponse[]>([]);
+  const [eventTypes, setEventTypes] = useState<UtilsEventTypesResponse[]>([]);
 
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -33,22 +38,23 @@ export default function EventsPage() {
     time: searchParams.get('time') || '',
     where: searchParams.get('where') || '',
     date: searchParams.get('date') || '',
-    price: searchParams.get('price') || '',
     page: Number(searchParams.get('page')) || 1
   });
 
-  const fetchEvents = async () => {
+  const fetchEvents = async () => { 
     try {
       setIsLoading(true);
-      const response = await getAllMainEvents({
-        search: filters.search,
-        category: filters.category,
-        eventType: filters.type,
-        date: filters.date,
-        where: filters.where,
+      const params: GetMainEventsParams = {
+        search: filters.search || undefined,
+        category: filters.category || undefined,
+        eventType: filters.type || undefined,
+        date: filters.date || undefined,
+        where: filters.where || undefined,
         page: filters.page,
         limit: 12
-      });
+      };
+
+      const response = await getAllMainEvents(params);
       setEvents(response);
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -74,6 +80,9 @@ export default function EventsPage() {
       if (value) params.set(key, value.toString());
     });
     router.push(`/event?${params.toString()}`, { scroll: false });
+    
+    // Fetch new events with updated filters
+    fetchEvents();
   };
 
   const formatDate = (dateString: string) => {
@@ -110,7 +119,6 @@ export default function EventsPage() {
       time: '',
       where: '',
       date: '',
-      price: '',
       page: 1
     };
     
@@ -124,6 +132,41 @@ export default function EventsPage() {
     // Fetch events with cleared filters
     fetchEvents();
   };
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      const formattedDate = date.toISOString().split('T')[0];
+      updateFilters({ date: formattedDate });
+    } else {
+      updateFilters({ date: '' });
+    }
+  };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getUtilsCategories();
+        setCategories(response);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchEventTypes = async () => {
+      try {
+        const response = await getUtilsEventTypes();
+        setEventTypes(Array.isArray(response) ? response : [response]);
+      } catch (error) {
+        console.error('Error fetching event types:', error);
+      }
+    };
+
+    fetchEventTypes();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -229,19 +272,13 @@ export default function EventsPage() {
                   {/* Date */}
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <select
-                      value={filters.date}
-                      onChange={(e) => updateFilters({ date: e.target.value })}
-                      className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 appearance-none cursor-pointer bg-transparent"
-                    >
-                      <option value="">Add dates</option>
-                      <option value="today">Today</option>
-                      <option value="tomorrow">Tomorrow</option>
-                      <option value="weekend">This Weekend</option>
-                      <option value="week">This Week</option>
-                      <option value="month">This Month</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+                    <DatePicker
+                      selected={filters.date ? new Date(filters.date) : null}
+                      onChange={handleDateChange}
+                      dateFormat="MMM dd, yyyy"
+                      placeholderText="Select date"
+                      className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 cursor-pointer bg-transparent"
+                    />
                   </div>
 
                   {/* Search Button */}
@@ -266,7 +303,7 @@ export default function EventsPage() {
                           Search Events
                         </label>
                         <div className="flex items-center">
-                          <Search className="text-gray-400 h-4 w-4" />
+                          <Search className="text-primaryColor h-4 w-4" />
                           <input
                             placeholder="Search events..."
                             value={filters.search}
@@ -284,7 +321,7 @@ export default function EventsPage() {
                           Location
                         </label>
                         <div className="flex items-center">
-                          <MapPin className="text-gray-400 h-4 w-4" />
+                          <MapPin className="text-primaryColor h-4 w-4" />
                           <select
                             value={filters.where}
                             onChange={(e) => updateFilters({ where: e.target.value })}
@@ -306,20 +343,14 @@ export default function EventsPage() {
                           When
                         </label>
                         <div className="flex items-center">
-                          <Calendar className="text-gray-400 h-4 w-4" />
-                          <select
-                            value={filters.date}
-                            onChange={(e) => updateFilters({ date: e.target.value })}
-                            className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none appearance-none cursor-pointer"
-                          >
-                            <option value="">Add dates</option>
-                            <option value="today">Today</option>
-                            <option value="tomorrow">Tomorrow</option>
-                            <option value="weekend">This Weekend</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                          </select>
-                          <ChevronDown className="text-gray-400 h-4 w-4 ml-auto pointer-events-none" />
+                          <Calendar className="text-primaryColor h-4 w-4" />
+                          <DatePicker
+                            selected={filters.date ? new Date(filters.date) : null}
+                            onChange={handleDateChange}
+                            dateFormat="MMM dd, yyyy"
+                            placeholderText="Select date"
+                            className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none cursor-pointer"
+                          />
                         </div>
                       </div>
                     </div>
@@ -378,10 +409,9 @@ export default function EventsPage() {
             {/* Center aligned filters with better spacing */}
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {[
-                { name: 'Category', icon: <Tag className="w-4 h-4" /> },
-                { name: 'Date', icon: <Calendar className="w-4 h-4" /> },
-                { name: 'Price', icon: <DollarSign className="w-4 h-4" /> },
-                { name: 'Type', icon: <Layout className="w-4 h-4" /> }
+                { name: 'Category', icon: <Tag className="w-4 h-4 text-primaryColor" /> },
+                { name: 'Date', icon: <Calendar className="w-4 h-4 text-primaryColor" /> },
+                { name: 'Type', icon: <Layout className="w-4 h-4 text-primaryColor" /> }
               ].map((filter) => {
                 const key = filter.name.toLowerCase() as FilterKey;
                 const filterValue = filters[key];
@@ -398,7 +428,16 @@ export default function EventsPage() {
                         min-w-[140px] sm:min-w-[160px]"
                     >
                       <option value="">{filter.name}</option>
-                      {/* Add your filter options here */}
+                      {key === 'category' && categories.map((category) => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
+                      {key === 'type' && eventTypes.map((type) => (
+                        <option key={type.id} value={type.name}>
+                          {type.name}
+                        </option>
+                      ))}
                     </select>
                     {/* Icon */}
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">
