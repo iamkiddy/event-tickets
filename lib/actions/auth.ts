@@ -43,7 +43,7 @@ export const loginEmail = async (email: LoginEmail): Promise<LoginEmailResponse>
                 maxAge: 60 * 60 // 1 hour
             });
         }
-        
+        console.log(response)
         return response;
     } catch (error: unknown) {
         const apiError = error as ApiError;

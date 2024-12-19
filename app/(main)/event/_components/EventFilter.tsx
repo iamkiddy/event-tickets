@@ -58,7 +58,7 @@ export default function EventFilterCard({ name, activeName, query, data, icon }:
 export interface EventFilterListProps {
     params: {
         category?: string;
-        eventType?: string;
+        type?: string;
         time?: string;
     }
   }
@@ -86,9 +86,9 @@ export const EventFilterList = ({params}: EventFilterListProps) => {
     return (
         <div className="flex items-center justify-center gap-2 mt-3">
             {params.category && <EventFilterCardButton name={params.category} remove={() => removeFilter("category")} />}
-            {params.eventType && <EventFilterCardButton name={params.eventType} remove={() => removeFilter("eventType")} />}
+            {params.type && <EventFilterCardButton name={params.type} remove={() => removeFilter("eventType")} />}
             {params.time && <EventFilterCardButton name={params.time} remove={() => removeFilter("time")} />}
-            {(params.category || params.eventType || params.time) && <button
+            {(params.category || params.type || params.time) && <button
                 onClick={clearAllFilters}
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
                 bg-primaryColor/10 text-red-500 text-sm hover:bg-red-500/15 
@@ -109,7 +109,7 @@ const EventFilterCardButton = ({remove, name}: {name: string, remove: ()=> void}
             bg-primaryColor/10 text-primaryColor text-sm hover:bg-primaryColor/15 
             transition-colors"
         >
-            {name.toUpperCase()}
+            {name}
             <X className="w-3 h-3" />
         </button>
     )

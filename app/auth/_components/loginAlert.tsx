@@ -27,9 +27,10 @@ export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose, onLoginSu
     e.preventDefault();
     setLoading(true);
     setError('');
-
+  
     try {
-      await loginEmail({ email });
+      const response = await loginEmail({ email });
+      console.log('Login response:', response); // Log the response here
       setShowVerifyCode(true);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');

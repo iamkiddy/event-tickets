@@ -102,7 +102,7 @@ export default function HeroSection() {
                       className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 appearance-none cursor-pointer bg-transparent"
                     >
                       <option value="">Where to?</option>
-                      <option value="nearby">Nearby</option>
+                      <option value="venuef">venue</option>
                       <option value="online">Online</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
@@ -156,7 +156,7 @@ export default function HeroSection() {
                             className="w-full border-0 p-0 pl-3 h-6 text-sm bg-transparent focus:ring-0 focus:outline-none appearance-none cursor-pointer"
                           >
                             <option value="">Where to?</option>
-                            <option value="nearby">Nearby</option>
+                            <option value="venue">venue</option>
                             <option value="online">Online</option>
                           </select>
                           <ChevronDown className="text-gray-400 h-4 w-4 ml-auto pointer-events-none" />

@@ -9,9 +9,9 @@ import { getAllMainEvents } from '@/lib/actions/mainEvent';
 import 'react-datepicker/dist/react-datepicker.css';
 import { formatDate } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import HeroSection from './_components/HeroSection;
-import EventFilterCard, { EventFilterList } from './_components/EventFilter;
-import { getCategoryUtils } from '@/lib/actions/main';
+import HeroSection from './_components/HeroSection';
+import EventFilterCard, { EventFilterList } from './_components/EventFilter';
+import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
 
@@ -47,7 +47,7 @@ export default function EventsPage({ searchParams }: EventPageProps) {
   // get all event types
   const { data: eventTypes } = useQuery({
     queryKey: ['eventTypes'],
-    queryFn: () => getCategoryUtils(),
+    queryFn: () => getEventTypeUtils(),
   });
 
 
@@ -123,12 +123,7 @@ export default function EventsPage({ searchParams }: EventPageProps) {
                 {events?.data.map((event) => (
                   <EventCard 
                     key={event.id} 
-                    id={event.id}
-                    month={formatDate(event.date, 'MMM')}
-                    day={formatDate(event.date, 'DD')}
-                    title={event.title}
-                    description={event.description}
-                    image={event.image}
+                   data={event}
                   />
                 ))}
               </div>

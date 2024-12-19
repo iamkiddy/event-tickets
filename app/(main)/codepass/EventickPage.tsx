@@ -230,12 +230,7 @@ export default function EventPage() {
               {homeData?.upcomingEvents.map((event) => (
                 <EventCard 
                   key={event.id}
-                  id={event.id}
-                  month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                  day={new Date(event.startDate).getDate().toString()}
-                  title={event.title}
-                  description={event.summary}
-                  image={event.image}
+                  data={event}
                 />
               ))}
             </div>
@@ -248,19 +243,14 @@ export default function EventPage() {
               {homeData?.mostViewedEvents.map((event) => (
                 <EventCard 
                   key={event.id}
-                  id={event.id}
-                  month={new Date(event.startDate).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                  day={new Date(event.startDate).getDate().toString()}
-                  title={event.title}
-                  description={event.summary}
-                  image={event.image}
+                  data={event}
                 />
               ))}
             </div>
           </section>
 
             {/* Banner Section */}
-      <div className="px-16">
+      <div className="px-16 sm:px-5">
       <EventsBanner />
       </div>
 
