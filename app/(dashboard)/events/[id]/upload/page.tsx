@@ -109,10 +109,6 @@ export default function UploadEventMedia() {
 
   // Handle file upload to server
   const uploadMediaToServer = async (media: UploadedMedia) => {
-    const formData = new FormData();
-    formData.append('file', media.file);
-    formData.append('eventId', params.id as string);
-    
     try {
       // Use the appropriate update function based on media type
       const response = media.type === 'image' 
@@ -375,7 +371,7 @@ export default function UploadEventMedia() {
                           className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full 
                             shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <X className="h-3 h-3 sm:h-4 sm:w-4 text-gray-600" />
+                          <X className="h-3 sm:h-4 sm:w-4 text-gray-600" />
                         </button>
                         {uploadedMedia[0].id === media.id && (
                           <div className="absolute bottom-2 left-2 px-2 py-1 bg-white/90 rounded-md 

@@ -53,7 +53,7 @@ export default async function <T, D = unknown>({
       url: `${url}?${new URLSearchParams(params).toString()}`,
       method,
       headers,
-      body: body ? JSON.parse(body.toString()) : null
+      body: body instanceof FormData ? '[FormData]' : body
     });
 
     const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {

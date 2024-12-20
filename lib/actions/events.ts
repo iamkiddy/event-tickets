@@ -17,7 +17,6 @@ import APIUrls from '../apiurls';
 import { ApiError } from 'next/dist/server/api-utils';
 import { cookies } from 'next/headers';
 
-
 // Get all events
 export const getAllEvents = async (params?: GetEventsParams): Promise<AllEventsResponse> => {
   try {
@@ -125,16 +124,9 @@ export const updateEventImage = async (eventId: string, image: File): Promise<Up
     const formData = new FormData();
     formData.append('image', image);
 
-    console.log('Upload details:', {
-      url: `${APIUrls.updateEventImages}/${eventId}`,
-      fileName: image.name,
-      fileType: image.type,
-      fileSize: image.size
-    });
-
     const response = await apiController<UpdateEventImagesResponse>({
       method: 'PUT',
-      url: `${APIUrls.updateEventImages}/${eventId}`,
+      url: `${APIUrls.BASE_URL_ORG}/api/v1/org/events/image/${eventId}`,
       data: formData,
       token,
       contentType: 'multipart/form-data'
@@ -252,7 +244,7 @@ export const getUtilsCategories = async (): Promise<UtilsCategoriesResponse[]> =
 
 export const updateEventFAQ = async (params: {
   eventId: string;
-  faqId: string;
+  faqId?: string;
   question: string;
   answer: string;
 }): Promise<any> => {
@@ -261,7 +253,6 @@ export const updateEventFAQ = async (params: {
     const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
     if (!params.eventId) throw new Error('Event ID is required');
-    if (!params.faqId) throw new Error('FAQ ID is required');
     if (!params.question) throw new Error('Question is required');
     if (!params.answer) throw new Error('Answer is required');
 
@@ -273,11 +264,11 @@ export const updateEventFAQ = async (params: {
 
     const response = await apiController({
       method: 'PUT',
-      url: `${APIUrls.updateEventFAQ}/${params.eventId}/${params.faqId}`,
+      url: `${APIUrls.updateEventFAQ}/${params.eventId}`,
       data: {
         question: params.question,
         answer: params.answer,
-        id: params.faqId  // Add the ID to the request body
+        id: params.faqId 
       },
       token,
       contentType: 'application/json'
@@ -294,7 +285,7 @@ export const updateEventFAQ = async (params: {
 
 export const updateEventAgenda = async (params: {
   eventId: string;
-  id: string;
+  id?: string;
   title: string;
   description: string;
   startTime: string;
@@ -306,11 +297,11 @@ export const updateEventAgenda = async (params: {
     const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
     if (!params.eventId) throw new Error('Event ID is required');
-    if (!params.id) throw new Error('Agenda ID is required');
     if (!params.title) throw new Error('Title is required');
     if (!params.description) throw new Error('Description is required');
     if (!params.startTime) throw new Error('Start time is required');
     if (!params.endTime) throw new Error('End time is required');
+    if (!Array.isArray(params.host)) throw new Error('Host must be an array');
 
     console.log('Updating Agenda:', {
       eventId: params.eventId,
@@ -320,13 +311,14 @@ export const updateEventAgenda = async (params: {
 
     const response = await apiController({
       method: 'PUT',
-      url: `${APIUrls.updateEventAgenda}/${params.eventId}/${params.id}`,
+      url: `${APIUrls.updateEventAgenda}/${params.eventId}`,
       data: {
         title: params.title,
         description: params.description,
         startTime: params.startTime,
         endTime: params.endTime,
-        host: params.host
+        host: params.host,
+        id: params.id
       },
       token,
       contentType: 'application/json'
@@ -337,6 +329,60 @@ export const updateEventAgenda = async (params: {
     console.error('Error updating agenda:', error);
     const apiError = error as ApiError;
     const errorMessage = apiError.message || "Failed to update agenda";
+    throw new Error(errorMessage);
+  }
+};
+
+export const deleteEventFAQ = async (params: {
+  eventId: string;
+  faqId: string;
+}): Promise<any> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+    if (!params.eventId) throw new Error('Event ID is required');
+    if (!params.faqId) throw new Error('FAQ ID is required');
+
+    const response = await apiController({
+      method: 'DELETE',
+      url: `${APIUrls.updateEventFAQ}/${params.eventId}/${params.faqId}`,
+      token,
+      contentType: 'application/json'
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error deleting FAQ:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to delete FAQ";
+    throw new Error(errorMessage);
+  }
+};
+
+export const deleteEventAgenda = async (params: {
+  eventId: string;
+  agendaId: string;
+}): Promise<any> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+    if (!params.eventId) throw new Error('Event ID is required');
+    if (!params.agendaId) throw new Error('Agenda ID is required');
+
+    const response = await apiController({
+      method: 'DELETE',
+      url: `${APIUrls.updateEventAgenda}/${params.eventId}/${params.agendaId}`,
+      token,
+      contentType: 'application/json'
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error deleting agenda:', error);
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to delete agenda";
     throw new Error(errorMessage);
   }
 };
@@ -587,7 +633,7 @@ export const getTicketsById = async (ticketId: string): Promise<getTicketsByIdRe
     const token = cookieStore.get('token')?.value;
     const response = await apiController<getTicketsByIdResponse>({
       method: 'GET',
-      url: `${APIUrls.getEventTickets}/${ticketId}`,
+      url: `${APIUrls.getEventTickets}/detail/${ticketId}`,
       token,
       contentType: 'application/json',
     });
@@ -634,9 +680,10 @@ export const getEventFinalStage = async (eventId: string): Promise<GetEventFinal
     });
 
     console.log('Event Final Stage Data:', {
-      organiser: response.organiser,
+      organizer: response.organizer,
       category: response.category,
-      subCategories: response.subCategories,
+      subcategory: response.subcategory,
+      eventType: response.eventType,
       isPublished: response.isPublished,
       isRefundable: response.isRefundable,
       daysBefore: response.daysBefore

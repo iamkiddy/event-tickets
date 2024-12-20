@@ -15,14 +15,13 @@ interface ViewPromotionSheetProps {
 
 const formatDateTime = (date?: string, time?: string) => {
   try {
-    if (!date) return 'Not specified';
-    if (!time) return format(new Date(date), 'PPP');
+    if (!date || !time) return '';
     const dateTime = new Date(`${date}T${time}`);
-    if (isNaN(dateTime.getTime())) return 'Invalid date';
-    return format(dateTime, 'PPP p');
+    if (isNaN(dateTime.getTime())) return '';
+    return format(dateTime, 'PPP');
   } catch (error) {
     console.error('Error formatting date:', error);
-    return 'Invalid date';
+    return '';
   }
 };
 
@@ -55,9 +54,9 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-xl md:max-w-2xl overflow-y-auto bg-white">
         <SheetHeader className="mb-6 border-b pb-4">
-          <SheetTitle className="text-2xl font-semibold text-gray-900">
+          <h3 className="font-semibold text-lg text-gray-900 mb-4">
             Promotion Details
-          </SheetTitle>
+          </h3>
         </SheetHeader>
 
         <ScrollArea className="h-[calc(100vh-120px)] pr-4">
@@ -70,8 +69,8 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
           ) : promotion ? (
             <div className="space-y-6">
               {/* Main Info Section */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 gap-6">
+                <div className="col-span-1">
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="block text-sm font-medium text-gray-500">
@@ -136,12 +135,9 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
                   Validity Period
                 </h3>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">
-                      Start Date & Time
-                    </label>
-                    <p className="mt-1 text-base text-gray-900">
+                    <p className="text-base text-gray-900">
                       {formatDateTime(promotion.startDate, promotion.startTime)}
                     </p>
                   </div>
@@ -150,7 +146,7 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
                     <label className="block text-sm font-medium text-gray-500">
                       End Date & Time
                     </label>
-                    <p className="mt-1 text-base text-gray-900">
+                    <p className="text-base text-gray-900">
                       {formatDateTime(promotion.endDate, promotion.endTime)}
                     </p>
                   </div>

@@ -61,3 +61,37 @@ export interface GetHomepageUtilsResponse {
     }[];
 }
 
+export interface EventOrganizer {
+  name: string;
+  profileImage: string;
+  phone1: string;
+  phone2: string;
+  website: string;
+  bio: string;
+  country: string;
+}
+
+export interface EventTicket {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  currency: string;
+  discountValue: number;
+  discountType: string;
+}
+
+export interface EventFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface EventAgenda {
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  host: string[];
+}
+
+

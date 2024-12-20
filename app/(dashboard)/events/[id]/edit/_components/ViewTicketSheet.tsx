@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { getTicketsById } from '@/lib/actions/events';
 import { getTicketsByIdResponse } from '@/lib/models/_events_models';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,10 +15,23 @@ export function ViewTicketSheet({ isOpen, onClose, ticketId }: ViewTicketSheetPr
   const [ticket, setTicket] = useState<getTicketsByIdResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const formatDateTime = (date: string | null | undefined, time: string | null | undefined) => {
+    if (!date || !time) return 'Not set';
+    try {
+      const dateTimeString = `${date}T${time}`;
+      const parsedDate = parseISO(dateTimeString);
+      if (!isValid(parsedDate)) return 'Invalid date';
+      return format(parsedDate, 'PPP p');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
+  };
+
   useEffect(() => {
     if (isOpen && ticketId) {
       setLoading(true);
-      getTicketsById(ticketId)
+      getTicketsById(ticketId) 
         .then((response) => {
           setTicket(response);
         })
@@ -74,13 +87,13 @@ export function ViewTicketSheet({ isOpen, onClose, ticketId }: ViewTicketSheetPr
               <div>
                 <label className="block text-sm font-medium text-gray-500">Start Date</label>
                 <p className="mt-1 text-base text-gray-900">
-                  {format(new Date(`${ticket.startDate}T${ticket.startTime}`), 'PPP p')}
+                  {formatDateTime(ticket.startDate, ticket.startTime)}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">End Date</label>
                 <p className="mt-1 text-base text-gray-900">
-                  {format(new Date(`${ticket.endDate}T${ticket.endTime}`), 'PPP p')}
+                  {formatDateTime(ticket.endDate, ticket.endTime)}
                 </p>
               </div>
             </div>
