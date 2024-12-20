@@ -40,7 +40,7 @@ export default function TabSelector({ activeTab }: TabSelectorProps) {
             onSelect={handleTabChange}
         />
         <LineTabSelectorCard 
-            title='All Tickets'
+            title='My Tickets'
             active={tab === 'tickets'}
             tab='tickets'
             onSelect={handleTabChange}

@@ -116,7 +116,7 @@ export default function ProfilePage({ data }: ProfilePageProps) {
             <div className='flex items-center gap-2'>
               <span className={cn('text-lg text-gray-400', formData.messageType === 'email' && 'text-secondaryColor')}>Email</span>
               <Switch
-                checked={formData.messageType === 'email' ? true : false}
+                checked={formData.messageType === 'email' ? false : true}
                 onCheckedChange={(checked) => 
                   setFormData(prev => ({ ...prev, messageType: checked ? 'sms' : 'email' }))
                 }
