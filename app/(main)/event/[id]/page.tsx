@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart, ImageIcon } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart, ImageIcon, Globe, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import { EventDetails } from '@/lib/models/_main_event_models';
@@ -273,28 +273,25 @@ export default function EventPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content */}
-          <div className="lg:col-span-2">
-            {/* Event details sections */}
+          <div className="lg:col-span-2 space-y-6">
             {/* About Section */}
-            <div className="bg-white p-3 xs:p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-lg xs:text-xl sm:text-2xl font-semibold text-gray-900 mb-3 xs:mb-4 sm:mb-6">
-                About This Event
-              </h2>
-              <div className="prose max-w-none text-gray-600 text-xs xs:text-sm sm:text-base">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">About This Event</h2>
+              <div className="prose max-w-none text-gray-600">
                 {parser(event.overview)}
               </div>
             </div>
 
             {/* Date and Location */}
-            <div className="bg-white p-3 xs:p-4 sm:p-8 rounded-xl shadow-sm border border-gray-200">
-              <div className="grid xs:grid-cols-2 gap-4 xs:gap-6 sm:gap-8">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+              <div className="grid sm:grid-cols-2 gap-8">
                 <div>
-                  <div className="flex items-center gap-2 text-gray-900 font-medium mb-4">
+                  <div className="flex items-center gap-3 text-gray-900 font-medium mb-4">
                     <Calendar className="w-6 h-6 text-primaryColor" />
-                    <span>Date and time</span>
+                    <span className="text-lg">Date and time</span>
                   </div>
-                  <div className="space-y-2 text-gray-600">
-                    <p>{formatDate(event.startDate).fullDate}</p>
+                  <div className="space-y-3 text-gray-600">
+                    <p className="text-base">{formatDate(event.startDate).fullDate}</p>
                     <p className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-primaryColor" />
                       {formatTimeRange(event.startTime, event.endTime)}
@@ -302,9 +299,9 @@ export default function EventPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 text-gray-900 font-medium mb-4">
+                  <div className="flex items-center gap-3 text-gray-900 font-medium mb-4">
                     <MapPin className="w-6 h-6 text-primaryColor" />
-                    <span>Location</span>
+                    <span className="text-lg">Location</span>
                   </div>
                   <div className="space-y-2 text-gray-600">
                     <p>{event.address1}</p>
@@ -318,19 +315,25 @@ export default function EventPage() {
 
             {/* Agenda */}
             {event.agendas && event.agendas.length > 0 && (
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">Event Schedule</h2>
                 <div className="space-y-6">
                   {event.agendas.map((agenda, index) => (
                     <div key={index} className="border-b border-gray-200 pb-6 last:border-0">
-                      <h3 className="font-semibold text-gray-900">{agenda.title}</h3>
-                      <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
-                        <span>{formatTimeRange(agenda.startTime, agenda.endTime)}</span>
-                        <span>Hosted by: {agenda.host.join(', ')}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{agenda.title}</h3>
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-primaryColor" />
+                          {formatTimeRange(agenda.startTime, agenda.endTime)}
+                        </span>
+                        {agenda.host.length > 0 && (
+                          <span className="flex items-center gap-2">
+                            <span className="font-medium">Hosted by:</span>
+                            {agenda.host.join(', ')}
+                          </span>
+                        )}
                       </div>
-                      <p className="mt-2 text-gray-600">
-                        {parser(agenda.description)}
-                      </p>
+                      <p className="text-gray-600">{parser(agenda.description)}</p>
                     </div>
                   ))}
                 </div>
@@ -339,15 +342,13 @@ export default function EventPage() {
 
             {/* FAQ */}
             {event.faqs && event.faqs.length > 0 && (
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">FAQ</h2>
                 <div className="space-y-6">
                   {event.faqs.map((faq, index) => (
                     <div key={index} className="border-b border-gray-200 pb-6 last:border-0">
-                      <h3 className="font-semibold text-gray-900">{faq.question}</h3>
-                      <p className="mt-2 text-gray-600">
-                        {parser(faq.answer)}
-                      </p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{faq.question}</h3>
+                      <p className="text-gray-600">{parser(faq.answer)}</p>
                     </div>
                   ))}
                 </div>
@@ -356,13 +357,13 @@ export default function EventPage() {
 
             {/* Tags */}
             {event.tags && event.tags.length > 0 && (
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Tags</h2>
+              <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Tags</h2>
                 <div className="flex flex-wrap gap-2">
                   {event.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      className="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
                     >
                       {tag}
                     </span>
@@ -372,12 +373,13 @@ export default function EventPage() {
             )}
           </div>
 
-          {/* Ticket selection - Sticky */}
+          {/* Right Column - Tickets & Organizer */}
           <div className="lg:col-span-1">
-            <div className="sticky top-20">
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Select Tickets</h3>
+            <div className="sticky top-20 space-y-6">
+              {/* Tickets Section */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-6 sm:p-8">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-6">Select Tickets</h3>
                   
                   {/* Ticket types */}
                   <div className="space-y-4">
@@ -427,6 +429,61 @@ export default function EventPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Organizer Section */}
+              {event.organizer && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 sm:p-8">
+                    <h3 className="text-2xl font-semibold text-gray-900 mb-6">Event Organizer</h3>
+                    <div className="flex items-start gap-4">
+                      {event.organizer.profileImage && (
+                        <img
+                          src={event.organizer.profileImage}
+                          alt={event.organizer.name}
+                          className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-semibold text-gray-900 mb-2">{event.organizer.name}</h4>
+                        {event.organizer.bio && (
+                          <p className="text-sm text-gray-600 mb-4">{event.organizer.bio}</p>
+                        )}
+                        <div className="space-y-3">
+                          {event.organizer.country && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <MapPin className="w-4 h-4 text-primaryColor" />
+                              <span>{event.organizer.country}</span>
+                            </div>
+                          )}
+                          {event.organizer.website && (
+                            <a
+                              href={event.organizer.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-primaryColor hover:underline"
+                            >
+                              <Globe className="w-4 h-4" />
+                              Visit Website
+                            </a>
+                          )}
+                          {event.organizer.phone1 && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Phone className="w-4 h-4 text-primaryColor" />
+                              <span>{event.organizer.phone1}</span>
+                            </div>
+                          )}
+                          {event.organizer.phone2 && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Phone className="w-4 h-4 text-primaryColor" />
+                              <span>{event.organizer.phone2}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
