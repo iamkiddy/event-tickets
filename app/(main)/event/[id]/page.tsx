@@ -3,17 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone } from 'lucide-react';
-import { toast } from 'sonner';
 import { getEventDetails } from '@/lib/actions/mainEvent';
-import { EventDetails } from '@/lib/models/_main_event_models';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
-import { NavLink } from '../../codepass/components/NavLink';
-import { LoginAlert } from '@/app/auth/_components/loginAlert';
-import { AuthenticatedNav } from '@/components/ui/authNavbar';
-import { navLinks } from "@/app/(main)/codepass/EventickPage";
-import { SearchBar } from '../../codepass/components/SearchBar';
+import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar';
 import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
+import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
+import { AccordionTrigger } from '@radix-ui/react-accordion';
 
 interface FormattedDate {
   fullDate: string;
@@ -70,34 +67,15 @@ const formatDate = (dateString: string | undefined): FormattedDate => {
 
 export default function EventPage() {
   const params = useParams();
-  const [event, setEvent] = useState<EventDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      if (!params.id || typeof params.id !== 'string') {
-        toast.error('Invalid event ID');
-        return;
-      }
-
-      try {
-        const response = await getEventDetails(params.id);
-        setEvent(response);
-      } catch (error) {
-        toast.error('Failed to load event details');
-        console.error('Error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchEventDetails();
-  }, [params.id]);
+  const { data: event, isLoading } = useQuery({
+    queryKey: ['event', params.id],
+    queryFn: () => getEventDetails(params.id as string),
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -137,56 +115,8 @@ export default function EventPage() {
           showSearchInNav={showSearchInNav}
         />
       ) : (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-          ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-4">
-              <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-primaryColor' : 'text-white'}`}>
-                CodePass
-              </div>
-              
-              <div className={`absolute left-1/2 transform -translate-x-1/2 w-full 
-                transition-all duration-300 px-4 md:px-0 hidden lg:block
-                ${showSearchInNav 
-                  ? 'opacity-100 visible top-1/2 -translate-y-1/2 max-w-xl' 
-                  : 'opacity-0 invisible -translate-y-full'}`}>
-                <SearchBar isCompact />
-              </div>
-
-              <div className={`hidden md:flex items-center gap-4 lg:gap-8 transition-all duration-300
-                ${showSearchInNav ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
-                {navLinks.map((link) => (
-                  <NavLink 
-                    key={link.label} 
-                    {...link} 
-                    isScrolled={isScrolled}
-                    onLoginClick={() => setShowLoginDialog(true)}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-2 sm:gap-4">
-                <NavLink 
-                  label="Create Event"
-                  isCreate={true}
-                  isScrolled={isScrolled}
-                />
-                <NavLink 
-                  label="Login"
-                  isButton={true}
-                  isScrolled={isScrolled}
-                  onLoginClick={() => setShowLoginDialog(true)}
-                />
-              </div>
-            </div>
-          </div>
-        </nav>
+        <UnauthenticatedNav isScrolled={isScrolled} />
       )}
-
-      <LoginAlert 
-        open={showLoginDialog} 
-        onClose={() => setShowLoginDialog(false)}
-        onLoginSuccess={() => setShowLoginDialog(false)}
-      />
 
       {/* Hero Section with Image */}
       <div className="relative h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] min-h-[250px] sm:min-h-[350px] md:min-h-[400px] overflow-hidden">
@@ -346,14 +276,16 @@ export default function EventPage() {
             {event.faqs && event.faqs.length > 0 && (
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">FAQ</h2>
-                <div className="space-y-6">
+                <Accordion type="single" collapsible className="w-full space-y-6">
                   {event.faqs.map((faq, index) => (
-                    <div key={index} className="border-b border-gray-200 pb-6 last:border-0">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{faq.question}</h3>
-                      <p className="text-gray-600">{parser(faq.answer)}</p>
-                    </div>
+                    <AccordionItem key={index} value={`item-${index}`}>
+                      <AccordionTrigger className='text-lg font-semibold text-gray-900'>{faq.question}</AccordionTrigger>
+                      <AccordionContent>
+                        <p className="text-gray-600">{parser(faq.answer)}</p>
+                      </AccordionContent>
+                    </AccordionItem>
                   ))}
-                </div>
+                </Accordion>
               </div>
             )}
 
