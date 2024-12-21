@@ -2,23 +2,105 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users, Trash2, Eye, CheckCircle, CalendarX2 } from 'lucide-react';
+import { MoreVertical, Calendar, Users, Trash2, Eye, Loader2, CalendarX2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import Link from 'next/link';
-import { DeleteEvent } from './deleteEvent';
 import { useState } from 'react';
 import { toast } from "sonner";
 import { deleteEvent } from "@/lib/actions/events";
-import { useRouter } from 'next/navigation';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface EventsTableProps {
   onRefresh: () => void;
+}
+
+interface ActionsCellProps {
+  event: Event;
+  onRefresh: () => void;
+}
+
+function ActionsCell({ event, onRefresh }: ActionsCellProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteEvent(event.id);
+      toast.success("Event deleted successfully");
+      onRefresh(); // Call the refresh function after successful deletion
+    } catch (error) {
+      toast.error("Failed to delete event");
+      console.error("Error deleting event:", error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="w-4 h-4 text-gray-400" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40 bg-white">
+          <DropdownMenuItem asChild>
+            <Link href={`/events/${event.id}/edit`} className="w-full cursor-pointer">
+              <Eye className="mr-2 h-4 w-4" />
+              View Details
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setShowDeleteDialog(true)}
+            className="text-red-600 focus:text-red-600"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the event
+              and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 focus:ring-red-600"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>Delete</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 }
 
 export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>[] => [
@@ -89,73 +171,6 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
-      const event = row.original;
-      const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-      const [isDeleting, setIsDeleting] = useState(false);
-
-      const handleDelete = async () => {
-        try {
-          setIsDeleting(true);
-          await deleteEvent(event.id);
-          toast.success("Event deleted successfully");
-          onRefresh(); // Call the refresh function after successful deletion
-        } catch (error) {
-          toast.error("Failed to delete event");
-          console.error("Error deleting event:", error);
-        } finally {
-          setIsDeleting(false);
-          setShowDeleteDialog(false);
-        }
-      };
-
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="w-4 h-4 text-gray-400" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 bg-white">
-              <DropdownMenuItem asChild>
-                <Link 
-                  href={`/events/${event.id}/edit`}
-                  className="flex items-center gap-2 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 w-full rounded-sm"
-                >
-                  <Eye className="w-4 h-4" />
-                  <span>View</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center gap-2 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 rounded-sm"
-                onClick={() => {
-                  // Add verification logic here
-                  console.log('Verify event:', event.id);
-                }}
-              >
-                <CheckCircle className="w-4 h-4" />
-                <span>Verify</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer transition-all hover:translate-x-1 hover:bg-gray-50 rounded-sm"
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DeleteEvent
-            isOpen={showDeleteDialog}
-            onClose={() => setShowDeleteDialog(false)}
-            onConfirm={handleDelete}
-            eventTitle={event.title}
-            isLoading={isDeleting}
-          />
-        </>
-      );
-    },
+    cell: ({ row }) => <ActionsCell event={row.original} onRefresh={onRefresh} />
   },
 ];

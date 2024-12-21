@@ -22,11 +22,10 @@ interface DashboardStats {
 }
 
 interface DashboardOverviewProps {
-  eventId: string;
   initialStats?: DashboardStats;
 }
 
-export function DashboardOverview({ eventId, initialStats }: DashboardOverviewProps) {
+export function DashboardOverview({ initialStats }: DashboardOverviewProps) {
   const [stats] = useState<DashboardStats>(initialStats || {
     totalSales: 0,
     ticketsSold: 0,
@@ -65,8 +64,14 @@ export function DashboardOverview({ eventId, initialStats }: DashboardOverviewPr
     }
   ];
 
-  const handleVerifyEvent = () => {
-    // Add your logic here
+  const handleVerifyEvent = async () => {
+    try {
+      // TODO: Implement event verification 
+      console.log('Verifying event');
+      // Add API call here
+    } catch (error) {
+      console.error('Error verifying event:', error);
+    }
   };
 
   const event = {

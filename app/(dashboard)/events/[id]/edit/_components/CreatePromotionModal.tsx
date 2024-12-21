@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { CreateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
+import { CreateEventTicketPromotionRequest, GetEventUtils, EventTicketPromotion } from '@/lib/models/_events_models';
 import { createEventTicketPromotion, getEventsUtils, getEventTicketPromotions } from '@/lib/actions/events';
 import {SelectItem} from "@/components/ui/select";
 import InputField from '@/components/custom/InputField';
@@ -31,7 +31,7 @@ export function CreatePromotionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
   const [promotionTab, setPromotionTab] = useState<'promo' | 'discount'>('promo');
-  const [existingPromotions, setExistingPromotions] = useState<any[]>([]);
+  const [existingPromotions, setExistingPromotions] = useState<EventTicketPromotion[]>([]);
   const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
     code: '',
     promotionType: 'discount',
@@ -55,9 +55,13 @@ export function CreatePromotionModal({
     try {
       const response = await getEventsUtils();
       setEventUtils(Array.isArray(response) ? response : [response]);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching event utils:', error);
-      toast.error('Failed to fetch event options');
+      if (error instanceof Error) {
+        toast.error(error.message || 'Failed to fetch event options');
+      } else {
+        toast.error('Failed to fetch event options');
+      }
     }
   };
 
@@ -65,8 +69,13 @@ export function CreatePromotionModal({
     try {
       const response = await getEventTicketPromotions(eventId);
       setExistingPromotions(response.promotions || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching promotions:', error);
+      if (error instanceof Error) {
+        toast.error(error.message || 'Failed to fetch promotions');
+      } else {
+        toast.error('Failed to fetch promotions');
+      }
     }
   };
 

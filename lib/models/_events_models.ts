@@ -1,5 +1,7 @@
 import { TicketType } from "@/app/(main)/codepass/types";
 
+export type LocationType = 'venue' | 'online';
+
 export interface Event {
     id: string;
     title: string;
@@ -52,7 +54,7 @@ export interface CreateEvent {
     endTime: string;
     totalCapacity: number;
     tags: string[];
-    locationType: 'venue' | 'online';
+    locationType: LocationType;
     address1: string;
     address2: string;
     city: string;
@@ -176,7 +178,7 @@ export interface GetEventByIdResponse {
     endTime: string;
     totalCapacity: number;
     tags: string[];
-    locationType: string;
+    locationType: LocationType;
     address1: string;
     address2: string;
     city: string;

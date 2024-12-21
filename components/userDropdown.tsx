@@ -25,12 +25,6 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
     pathname.startsWith('/finance') ||
     pathname.startsWith('/settings');
   
-  // Check if current route is in the main group (attending view)
-  const isMainRoute = pathname === '/' || 
-    pathname.startsWith('/blog') || 
-    pathname.startsWith('/tickets') || 
-    pathname === '/codepass';
-
   const handleLogout = () => {
     logout();
     router.push('/');

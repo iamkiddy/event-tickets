@@ -1,71 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { LucideIcon } from 'lucide-react';
 import {
   Search,
   Book,
-  LifeBuoy,
   MessageCircle,
   Mail,
-  Phone,
   FileText,
-  ChevronRight,
-  PlayCircle,
-  Calendar,
-  CreditCard,
   Users,
-  Settings,
   ChevronDown,
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 interface QuickLink {
   title: string;
   description: string;
-  icon: any; // TODO: Replace with proper Lucide icon type
+  icon: LucideIcon;
 }
 
 interface FAQ {
   question: string;
   answer: string;
 }
-
-const quickStartGuides: QuickLink[] = [
-  {
-    title: 'Creating Your First Event',
-    description: 'Learn how to create and publish your first event',
-    icon: Calendar,
-  },
-  {
-    title: 'Setting Up Payments',
-    description: 'Configure your payment methods and pricing',
-    icon: CreditCard,
-  },
-  {
-    title: 'Managing Attendees',
-    description: 'Handle registrations and attendee communications',
-    icon: Users,
-  },
-  {
-    title: 'Event Settings',
-    description: 'Customize your event settings and preferences',
-    icon: Settings,
-  },
-];
 
 const faqs: FAQ[] = [
   {
@@ -105,7 +63,6 @@ const quickLinks: QuickLink[] = [
 ];
 
 export default function HelpPage() {
-  const [searchTerm, setSearchTerm] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 

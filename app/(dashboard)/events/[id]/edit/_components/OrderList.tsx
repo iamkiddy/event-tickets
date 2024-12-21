@@ -15,11 +15,10 @@ interface Order {
 }
 
 interface OrderListProps {
-  eventId: string;
   initialOrders?: Order[];
 }
 
-export function OrderList({ eventId, initialOrders = [] }: OrderListProps) {
+export function OrderList({ initialOrders = [] }: OrderListProps) {
   const [orders] = useState<Order[]>(initialOrders);
   const [searchQuery, setSearchQuery] = useState('');
 

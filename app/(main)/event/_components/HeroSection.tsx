@@ -43,16 +43,6 @@ export default function HeroSection() {
         replace(`${pathName}?${params.toString()}`);
     }
 
-    // clear search
-    const clearFilter = () => {
-      const params = new URLSearchParams(searchParams);
-      params.delete("search");
-      params.delete("where");
-      params.delete("date");
-      replace(`${pathName}?${params.toString()}`);
-    }
-
-
   return (
     <div className="relative h-[350px] xs:h-[400px] sm:h-[500px] lg:h-[600px] mb-6 xs:mb-8 sm:mb-16">
         <div className="absolute inset-0">
@@ -102,7 +92,7 @@ export default function HeroSection() {
                       className="w-full pl-10 pr-4 py-3 rounded-full text-sm focus:outline-none focus:ring-0 appearance-none cursor-pointer bg-transparent"
                     >
                       <option value="">Where to?</option>
-                      <option value="venuef">venue</option>
+                      <option value="venue">venue</option>
                       <option value="online">Online</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />

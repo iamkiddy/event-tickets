@@ -29,8 +29,8 @@ interface EventPageProps {
 export default function EventsPage({ searchParams }: EventPageProps) {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  const params = React.use<typeof searchParams>(searchParams);
-  
+  const params = React.useMemo(() => searchParams, [searchParams]);
+
   // get all events
   const { data: events, isLoading } = useQuery({
     queryKey: ['events', params],

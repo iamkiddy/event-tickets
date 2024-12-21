@@ -2,7 +2,6 @@
 
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { cookies } from 'next/headers';
 import {
   GetAllBlogsResponse,
   GetBlogByIdResponse,

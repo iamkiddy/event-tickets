@@ -20,6 +20,12 @@ export interface IController<T = unknown> {
   baseUrl?: string;
 }
 
+// interface for API errors
+interface APIError extends Error {
+  status?: number;
+  data?: unknown;
+}
+
 // api controller
 export default async function <T, D = unknown>({
   method = "GET",
@@ -79,13 +85,14 @@ export default async function <T, D = unknown>({
     }
 
     return responseData as T;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as APIError;
     console.error('API Controller Error:', {
-      error,
-      message: error.message,
-      status: error.status,
-      data: error.data
+      error: apiError,
+      message: apiError.message,
+      status: apiError.status,
+      data: apiError.data
     });
-    throw error;
+    throw apiError;
   }
 }

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { EventForm } from '@/app/(dashboard)/events/[id]/_components/eventForm';
 import { updateEventFAQ, updateEventAgenda, getEventById } from '@/lib/actions/events';
 import { toast } from 'sonner';
-import { Check, Image as ImageIcon, Info, Tag, Users, LayoutDashboard, ShoppingCart, Menu } from 'lucide-react';
+import { Check, Image as ImageIcon, Info, Tag, Users, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { GetEventByIdResponse } from '@/lib/models/_events_models';
@@ -14,7 +14,6 @@ import { TicketList } from './_components/TicketList';
 import { PublishingList } from './_components/PublishingList';
 import { DashboardOverview } from './_components/DashboardOverview';
 import { OrderList } from './_components/OrderList';
-import { Button } from '@/components/ui/button';
 
 interface StepProps {
   icon: React.ElementType;
@@ -70,7 +69,6 @@ export default function EditEventPage() {
   const [event, setEvent] = useState<GetEventByIdResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeForm, setActiveForm] = useState<ActiveForm>('tickets');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -229,9 +227,9 @@ export default function EditEventPage() {
             
             <div className="space-y-4 lg:space-y-8">
               {activeForm === 'dashboard' ? (
-                <DashboardOverview eventId={eventId} />
+                <DashboardOverview />
               ) : activeForm === 'orders' ? (
-                <OrderList eventId={eventId} />
+                <OrderList />
               ) : activeForm === 'publishing' ? (
                 <PublishingList eventId={eventId} currentStatus={event.status} />
               ) : activeForm === 'tickets' ? (

@@ -13,7 +13,7 @@ export const EventCard =({
   data
 }: EventCardProps ) => {
 
-  const { month, day, fullDate } = formatDate(data.startDate);
+  const { month, day } = formatDate(data.startDate);
  
   return (
     <Link href={`/event/${data.id}`}>

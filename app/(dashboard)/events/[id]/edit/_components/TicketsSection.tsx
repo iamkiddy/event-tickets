@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Clock, Tag, Users } from 'lucide-react';
+import { Plus, Pencil, Trash, Tag, Users } from 'lucide-react';
 import { TicketType } from '@/app/(main)/codepass/types';
 import { EventTicketPromotion } from '@/lib/models/_events_models';
 import { Card } from '@/components/ui/card';

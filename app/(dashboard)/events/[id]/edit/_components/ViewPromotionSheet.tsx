@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { format } from 'date-fns';
 import { getEventTicketPromotionById } from '@/lib/actions/events';
 import { getEventTicketPromotionByIdResponse } from '@/lib/models/_events_models';

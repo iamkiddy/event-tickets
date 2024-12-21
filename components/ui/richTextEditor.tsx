@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
 import { 
   Bold, 
   Italic, 
@@ -22,7 +23,12 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ value, onChange, disabled, placeholder }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: placeholder || 'Start typing...',
+      }),
+    ],
     content: value,
     editable: !disabled,
     onUpdate: ({ editor }) => {
