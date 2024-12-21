@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Calendar, Clock, MapPin, Tag, Share2, DollarSign, Heart, ImageIcon } from 'lucide-react';
+import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import { EventDetails } from '@/lib/models/_main_event_models';
@@ -13,6 +13,7 @@ import { LoginAlert } from '@/app/auth/_components/loginAlert';
 import { AuthenticatedNav } from '@/components/ui/authNavbar';
 import { navLinks } from "@/app/(main)/codepass/EventickPage";
 import { SearchBar } from '../../codepass/components/SearchBar';
+import Image from 'next/image';
 
 interface FormattedDate {
   fullDate: string;
@@ -211,9 +212,10 @@ export default function EventPage() {
             {/* Main image */}
             {event.images && event.images.length > 0 ? (
               <div className="absolute inset-0">
-                <img
+                <Image
                   src={event.images[0]}
                   alt={event.title}
+                  fill
                   className="w-full h-full object-cover rounded-lg"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent rounded-lg" />
