@@ -371,11 +371,13 @@ export default function EventPage() {
                     <h3 className="text-2xl font-semibold text-gray-900 mb-6">Event Organizer</h3>
                     <div className="flex items-start gap-4">
                       {event.organizer.profileImage && (
-                        <img
-                          src={event.organizer.profileImage}
-                          alt={event.organizer.name}
-                          className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                        />
+                        <div className='w-16 h-16 relative overflow-hidden rounded-full flex-shrink-0'>
+                          <Image
+                            src={event.organizer.profileImage}
+                            alt={event.organizer.name}
+                            className="object-cover"
+                          />
+                        </div>
                       )}
                       <div className="flex-1 min-w-0">
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">{event.organizer.name}</h4>
