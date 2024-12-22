@@ -29,12 +29,19 @@ interface EventPageProps {
 export default function EventsPage({ searchParams }: EventPageProps) {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  const params = React.useMemo(() => searchParams, [searchParams]);
+  // params
+  const category = searchParams.category || '';
+  const time = searchParams.time || '';
+  const type = searchParams.type || '';
+  const date = searchParams.date || '';
+  const where = searchParams.where || '';
+  const search = searchParams.search || '';
+  const page = searchParams.page || 1;
 
   // get all events
   const { data: events, isLoading } = useQuery({
-    queryKey: ['events', params],
-    queryFn: () => getAllMainEvents(params),
+    queryKey: ['events', category, time, type, date, where, search, page],
+    queryFn: () => getAllMainEvents({ category, time, type, date, where, search, page }),
   });
 
   // get all categories
@@ -81,26 +88,26 @@ export default function EventsPage({ searchParams }: EventPageProps) {
                 <EventFilterCard 
                   icon={<Tag className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Category" 
-                  activeName={params.category} 
+                  activeName={category} 
                   query="category"
                   data={categories?.map((category) => category.name) as string[]} 
                 />
                 <EventFilterCard 
                   icon={<Dice3 className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Any Time" 
-                  activeName={params.time} 
+                  activeName={time} 
                   query="time" 
                   data={eventFilterTime}
                 />
                 <EventFilterCard 
                   icon={<Layout className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Event Type" 
-                  activeName={params.type} 
+                  activeName={type} 
                   query="type" 
                   data={eventTypes?.map((type) => type.name) as string[] || []}
                 />
               </div>
-              <EventFilterList params={params} />
+              <EventFilterList params={{category, type, time}} />
             </div>
           </div>
 
