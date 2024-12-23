@@ -3,17 +3,21 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const EventsBanner: React.FC = () => {
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-purple-700/90" />
-        <img
-          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070"
-          alt="Events background"
-          className="h-full w-full object-cover"
-        />
+        <div className='w-full h-full relative overflow-hidden'>
+          <Image
+            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070"
+            alt="Events background"
+            fill
+            className="object-cover"
+          />
+        </div>
       </div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">

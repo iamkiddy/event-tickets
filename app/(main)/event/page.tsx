@@ -13,40 +13,39 @@ import EventFilterCard, { EventFilterList } from './_components/EventFilter';
 import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
+import { useSearchParams } from 'next/navigation';
 
-interface EventPageProps {
-  searchParams: {
-    search?: string;
-    category?: string;
-    type?: string;
-    time?: string;
-    where?: string;
-    date?: string;
-    page?: number;
-  };
-}
 
-export default function EventsPage({ searchParams }: EventPageProps) {
+export default function EventsPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  const params = React.useMemo(() => searchParams, [searchParams]);
+  const searchParams = useSearchParams();
+
+  // params
+  const category = searchParams.get('category') || '';
+  const time = searchParams.get('time') || '';
+  const type = searchParams.get('type') || '';
+  const date = searchParams.get('date') || '';
+  const where = searchParams.get('where') || '';
+  const search = searchParams.get('search') || '';
+  const page = Number(searchParams.get('page')) || 1;
 
   // get all events
   const { data: events, isLoading } = useQuery({
-    queryKey: ['events', params],
-    queryFn: () => getAllMainEvents(params),
+    queryKey: ['events', category, time, type, date, where, search, page],
+    queryFn: () => getAllMainEvents({ category, time, type, date, where, search, page }),
   });
 
   // get all categories
   const { data: categories, isLoading: isMainLoading } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => getCategoryUtils(),
+    queryFn: getCategoryUtils,
   });
 
   // get all event types
   const { data: eventTypes } = useQuery({
     queryKey: ['eventTypes'],
-    queryFn: () => getEventTypeUtils(),
+    queryFn: getEventTypeUtils,
   });
 
 
@@ -81,26 +80,26 @@ export default function EventsPage({ searchParams }: EventPageProps) {
                 <EventFilterCard 
                   icon={<Tag className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Category" 
-                  activeName={params.category} 
+                  activeName={category} 
                   query="category"
                   data={categories?.map((category) => category.name) as string[]} 
                 />
                 <EventFilterCard 
                   icon={<Dice3 className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Any Time" 
-                  activeName={params.time} 
+                  activeName={time} 
                   query="time" 
                   data={eventFilterTime}
                 />
                 <EventFilterCard 
                   icon={<Layout className="w-3 h-3 sm:w-4 sm:h-4 text-primaryColor mr-1 sm:mr-2" />}
                   name="Event Type" 
-                  activeName={params.type} 
+                  activeName={type} 
                   query="type" 
                   data={eventTypes?.map((type) => type.name) as string[] || []}
                 />
               </div>
-              <EventFilterList params={params} />
+              <EventFilterList params={{category, type, time}} />
             </div>
           </div>
 

@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import { deleteEvent } from "@/lib/actions/events";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import Image from 'next/image';
 
 interface EventsTableProps {
   onRefresh: () => void;
@@ -114,11 +115,14 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
             {event.image && event.image.trim() !== "" ? (
-              <img
-                src={event.image}
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
+              <div className='w-full h-full relative overflow-hidden'>
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             ) : (
               <CalendarX2 className="w-6 h-6 text-gray-400" />
             )}

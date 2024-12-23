@@ -8,11 +8,11 @@ import { EventListResponse, EventDetails,OrganisedEventResponse,RelatedEventResp
 export interface GetMainEventsParams {
   search?: string;
   page?: number;
-  limit?: number;
   category?: string;
-  eventType?: string;
+  type?: string;
   date?: string;
   where?: string;
+  time?: string;
 }
 
 export const getAllMainEvents = async (params?: GetMainEventsParams): Promise<EventListResponse> => {
@@ -20,11 +20,11 @@ export const getAllMainEvents = async (params?: GetMainEventsParams): Promise<Ev
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.category) queryParams.append('category', params.category);
-    if (params?.eventType) queryParams.append('eventType', params.eventType);
+    if (params?.type) queryParams.append('type', params.type);
     if (params?.date) queryParams.append('date', params.date);
     if (params?.where) queryParams.append('where', params.where);
+    if (params?.time) queryParams.append('time', params.time);
 
     const response = await apiController<EventListResponse>({
       method: 'GET',

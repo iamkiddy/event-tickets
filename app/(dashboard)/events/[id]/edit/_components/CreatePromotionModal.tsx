@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -249,10 +250,11 @@ export function CreatePromotionModal({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 mt-3">End Date</label>
+              <div className="space-y-4">
                 <DateTimePicker
-                  date={formData.endDate ? new Date(formData.endDate) : undefined}
+                  label="End Date and Time"
+                  date={formData.endDate && formData.endTime ? 
+                    new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
                   setDate={(date) => {
                     if (date) {
                       setFormData({

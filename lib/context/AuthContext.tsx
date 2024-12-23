@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     getServerSession().then((session) => {
       if (session) {
         setIsAuthenticated(true);
-        setUserProfile(session.userProfile);
+        setUserProfile(session.userProfileModel);
       }
     });
   }, []);
