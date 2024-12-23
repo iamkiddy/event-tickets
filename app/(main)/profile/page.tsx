@@ -7,11 +7,11 @@ import ProfileLoader from './_components/Profile/ProfileLoader';
 import { UserProfileModel } from '@/lib/models/_auth_models';
 
 interface TabSelectorProps {
-  searchParams: {
+  searchParams: Promise<{
     tab?: string;
     page?: string;
     query?: string;
-  };
+  }>;
 }
 
 

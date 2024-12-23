@@ -13,30 +13,22 @@ import EventFilterCard, { EventFilterList } from './_components/EventFilter';
 import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
+import { useSearchParams } from 'next/navigation';
 
-interface EventPageProps {
-  searchParams: {
-    search?: string;
-    category?: string;
-    type?: string;
-    time?: string;
-    where?: string;
-    date?: string;
-    page?: number;
-  };
-}
 
-export default function EventsPage({ searchParams }: EventPageProps) {
+export default function EventsPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
+  const searchParams = useSearchParams();
+
   // params
-  const category = searchParams.category || '';
-  const time = searchParams.time || '';
-  const type = searchParams.type || '';
-  const date = searchParams.date || '';
-  const where = searchParams.where || '';
-  const search = searchParams.search || '';
-  const page = searchParams.page || 1;
+  const category = searchParams.get('category') || '';
+  const time = searchParams.get('time') || '';
+  const type = searchParams.get('type') || '';
+  const date = searchParams.get('date') || '';
+  const where = searchParams.get('where') || '';
+  const search = searchParams.get('search') || '';
+  const page = Number(searchParams.get('page')) || 1;
 
   // get all events
   const { data: events, isLoading } = useQuery({
@@ -47,13 +39,13 @@ export default function EventsPage({ searchParams }: EventPageProps) {
   // get all categories
   const { data: categories, isLoading: isMainLoading } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => getCategoryUtils(),
+    queryFn: getCategoryUtils,
   });
 
   // get all event types
   const { data: eventTypes } = useQuery({
     queryKey: ['eventTypes'],
-    queryFn: () => getEventTypeUtils(),
+    queryFn: getEventTypeUtils,
   });
 
 
