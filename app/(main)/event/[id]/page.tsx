@@ -3,6 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -11,6 +22,7 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { AccordionTrigger } from '@radix-ui/react-accordion';
+import BuyTicketsModel from './_componenets/BuyTicketsModel';
 
 interface FormattedDate {
   fullDate: string;
@@ -353,9 +365,12 @@ export default function EventPage() {
                   </div>
 
                   {/* Get Tickets Button */}
-                  <button className="w-full mt-6 px-6 py-3 bg-primaryColor text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                    Get Tickets
-                  </button>
+                  <BuyTicketsModel 
+                    eventTitle={event.title}
+                    totalAmount={40}
+                    serviceFee={5}
+                    eventImage={event.images[0]}
+                  />
 
                   {/* Refund Policy */}
                   <p className="mt-4 text-sm text-gray-600 text-center">
