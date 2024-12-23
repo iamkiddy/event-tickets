@@ -3,17 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
