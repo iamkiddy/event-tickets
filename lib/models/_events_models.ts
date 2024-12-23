@@ -230,7 +230,7 @@ export interface CreateEventTicketResponse {
     message: string;
 }
 
-export type PromotionType = 'discount' | 'promo';
+export type PromotionType = 'discount' | 'coupon';
 export type ValueType = 'percentage' | 'amount';
 
 export interface CreateEventTicketPromotion {
@@ -346,6 +346,15 @@ export interface UpdateEventTicket {
     isActive: boolean;
     tickets: string[];
     }
+
+export interface EventTicket {
+  name: string;
+  price: number;
+  quantity: number;
+  currency: string;
+  isActive: boolean;
+  id: string;
+}
 
 export interface GetEventFinalStage{
     organizer: string;

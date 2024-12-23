@@ -27,6 +27,10 @@ export interface TicketType {
   price: number;
   available: number;
   description: string;
+  currency: string;
+  isPromotion?: boolean;
+  originalPrice?: number;
+  promotionLabel?: string;
 }
 
 export interface EventDetails extends EventCardProps {

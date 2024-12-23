@@ -25,9 +25,9 @@ const formatDateTime = (date?: string, time?: string) => {
   }
 };
 
-const formatValue = (value: number, valueType: string) => {
+const formatValue = (value: number, valueType: string, currency?: string) => {
   if (valueType === 'percentage') return `${value}%`;
-  return `$${value.toFixed(2)}`;
+  return `${currency || 'USD'} ${value.toFixed(2)}`;
 };
 
 export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromotionSheetProps) {
@@ -106,7 +106,7 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Value</label>
                   <p className="mt-1 text-base text-gray-900">
-                    {formatValue(promotion.value, promotion.valueType)}
+                    {formatValue(promotion.value, promotion.valueType, promotion.promotionType)}
                   </p>
                 </div>
 

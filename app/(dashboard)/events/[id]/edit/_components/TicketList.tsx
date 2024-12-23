@@ -51,6 +51,7 @@ export function TicketList({ eventId, initialTickets = [] }: TicketListProps) {
           type: ticket.name || 'Unnamed Ticket',
           price: Number(ticket.price) || 0,
           available: Number(ticket.quantity) || 0,
+          currency: ticket.currency,
           description: ticket.startDate && ticket.endDate 
             ? `${format(new Date(`${ticket.startDate}T00:00:00`), 'PPP')} - ${format(new Date(`${ticket.endDate}T00:00:00`), 'PPP')}`
             : '',

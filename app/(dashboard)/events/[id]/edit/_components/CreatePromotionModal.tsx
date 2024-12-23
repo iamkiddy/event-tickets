@@ -31,9 +31,8 @@ export function CreatePromotionModal({
 }: CreatePromotionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
-  const [promotionTab, setPromotionTab] = useState<'promo' | 'discount'>('promo');
+  const [promotionTab, setPromotionTab] = useState<'coupon' | 'discount'>('coupon');
   const [existingPromotions, setExistingPromotions] = useState<EventTicketPromotion[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
     code: '',
     promotionType: 'discount',
@@ -50,7 +49,6 @@ export function CreatePromotionModal({
     if (isOpen) {
       fetchEventUtils();
       fetchExistingPromotions();
-      setSelectedDate(undefined);
       setFormData({
         code: '',
         promotionType: 'discount',
@@ -64,16 +62,6 @@ export function CreatePromotionModal({
       });
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (selectedDate) {
-      setFormData(prev => ({
-        ...prev,
-        endDate: format(selectedDate, 'yyyy-MM-dd'),
-        endTime: format(selectedDate, 'HH:mm')
-      }));
-    }
-  }, [selectedDate]);
 
   const fetchEventUtils = async () => {
     try {
@@ -153,11 +141,11 @@ export function CreatePromotionModal({
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setPromotionTab('promo')}
+                  onClick={() => setPromotionTab('coupon')}
                   className={cn(
                     "flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-medium transition-all duration-300",
                     "text-lg hover:text-primaryColor/80",
-                    promotionTab === 'promo' 
+                    promotionTab === 'coupon' 
                       ? "bg-white text-primaryColor shadow-lg scale-[1.02]" 
                       : "text-gray-600"
                   )}
@@ -191,7 +179,7 @@ export function CreatePromotionModal({
           </div>
 
           <div className="space-y-6">
-            {promotionTab === 'promo' && (
+            {promotionTab === 'coupon' && (
               <InputField
                 label="Promotion Code"
                 value={formData.code}
@@ -280,18 +268,26 @@ export function CreatePromotionModal({
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-4 col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+              <div className="space-y-4 col-span-2 mt-3">
                 <DateTimePicker
                   label="End Date and Time"
-                  date={selectedDate}
+                  date={formData.endDate && formData.endTime ? 
+                    new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
                   setDate={(date) => {
-                    setSelectedDate(date);
+                    if (date) {
+                      const formattedDate = format(date, 'yyyy-MM-dd');
+                      const formattedTime = format(date, 'HH:mm:ss');
+                      console.log('Setting end date and time:', { formattedDate, formattedTime });
+                      setFormData({
+                        ...formData,
+                        endDate: formattedDate,
+                        endTime: formattedTime
+                      });
+                    }
                   }}
                 />
-                {!formData.endDate && !formData.endTime && (
-                  <p className="text-sm text-red-500">Please select an end date and time</p>
-                )}
+             
               </div>
             </div>
           </div>
@@ -318,3 +314,4 @@ export function CreatePromotionModal({
     </Sheet>
   );
 } 
+          

@@ -2,15 +2,13 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users, Trash2, Eye, Loader2, CalendarX2 } from 'lucide-react';
+import { MoreVertical, Calendar, Users, Loader2, CalendarX2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -48,29 +46,25 @@ function ActionsCell({ event, onRefresh }: ActionsCellProps) {
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <Popover>
+        <PopoverTrigger asChild>
           <Button variant="ghost" size="icon">
             <MoreVertical className="w-4 h-4 text-gray-400" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 bg-white">
-          <DropdownMenuItem asChild>
-            <Link href={`/events/${event.id}/edit`} className="w-full cursor-pointer">
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-40 bg-white">
+          <Link href={`/events/${event.id}/edit`} className="w-full cursor-pointer block p-2 hover:bg-gray-100">
+            View Details
+          </Link>
+          <div className="border-b border-gray-200 my-2" />
+          <div
             onClick={() => setShowDeleteDialog(true)}
-            className="text-red-600 focus:text-red-600"
+            className="text-red-600 focus:text-red-600 block p-2 hover:bg-gray-100 cursor-pointer"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
             Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className='bg-white'>
@@ -124,7 +118,7 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
                 />
               </div>
             ) : (
-              <CalendarX2 className="w-6 h-6 text-gray-400" />
+              <div className="w-6 h-6 text-gray-400" />
             )}
           </div>
           <div>
@@ -132,7 +126,7 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
             <p className="text-sm text-gray-500">
               {new Date(event.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
-        </div>
+          </div>
         </div>
       );
     },
@@ -143,7 +137,6 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Calendar className="w-4 h-4" />
           {new Date(row.original.startDate).toLocaleDateString()}
         </div>
       );
@@ -155,7 +148,6 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Users className="w-4 h-4" />
           {row.original.soldOut}
         </div>
       );

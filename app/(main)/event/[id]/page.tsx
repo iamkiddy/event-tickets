@@ -18,7 +18,6 @@ import { getEventDetails } from '@/lib/actions/mainEvent';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
 import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar';
-import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { AccordionTrigger } from '@radix-ui/react-accordion';
@@ -154,11 +153,10 @@ export default function EventPage() {
             {/* Main image */}
             {event.images && event.images.length > 0 ? (
               <div className="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
-                <Image
+                <img
                   src={event.images[0]}
                   alt={event.title}
-                  fill
-                  className="object-cover"
+                  className="object-cover w-full h-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent rounded-lg" />
               </div>
@@ -179,8 +177,8 @@ export default function EventPage() {
                   {event.locationType === 'online' && (
                     <>
                       <span className="mx-2">•</span>
-                      <div className="flex items-center gap-1 text-emerald-400">
-                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <div className="flex items-center gap-1">
+                        <Globe className="w-4 h-4" />
                         <span>Online Event</span>
                       </div>
                     </>
@@ -415,7 +413,7 @@ export default function EventPage() {
                     <div className="flex items-start gap-4">
                       {event.organizer.profileImage && (
                         <div className='w-16 h-16 relative overflow-hidden rounded-full flex-shrink-0'>
-                          <Image
+                          <img
                             src={event.organizer.profileImage}
                             alt={event.organizer.name}
                             className="object-cover"

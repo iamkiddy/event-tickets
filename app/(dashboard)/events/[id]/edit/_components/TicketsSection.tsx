@@ -91,7 +91,7 @@ export function TicketsSection({
                         </h3>
                         <div className="flex items-center gap-2">
                           <span className="px-4 py-1.5 bg-indigo-50 text-primaryColor text-sm font-medium rounded-full">
-                            ${ticket.price}
+                            {ticket.currency} {ticket.price}
                           </span>
                         </div>
                       </div>
@@ -101,7 +101,10 @@ export function TicketsSection({
                           <Users className="w-4 h-4 text-gray-400" />
                           <span>{ticket.available} tickets available</span>
                         </div>
-                       
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-gray-400" />
+                          <span className="text-green-600">Active</span>
+                        </div>
                       </div>
 
                       {ticketPromotions.length > 0 && (
