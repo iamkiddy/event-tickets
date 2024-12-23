@@ -230,7 +230,7 @@ export interface CreateEventTicketResponse {
     message: string;
 }
 
-export type PromotionType = 'discount' | 'coupon';
+export type PromotionType = 'discount' | 'promo';
 export type ValueType = 'percentage' | 'amount';
 
 export interface CreateEventTicketPromotion {

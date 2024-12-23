@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { toast } from 'sonner';
 import { CreateEventTicketPromotionRequest, GetEventUtils, EventTicketPromotion } from '@/lib/models/_events_models';
 import { createEventTicketPromotion, getEventsUtils, getEventTicketPromotions } from '@/lib/actions/events';
@@ -33,6 +33,7 @@ export function CreatePromotionModal({
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
   const [promotionTab, setPromotionTab] = useState<'promo' | 'discount'>('promo');
   const [existingPromotions, setExistingPromotions] = useState<EventTicketPromotion[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
     code: '',
     promotionType: 'discount',
@@ -49,8 +50,30 @@ export function CreatePromotionModal({
     if (isOpen) {
       fetchEventUtils();
       fetchExistingPromotions();
+      setSelectedDate(undefined);
+      setFormData({
+        code: '',
+        promotionType: 'discount',
+        value: 0,
+        valueType: 'percentage',
+        endDate: '',
+        endTime: '',
+        quantity: 0,
+        isActive: true,
+        tickets: []
+      });
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setFormData(prev => ({
+        ...prev,
+        endDate: format(selectedDate, 'yyyy-MM-dd'),
+        endTime: format(selectedDate, 'HH:mm')
+      }));
+    }
+  }, [selectedDate]);
 
   const fetchEventUtils = async () => {
     try {
@@ -83,6 +106,11 @@ export function CreatePromotionModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.endDate || !formData.endTime) {
+      toast.error('Please select an end date and time');
+      return;
+    }
+    
     if (promotionTab === 'discount') {
       const existingDiscount = existingPromotions.find(
         (promo) => promo.promotionType === 'discount'
@@ -97,7 +125,10 @@ export function CreatePromotionModal({
     setIsSubmitting(true);
 
     try {
-      const response = await createEventTicketPromotion(eventId, formData);
+      const response = await createEventTicketPromotion(eventId, {
+        ...formData,
+        promotionType: promotionTab
+      });
       console.log('Promotion created:', response);
       toast.success('Promotion created successfully');
       onSuccess();
@@ -253,26 +284,14 @@ export function CreatePromotionModal({
               <div className="space-y-4 col-span-2">
                 <DateTimePicker
                   label="End Date and Time"
-                  date={formData.endDate && formData.endTime ? 
-                    new Date(`${formData.endDate}T${formData.endTime}:00`) : undefined}
+                  date={selectedDate}
                   setDate={(date) => {
-                    if (date) {
-                      const formattedDate = format(date, 'yyyy-MM-dd');
-                      const formattedTime = format(date, 'HH:mm');
-                      setFormData({
-                        ...formData,
-                        endDate: formattedDate,
-                        endTime: formattedTime
-                      });
-                    } else {
-                      setFormData({
-                        ...formData,
-                        endDate: '',
-                        endTime: ''
-                      });
-                    }
+                    setSelectedDate(date);
                   }}
                 />
+                {!formData.endDate && !formData.endTime && (
+                  <p className="text-sm text-red-500">Please select an end date and time</p>
+                )}
               </div>
             </div>
           </div>

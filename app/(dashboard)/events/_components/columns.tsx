@@ -86,7 +86,7 @@ function ActionsCell({ event, onRefresh }: ActionsCellProps) {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-red-600 text-white focus:ring-red-600"
             >
               {isDeleting ? (
                 <>
