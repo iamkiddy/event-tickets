@@ -250,17 +250,25 @@ export function CreatePromotionModal({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-4">
+              <div className="space-y-4 col-span-2">
                 <DateTimePicker
                   label="End Date and Time"
                   date={formData.endDate && formData.endTime ? 
-                    new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
+                    new Date(`${formData.endDate}T${formData.endTime}:00`) : undefined}
                   setDate={(date) => {
                     if (date) {
+                      const formattedDate = format(date, 'yyyy-MM-dd');
+                      const formattedTime = format(date, 'HH:mm');
                       setFormData({
                         ...formData,
-                        endDate: format(date, 'yyyy-MM-dd'),
-                        endTime: format(date, 'HH:mm')
+                        endDate: formattedDate,
+                        endTime: formattedTime
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        endDate: '',
+                        endTime: ''
                       });
                     }
                   }}
