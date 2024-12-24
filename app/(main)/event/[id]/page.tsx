@@ -165,6 +165,15 @@ export default function EventPage() {
                   <span>{formatDate(event.startDate).fullDate}</span>
                   <span className="mx-2">•</span>
                   <span>{formatTimeRange(event.startTime, event.endTime)}</span>
+                  {event.locationType === 'online' && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <div className="flex items-center gap-1 text-emerald-400">
+                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span>Online Event</span>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
                   {parser(event.title)}
@@ -233,14 +242,33 @@ export default function EventPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-3 text-gray-900 font-medium mb-4">
-                    <MapPin className="w-6 h-6 text-primaryColor" />
+                    {event.locationType === 'online' ? (
+                      <Globe className="w-6 h-6 text-gray-500" />
+                    ) : (
+                      <MapPin className="w-6 h-6 text-gray-500" />
+                    )}
                     <span className="text-lg">Location</span>
                   </div>
                   <div className="space-y-2 text-gray-600">
-                    <p>{event.address1}</p>
-                    {event.address2 && <p>{event.address2}</p>}
-                    <p>{event.city}, {event.state}</p>
-                    <p>{event.country}</p>
+                    {event.locationType === 'online' ? (
+                      <div className="space-y-2">
+                        <p className="flex items-center gap-2">
+                          <span className="font-medium">Online Event</span>
+                        </p>
+                        {event.videoUrl && (
+                          <p className="text-sm text-primaryColor">
+                            Event link will be provided after registration
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <p>{event.address1}</p>
+                        {event.address2 && <p>{event.address2}</p>}
+                        <p>{event.city}, {event.state}</p>
+                        <p>{event.country}</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
