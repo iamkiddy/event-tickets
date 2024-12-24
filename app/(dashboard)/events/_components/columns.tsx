@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Event } from '@/lib/models/_events_models';
-import { MoreVertical, Calendar, Users, Loader2, CalendarX2 } from 'lucide-react';
+import { MoreVertical, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,

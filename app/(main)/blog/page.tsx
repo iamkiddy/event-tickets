@@ -1,20 +1,31 @@
 'use client';
 
 import * as React from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { NavLink } from '../codepass/components/NavLink';
-import { LoginAlert } from '../../auth/_components/loginAlert';
 import { useAuth } from '@/lib/context/AuthContext';
-import { AuthenticatedNav } from '../../../components/ui/authNavbar';
 import Image from 'next/image';
 import { Input } from "@/components/ui/input";
 import { getAllBlogs } from '@/lib/actions/blog';
 import { GetAllBlogsResponse } from '@/lib/models/_blogs_models';
 import { BlogCardSkeleton } from '../codepass/components/skeletons';
 import parser from 'html-react-parser';
-import {navLinks} from "@/app/(main)/codepass/EventickPage"
-import { BlogCard } from '../codepass/components/BlogCard';
+
+const BlogHeader = dynamic(
+  () => import('./_components/BlogHeader').then(mod => mod.BlogHeader),
+  { ssr: false }
+);
+
+const LoginAlert = dynamic(
+  () => import('../../auth/_components/loginAlert').then(mod => ({ default: mod.LoginAlert })),
+  { ssr: false }
+);
+
+const BlogCard = dynamic(
+  () => import('../codepass/components/BlogCard').then(mod => ({ default: mod.BlogCard })),
+  { ssr: false }
+);
 
 const categories = [
   'All',
@@ -26,31 +37,21 @@ const categories = [
 
 export default function BlogPage() {
   const { isAuthenticated } = useAuth();
-  const [isScrolled, setIsScrolled] = React.useState(false);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState('All');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [blogs, setBlogs] = React.useState<GetAllBlogsResponse['data']>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  React.useEffect(() => {
+    setIsClient(true);
     const fetchBlogs = async () => {
       try {
         const response = await getAllBlogs();
         setBlogs(response.data);
       } catch (error) {
         console.error('Failed to fetch blogs:', error);
-        // You might want to add error state handling here
       } finally {
         setIsLoading(false);
       }
@@ -59,47 +60,16 @@ export default function BlogPage() {
     fetchBlogs();
   }, []);
 
+  if (!isClient) {
+    return <BlogCardSkeleton />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {!isAuthenticated ? (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-          ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-4">
-              <div className={`text-lg sm:text-xl font-bold ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
-                CodePass
-              </div>
-              
-              <div className="hidden md:flex items-center gap-4 lg:gap-8">
-                {navLinks.map((link) => (
-                  <NavLink 
-                    key={link.label}
-                    {...link} 
-                    isScrolled={isScrolled}
-                    onLoginClick={() => setShowLoginDialog(true)}
-                  />
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-4">
-                <NavLink 
-                  label="Create Event"
-                  isCreate={true}
-                  isScrolled={isScrolled}
-                />
-                <NavLink 
-                  label="Login"
-                  isButton={true}
-                  isScrolled={isScrolled}
-                  onLoginClick={() => setShowLoginDialog(true)}
-                />
-              </div>
-            </div>
-          </div>
-        </nav>
-      ) : (
-        <AuthenticatedNav isScrolled={isScrolled} showSearchInNav={false} />
-      )}
+      <BlogHeader 
+        isAuthenticated={isAuthenticated}
+        onLoginClick={() => setShowLoginDialog(true)}
+      />
 
       <LoginAlert 
         open={showLoginDialog} 
@@ -117,7 +87,7 @@ export default function BlogPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         </div>
-        
+
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-full flex flex-col items-center justify-center pt-16 sm:pt-20">
             <span className="inline-block px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-4 sm:mb-6">
@@ -138,7 +108,7 @@ export default function BlogPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
             Browse by Category
           </h2>
-          
+
           <div className="mb-8">
             <Input
               type="search"

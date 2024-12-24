@@ -10,7 +10,8 @@ import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { AccordionTrigger } from '@radix-ui/react-accordion';
-import BuyTicketsModel from './_componenets/BuyTicketsModel';
+import { BuyTicketsModel } from './components/BuyTicketsModel';
+import { CheckoutModal } from './components/CheckoutModal';
 
 interface FormattedDate {
   fullDate: string;
@@ -71,6 +72,9 @@ export default function EventPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [ticketCounts, setTicketCounts] = useState({ general: 0, vip: 0 });
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', params.id as string],
@@ -90,6 +94,25 @@ export default function EventPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const total = (ticketCounts.general * 30) + (ticketCounts.vip * 50);
+  const fees = total * 0.1;
+
+  const handleOpenBuyModal = () => {
+    setIsBuyModalOpen(true);
+  };
+
+  const handleCloseBuyModal = () => {
+    setIsBuyModalOpen(false);
+  };
+
+  const handleOpenCheckout = () => {
+    setIsCheckoutOpen(true);
+  };
+
+  const handleCloseCheckout = () => {
+    setIsCheckoutOpen(false);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -98,16 +121,10 @@ export default function EventPage() {
     );
   }
 
-  if (!event) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Event not found</p>
-      </div>
-    );
-  }
+  if (!event) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Add Navbar */}
       {isAuthenticated ? (
         <AuthenticatedNav 
@@ -210,7 +227,7 @@ export default function EventPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
@@ -338,113 +355,100 @@ export default function EventPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-20 space-y-6">
               {/* Tickets Section */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 sm:p-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-6">Select Tickets</h3>
-                  
-                  {/* Ticket types */}
-                  <div className="space-y-4">
-                    {/* Afro Nation Ticket */}
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Afro Nation</h4>
-                        <p className="text-sm text-gray-600">20 remaining</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">GHS30</p>
-                        <select className="mt-1 text-sm border-gray-200 rounded-md focus:ring-primaryColor focus:border-primaryColor">
-                          <option value="0">0</option>
-                          {[...Array(5)].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                          ))}
-                        </select>
-                      </div>
+              <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">Select Tickets</h3>
+                
+                {/* Ticket types */}
+                <div className="space-y-4">
+                  {/* Afro Nation Ticket */}
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Afro Nation</h4>
+                      <p className="text-sm text-gray-600">20 remaining</p>
                     </div>
-
-                    {/* Promo 2024 Ticket */}
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Promo 2024</h4>
-                        <p className="text-sm text-gray-600">10 remaining</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">GHS10</p>
-                        <select className="mt-1 text-sm border-gray-200 rounded-md focus:ring-primaryColor focus:border-primaryColor">
-                          <option value="0">0</option>
-                          {[...Array(5)].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                          ))}
-                        </select>
-                      </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">GHS30</p>
+                      
                     </div>
                   </div>
 
-                  {/* Get Tickets Button */}
-                  <BuyTicketsModel 
-                    eventTitle={event.title}
-                    totalAmount={40}
-                    serviceFee={5}
-                    eventImage={event.images[0]}
-                  />
-
-                  {/* Refund Policy */}
-                  <p className="mt-4 text-sm text-gray-600 text-center">
-                    Refundable up to 7 days before the event
-                  </p>
+                  {/* Promo 2024 Ticket */}
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Promo 2024</h4>
+                      <p className="text-sm text-gray-600">10 remaining</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">GHS10</p>
+                      
+                    </div>
+                  </div>
                 </div>
+
+                {/* Get Tickets Button */}
+                <button
+                  onClick={handleOpenBuyModal}
+                  className="w-full bg-primaryColor text-white font-medium rounded-xl py-4 hover:bg-indigo-700 
+                    transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-indigo-200"
+                >
+                  Get Tickets
+                </button>
+
+                {/* Refund Policy */}
+                <p className="mt-4 text-sm text-gray-600 text-center">
+                  Refundable up to 7 days before the event
+                </p>
               </div>
 
               {/* Organizer Section */}
               {event.organizer && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="p-6 sm:p-8">
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-6">Event Organizer</h3>
-                    <div className="flex items-start gap-4">
-                      {event.organizer.profileImage && (
-                        <div className='w-16 h-16 relative overflow-hidden rounded-full flex-shrink-0'>
-                          <img
-                            src={event.organizer.profileImage}
-                            alt={event.organizer.name}
-                            className="object-cover"
-                          />
-                        </div>
+                <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-6">Event Organizer</h3>
+                  <div className="flex items-start gap-4">
+                    {event.organizer.profileImage && (
+                      <div className='w-16 h-16 relative overflow-hidden rounded-full flex-shrink-0'>
+                        <img
+                          src={event.organizer.profileImage}
+                          alt={event.organizer.name}
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">{event.organizer.name}</h4>
+                      {event.organizer.bio && (
+                        <p className="text-sm text-gray-600 mb-4">{event.organizer.bio}</p>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">{event.organizer.name}</h4>
-                        {event.organizer.bio && (
-                          <p className="text-sm text-gray-600 mb-4">{event.organizer.bio}</p>
+                      <div className="space-y-3">
+                        {event.organizer.country && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <MapPin className="w-4 h-4 text-primaryColor" />
+                            <span>{event.organizer.country}</span>
+                          </div>
                         )}
-                        <div className="space-y-3">
-                          {event.organizer.country && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <MapPin className="w-4 h-4 text-primaryColor" />
-                              <span>{event.organizer.country}</span>
-                            </div>
-                          )}
-                          {event.organizer.website && (
-                            <a
-                              href={event.organizer.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-primaryColor hover:underline"
-                            >
-                              <Globe className="w-4 h-4" />
-                              Visit Website
-                            </a>
-                          )}
-                          {event.organizer.phone1 && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Phone className="w-4 h-4 text-primaryColor" />
-                              <span>{event.organizer.phone1}</span>
-                            </div>
-                          )}
-                          {event.organizer.phone2 && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Phone className="w-4 h-4 text-primaryColor" />
-                              <span>{event.organizer.phone2}</span>
-                            </div>
-                          )}
-                        </div>
+                        {event.organizer.website && (
+                          <a
+                            href={event.organizer.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-primaryColor hover:underline"
+                          >
+                            <Globe className="w-4 h-4" />
+                            Visit Website
+                          </a>
+                        )}
+                        {event.organizer.phone1 && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Phone className="w-4 h-4 text-primaryColor" />
+                            <span>{event.organizer.phone1}</span>
+                          </div>
+                        )}
+                        {event.organizer.phone2 && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Phone className="w-4 h-4 text-primaryColor" />
+                            <span>{event.organizer.phone2}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -454,6 +458,28 @@ export default function EventPage() {
           </div>
         </div>
       </div>
+
+      {isBuyModalOpen && (
+        <BuyTicketsModel
+          eventTitle={event.title}
+          eventImage={event.images[0]}
+          onClose={handleCloseBuyModal}
+          ticketCounts={ticketCounts}
+          setTicketCounts={setTicketCounts}
+          onProceedToCheckout={handleOpenCheckout}
+        />
+      )}
+
+      {isCheckoutOpen && (
+        <CheckoutModal
+          onClose={handleCloseCheckout}
+          total={total}
+          generalCount={ticketCounts.general}
+          vipCount={ticketCounts.vip}
+          fees={fees}
+          eventTitle={event.title}
+        />
+      )}
     </div>
   );
 }

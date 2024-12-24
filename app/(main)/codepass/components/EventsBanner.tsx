@@ -11,12 +11,12 @@ export const EventsBanner: React.FC = () => {
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-purple-700/90" />
         <div className='w-full h-full relative overflow-hidden'>
-          <Image
+          {/* <Image
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070"
             alt="Events background"
             fill
             className="object-cover"
-          />
+          /> */}
         </div>
       </div>
       

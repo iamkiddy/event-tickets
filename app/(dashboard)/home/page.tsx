@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon } from 'lucide-react';
+import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon, BanknoteIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/context/AuthContext';
 
@@ -11,9 +11,19 @@ export default function DashboardHome() {
     <div className="space-y-12 max-w-5xl mx-auto">
       {/* Welcome & Getting Started */}
       <div className="space-y-8">
-        <h1 className="text-3xl font-bold text-gray-900r">
-          Welcome, {userProfile?.fullname || 'User'}
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome, {userProfile?.fullname || 'User'}
+          </h1>
+          <Link 
+            href="/finance/withdraw" 
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg 
+              hover:bg-green-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <BanknoteIcon className="w-4 h-4" />
+            Withdraw Funds
+          </Link>
+        </div>
         
         {/* Quick Start Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

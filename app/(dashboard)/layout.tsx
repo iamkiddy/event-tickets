@@ -1,6 +1,7 @@
 
 import { DashboardNav } from '@/components/ui/dashboardNav';
 import { SideNav } from '@/components/ui/sideNav';
+import { Suspense } from 'react';
 
 // Dashboard Layout
 
@@ -10,6 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="min-h-screen bg-gray-50">
       <DashboardNav />
       <SideNav />
@@ -21,5 +23,6 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+    </Suspense>
   );
 } 
