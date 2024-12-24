@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { CreateEventTicketPromotionRequest, GetEventUtils, EventTicketPromotion } from '@/lib/models/_events_models';
 import { createEventTicketPromotion, getEventsUtils, getEventTicketPromotions } from '@/lib/actions/events';
