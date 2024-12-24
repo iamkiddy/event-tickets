@@ -73,7 +73,7 @@ export default function EventPage() {
   const [showSearchInNav, setShowSearchInNav] = useState(false);
 
   const { data: event, isLoading } = useQuery({
-    queryKey: ['event', params.id],
+    queryKey: ['event', params.id as string],
     queryFn: () => getEventDetails(params.id as string),
   });
 
@@ -141,12 +141,12 @@ export default function EventPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full relative">
             {/* Main image */}
             {event.images && event.images.length > 0 ? (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
                 <Image
                   src={event.images[0]}
                   alt={event.title}
                   fill
-                  className="w-full h-full object-cover rounded-lg"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent rounded-lg" />
               </div>
