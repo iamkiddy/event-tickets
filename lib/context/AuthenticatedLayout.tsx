@@ -17,15 +17,20 @@ export default function AuthenticatedLayout({
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
 
-  // Check if current route is a dashboard route
+  // Check if current route is a dashboard route or checkout route
   const isDashboardRoute = pathname.startsWith('/dashboard') || 
     pathname.startsWith('/home') || 
     pathname.startsWith('/events') ||
     pathname.startsWith('/orders') ||
     pathname.startsWith('/finance') ||
     pathname.startsWith('/settings');
+    
+  // Add this check for checkout route
+  const isCheckoutRoute = pathname.includes('/checkout');
 
   useEffect(() => {
+    if (isCheckoutRoute) return;
+
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 50);
@@ -36,7 +41,12 @@ export default function AuthenticatedLayout({
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
-  }, [isDashboardRoute]);
+  }, [isDashboardRoute, isCheckoutRoute]);
+
+  // Skip navigation for checkout pages
+  if (isCheckoutRoute) {
+    return <>{children}</>;
+  }
 
   return (
     <>

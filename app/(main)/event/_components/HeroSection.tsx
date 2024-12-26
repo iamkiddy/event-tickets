@@ -1,5 +1,5 @@
 "use client"
-import { Calendar, ChevronDown, MapPin, Search} from 'lucide-react';
+import { Calendar, ChevronDown, MapPin, Search, X} from 'lucide-react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
@@ -43,6 +43,32 @@ export default function HeroSection() {
         replace(`${pathName}?${params.toString()}`);
     }
 
+    const clearSearch = () => {
+        const params = new URLSearchParams(searchParams);
+        params.delete("search");
+        replace(`${pathName}?${params.toString()}`);
+    }
+
+    const clearWhere = () => {
+        const params = new URLSearchParams(searchParams);
+        params.delete("where");
+        replace(`${pathName}?${params.toString()}`);
+    }
+
+    const clearDate = () => {
+        const params = new URLSearchParams(searchParams);
+        params.delete("date");
+        replace(`${pathName}?${params.toString()}`);
+    }
+
+    const clearAllFilters = () => {
+        const params = new URLSearchParams(searchParams);
+        params.delete("search");
+        params.delete("where");
+        params.delete("date");
+        replace(`${pathName}?${params.toString()}`);
+    }
+
   return (
     <div className="relative h-[350px] xs:h-[400px] sm:h-[500px] lg:h-[600px] mb-6 xs:mb-8 sm:mb-16">
         <div className="absolute inset-0">
@@ -69,7 +95,7 @@ export default function HeroSection() {
 
             {/* Enhanced Search Bar - Responsive */}
             <div className="w-full max-w-4xl px-3 xs:px-4 sm:px-6">
-              <div className="bg-white/95 backdrop-blur-lg rounded-xl xs:rounded-2xl sm:rounded-full shadow-xl">
+              <div className="bg-white/95 backdrop-blur-lg rounded-xl xs:rounded-2xl sm:rounded-full shadow-xl relative">
                 {/* Mobile Layout */}
                 <div className="block lg:hidden p-3 xs:p-4 space-y-3 xs:space-y-4">
                   {/* Search Input */}
@@ -120,7 +146,7 @@ export default function HeroSection() {
                         <label className="block text-xs font-semibold text-gray-800 mb-1">
                           Search Events
                         </label>
-                        <div className="flex items-center">
+                        <div className="flex items-center w-full">
                           <Search className="text-primaryColor h-4 w-4" />
                           <input
                             placeholder="Search events..."
@@ -138,7 +164,7 @@ export default function HeroSection() {
                         <label className="block text-xs font-semibold text-gray-800 mb-1">
                           Location
                         </label>
-                        <div className="flex items-center">
+                        <div className="flex items-center w-full">
                           <MapPin className="text-primaryColor h-4 w-4" />
                           <select
                             value={searchParams.get("where")?.toString() || ""}
@@ -160,7 +186,7 @@ export default function HeroSection() {
                         <label className="block text-xs font-semibold text-gray-800 mb-1">
                           When
                         </label>
-                        <div className="flex items-center">
+                        <div className="flex items-center w-full">
                           <Calendar className="text-primaryColor h-4 w-4" />
                           <DatePicker
                             selected={searchParams.get("date") ? new Date(searchParams.get("date") as string) : null}
@@ -173,6 +199,19 @@ export default function HeroSection() {
                       </div>
                     </div>
 
+                    {/* Clear All Button */}
+                    {(searchParams.get("search") || searchParams.get("where") || searchParams.get("date")) && (
+                      <button
+                        onClick={clearAllFilters}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 
+                        bg-rose-50 hover:bg-rose-100/80 rounded-full transition-all duration-200 
+                        backdrop-blur-sm border border-rose-200/50 shadow-sm 
+                        group transform hover:scale-105 active:scale-95"
+                      >
+                        <X className="h-4 w-4 text-rose-500 group-hover:text-rose-600 transition-colors duration-200" />
+                        <span className="sr-only">Clear filters</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

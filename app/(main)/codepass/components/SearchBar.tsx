@@ -4,9 +4,16 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, MapPin, Calendar, X } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/navigation";
 
 export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
+  const [location, setLocation] = React.useState("");
 
   // Base container styles
   const containerClasses = isCompact
@@ -46,11 +53,32 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
   // Mobile input styles - Adjusted for consistency
   const mobileInputClasses = "w-full pl-9 pr-4 py-3 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-primaryColor/30 bg-transparent";
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const params = new URLSearchParams();
+    
+    if (searchQuery) {
+      params.set("search", searchQuery);
+    }
+    
+    if (selectedDate) {
+      params.set("date", selectedDate.toISOString());
+    }
+    
+    if (location) {
+      params.set("where", location);
+    }
+
+    // Navigate to events page with search params
+    router.push(`/event?${params.toString()}`);
+  };
+
   return (
     <>
       {/* Desktop & Tablet Version */}
       <div className={`hidden sm:block ${containerClasses}`}>
-        <form className={formClasses}>
+        <form onSubmit={handleSearch} className={formClasses}>
           {/* Search Events */}
           <div className="flex-1 relative group border-b sm:border-b-0 sm:border-r border-gray-200">
             <div className={inputContainerClasses}>
@@ -60,6 +88,8 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
                 <Input 
                   placeholder="Search events..."
                   className={inputClasses}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
@@ -71,10 +101,15 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
               <label className={labelClasses}>Location</label>
               <div className="relative flex items-center h-full">
                 <MapPin className={iconClasses} />
-                <Input 
-                  placeholder="Where to?"
-                  className={inputClasses}
-                />
+                <select 
+                  className="w-full border-0 p-0 pl-8 h-9 text-sm bg-transparent focus:ring-0 focus:outline-none appearance-none cursor-pointer"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                >
+                  <option value="">Where to?</option>
+                  <option value="venue">Venue</option>
+                  <option value="online">Online</option>
+                </select>
               </div>
             </div>
           </div>
@@ -85,9 +120,12 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
               <label className={labelClasses}>When</label>
               <div className="relative flex items-center h-full">
                 <Calendar className={iconClasses} />
-                <Input 
-                  placeholder="Add dates"
-                  className={inputClasses}
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="MMM dd, yyyy"
+                  placeholderText="Select date"
+                  className="w-full border-0 p-0 pl-8 h-9 text-sm bg-transparent focus:ring-0 focus:outline-none cursor-pointer"
                 />
               </div>
             </div>
@@ -129,61 +167,74 @@ export const SearchBar: React.FC<{ isCompact?: boolean }> = ({ isCompact }) => {
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Search Events */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <label className="block text-xs font-semibold text-gray-800 mb-2">
-                    Search Events
-                  </label>
-                  <div className="relative flex items-center">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input 
-                      placeholder="Search events..."
-                      className={mobileInputClasses}
-                    />
+              <form onSubmit={handleSearch} className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {/* Search Events */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <label className="block text-xs font-semibold text-gray-800 mb-2">
+                      Search Events
+                    </label>
+                    <div className="relative flex items-center">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Input 
+                        placeholder="Search events..."
+                        className={mobileInputClasses}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <label className="block text-xs font-semibold text-gray-800 mb-2">
+                      Location
+                    </label>
+                    <div className="relative flex items-center">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <select
+                        className={mobileInputClasses}
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                      >
+                        <option value="">Where to?</option>
+                        <option value="venue">Venue</option>
+                        <option value="online">Online</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Date */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <label className="block text-xs font-semibold text-gray-800 mb-2">
+                      When
+                    </label>
+                    <div className="relative flex items-center">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <DatePicker
+                        selected={selectedDate}
+                        onChange={(date) => setSelectedDate(date)}
+                        dateFormat="MMM dd, yyyy"
+                        placeholderText="Select date"
+                        className={mobileInputClasses}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Location */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <label className="block text-xs font-semibold text-gray-800 mb-2">
-                    Location
-                  </label>
-                  <div className="relative flex items-center">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input 
-                      placeholder="Where to?"
-                      className={mobileInputClasses}
-                    />
-                  </div>
+                {/* Modal Footer */}
+                <div className="p-4 border-t bg-white">
+                  <Button 
+                    type="submit"
+                    className="w-full h-12 bg-gradient-to-r from-primaryColor to-indigo-700 
+                      hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full font-medium"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    Search
+                  </Button>
                 </div>
-
-                {/* Date */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <label className="block text-xs font-semibold text-gray-800 mb-2">
-                    When
-                  </label>
-                  <div className="relative flex items-center">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input 
-                      placeholder="Add dates"
-                      className={mobileInputClasses}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 border-t bg-white">
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 bg-gradient-to-r from-primaryColor to-indigo-700 
-                    hover:from-indigo-700 hover:to-indigo-800 text-white rounded-full font-medium"
-                >
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </Button>
-              </div>
+              </form>
             </div>
           </div>
         )}

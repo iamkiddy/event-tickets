@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone } from 'lucide-react';
+import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone, Video, Play, Info } from 'lucide-react';
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -11,7 +11,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { AccordionTrigger } from '@radix-ui/react-accordion';
 import { BuyTicketsModel } from './components/BuyTicketsModel';
-import { CheckoutModal } from './components/CheckoutModal';
 
 interface FormattedDate {
   fullDate: string;
@@ -388,7 +387,7 @@ export default function EventPage() {
                 {/* Get Tickets Button */}
                 <button
                   onClick={handleOpenBuyModal}
-                  className="w-full bg-primaryColor text-white font-medium rounded-xl py-4 hover:bg-indigo-700 
+                  className="w-full mt-5 bg-primaryColor text-white font-medium rounded-xl py-4 hover:bg-indigo-700 
                     transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-indigo-200"
                 >
                   Get Tickets
@@ -459,8 +458,93 @@ export default function EventPage() {
         </div>
       </div>
 
+      {/* Video Section */}
+      {event?.videoUrl && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+            {/* Header with Icon */}
+            <div className="flex items-center gap-2 sm:gap-3 mb-4">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-indigo-50">
+                <Video className="w-4 h-4 sm:w-5 sm:h-5 text-primaryColor" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Event Preview</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Watch a preview of what to expect</p>
+              </div>
+            </div>
+
+            {/* Video Player Container */}
+            <div className="relative group">
+              {/* Video Container with Gradient Overlay */}
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900 shadow-sm max-w-3xl mx-auto">
+                <video
+                  controls
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.01]"
+                  poster={event.images?.[0]}
+                  preload="metadata"
+                >
+                  <source 
+                    src={event.videoUrl} 
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50 transform transition-transform group-hover:scale-110">
+                    <Play className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Video Information */}
+              <div className="mt-3 flex items-center justify-between text-xs sm:text-sm text-gray-600 max-w-3xl mx-auto">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    {formatTime(event.startTime)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                    {formatDate(event.startDate).fullDate}
+                  </span>
+                </div>
+                
+                {/* Share Button */}
+                <button 
+                  className="flex items-center gap-1.5 text-primaryColor hover:text-indigo-700 transition-colors"
+                  onClick={() => {/* Add share functionality */}}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-100 max-w-3xl mx-auto">
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 text-gray-400 mt-0.5" />
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-900">About this video</h3>
+                  <p className="mt-0.5 text-xs text-gray-600">
+                    Get a sneak peek of the event atmosphere and what you can expect. 
+                    This preview showcases highlights from previous editions or upcoming features.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isBuyModalOpen && (
         <BuyTicketsModel
+          eventId={params.id as string}
           eventTitle={event.title}
           eventImage={event.images[0]}
           onClose={handleCloseBuyModal}
@@ -470,16 +554,7 @@ export default function EventPage() {
         />
       )}
 
-      {isCheckoutOpen && (
-        <CheckoutModal
-          onClose={handleCloseCheckout}
-          total={total}
-          generalCount={ticketCounts.general}
-          vipCount={ticketCounts.vip}
-          fees={fees}
-          eventTitle={event.title}
-        />
-      )}
+     
     </div>
   );
 }

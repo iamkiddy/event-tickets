@@ -2,8 +2,10 @@
 
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Minus, Plus, Ticket, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface BuyTicketsModelProps {
+  eventId: string;
   eventTitle: string;
   eventImage?: string;
   onClose: () => void;
@@ -16,6 +18,7 @@ interface BuyTicketsModelProps {
 }
 
 export function BuyTicketsModel({ 
+  eventId,
   eventTitle, 
   eventImage,
   onClose,
@@ -23,6 +26,7 @@ export function BuyTicketsModel({
   setTicketCounts,
   onProceedToCheckout
 }: BuyTicketsModelProps) {
+  const router = useRouter();
   const updateCount = (type: 'general' | 'vip', increment: boolean) => {
     setTicketCounts({
       ...ticketCounts,
@@ -32,6 +36,10 @@ export function BuyTicketsModel({
 
   const total = (ticketCounts.general * 30) + (ticketCounts.vip * 50);
   const fees = total * 0.1; // 10% service fee
+
+  const handleCheckout = () => {
+    router.push(`/event/${eventId}/checkout?general=${ticketCounts.general}&vip=${ticketCounts.vip}`);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -227,7 +235,7 @@ export function BuyTicketsModel({
 
                 {(ticketCounts.general > 0 || ticketCounts.vip > 0) ? (
                   <button
-                    onClick={onProceedToCheckout}
+                    onClick={handleCheckout}
                     className="w-full bg-primaryColor text-white font-medium rounded-xl py-4 
                       hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] 
                       shadow-lg hover:shadow-indigo-200"
