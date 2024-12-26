@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone, Video, Play, Info } from 'lucide-react';
+import { Calendar, Clock, MapPin, Share2, Heart, ImageIcon, Globe, Phone, Video, Play, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getEventDetails } from '@/lib/actions/mainEvent';
 import parser from 'html-react-parser';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -74,6 +74,7 @@ export default function EventPage() {
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [ticketCounts, setTicketCounts] = useState({ general: 0, vip: 0 });
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', params.id as string],
@@ -112,6 +113,18 @@ export default function EventPage() {
     setIsCheckoutOpen(false);
   };
 
+  const nextImage = () => {
+    if (event?.images) {
+      setCurrentImageIndex((prev) => (prev + 1) % event.images.length);
+    }
+  };
+
+  const previousImage = () => {
+    if (event?.images) {
+      setCurrentImageIndex((prev) => (prev - 1 + event.images.length) % event.images.length);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -136,11 +149,11 @@ export default function EventPage() {
 
       {/* Hero Section with Image */}
       <div className="relative h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] min-h-[250px] sm:min-h-[350px] md:min-h-[400px] overflow-hidden">
-        {/* Background blur effect from the image */}
+        {/* Background blur effect from the current image */}
         {event.images && event.images.length > 0 ? (
           <>
             <div className="absolute inset-0" style={{ 
-              backgroundImage: `url(${event.images[0]})`,
+              backgroundImage: `url(${event.images[currentImageIndex]})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               filter: 'blur(20px) brightness(0.7)',
@@ -155,15 +168,59 @@ export default function EventPage() {
         {/* Content container with padding */}
         <div className="relative h-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full relative">
-            {/* Main image */}
+            {/* Main image slider */}
             {event.images && event.images.length > 0 ? (
               <div className="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
                 <img
-                  src={event.images[0]}
-                  alt={event.title}
-                  className="object-cover w-full h-full"
+                  src={event.images[currentImageIndex]}
+                  alt={`${event.title} - Image ${currentImageIndex + 1}`}
+                  className="object-cover w-full h-full transition-opacity duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent rounded-lg" />
+                
+                {/* Navigation arrows - only show if there are multiple images */}
+                {event.images.length > 1 && (
+                  <>
+                    {/* Previous button */}
+                    <button
+                      onClick={previousImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all transform hover:scale-110"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    
+                    {/* Next button */}
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all transform hover:scale-110"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    {/* Image counter */}
+                    <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {currentImageIndex + 1} / {event.images.length}
+                    </div>
+
+                    {/* Image dots indicator */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      {event.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            index === currentImageIndex 
+                              ? 'bg-white scale-125' 
+                              : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                          aria-label={`Go to image ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
