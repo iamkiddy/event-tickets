@@ -20,6 +20,7 @@ import FilterCard from './components/FilterCard';
 import { eventFilterTime } from '@/lib/constants';
 import Link from 'next/link';
 import { EventPageHeader } from './components/EventPageHeader';
+import { useState } from 'react';
 
 export const navLinks = [
   { label: 'Schedule' },
@@ -54,10 +55,6 @@ export default function EventPage() {
 
     fetchData();
   }, []);
-
-  if (isLoading) {
-    return <EventPageLoader />;
-  }
 
   return (
     <div>
@@ -169,14 +166,18 @@ export default function EventPage() {
               </svg>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {homeData?.upcomingEvents.map((event) => (
-              <EventCard 
-                key={event.id}
-                data={event}
-              />
-            ))}
-          </div>
+          {isLoading ? (
+            <EventPageLoader />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {homeData?.upcomingEvents.map((event) => (
+                <EventCard 
+                  key={event.id}
+                  data={event}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Most Viewed Events Section */}

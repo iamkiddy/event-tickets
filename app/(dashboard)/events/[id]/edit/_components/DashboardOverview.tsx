@@ -99,7 +99,7 @@ export function DashboardOverview({ initialStats }: DashboardOverviewProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">Overview</h2>
-          <p className="text-sm text-gray-500">Monitor your event's performance and metrics</p>
+          <p className="text-sm text-gray-500">Monitor your event&apos;s performance and metrics</p>
         </div>
         <div className="flex items-center gap-3">
           <Button

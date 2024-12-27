@@ -7,8 +7,6 @@ import {
   Receipt, 
   Shield, 
   ArrowLeft, 
-  Calendar,
-  MapPin,
   Check,
   Ticket
 } from "lucide-react";
@@ -20,11 +18,6 @@ import { cn } from "@/lib/utils";
 
 type PaymentMethod = 'card' | 'mobile';
 
-const steps = [
-  { id: 'details', label: 'Details', icon: Receipt },
-  { id: 'payment', label: 'Payment', icon: CreditCard },
-  { id: 'confirmation', label: 'Confirmation', icon: Check }
-];
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -33,7 +26,6 @@ export default function CheckoutPage() {
   const vipCount = parseInt(searchParams.get('vip') || '0');
   
   const [isAtTop, setIsAtTop] = useState(true);
-  const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
     setIsAtTop(window.scrollY < 10);
@@ -76,7 +68,6 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentStep(3); // Move to confirmation step
     // Add your payment processing logic here
   };
 
@@ -315,7 +306,7 @@ export default function CheckoutPage() {
                           <div>
                             <h5 className="font-medium text-gray-900">Payment Instructions</h5>
                             <p className="text-sm text-gray-600 mt-0.5">
-                              After clicking pay, you'll receive a prompt on your phone to complete the payment
+                              After clicking pay, you&apos;ll receive a prompt on your phone to complete the payment
                             </p>
                           </div>
                         </div>

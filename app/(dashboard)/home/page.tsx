@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon, BanknoteIcon } from 'lucide-react';
+import { ArrowRight, BookOpen, Wallet, UserCircle2, PlusCircle, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/context/AuthContext';
 
