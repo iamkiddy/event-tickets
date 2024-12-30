@@ -142,17 +142,17 @@ export default function EventPage() {
             />
           </div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Upcoming Events</h2>
+            <h2 className="text-xl md:text-2xl font-bold">Upcoming Events</h2>
             <Link 
               href="/event" 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg 
-                text-primaryColor hover:bg-primaryColor/10 font-medium 
+              className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
+                text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
                 transition-all duration-300 group"
             >
               View All Events
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
@@ -200,17 +200,17 @@ export default function EventPage() {
         {/* Blog Section */}
         <section className="my-16">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Latest Blog Posts</h2>
+            <h2 className="text-xl md:text-2xl font-bold">Latest Blog Posts</h2>
             <Link 
               href="/blog" 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg 
-                text-primaryColor hover:bg-primaryColor/10 font-medium 
+              className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
+                text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
                 transition-all duration-300 group"
             >
               View All Blog Posts
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"

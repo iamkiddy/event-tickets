@@ -4,11 +4,25 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
 import DatePicker from 'react-datepicker';
+import { useQuery } from '@tanstack/react-query';
+import { getBannerUtils } from '@/lib/actions/main';
 
 export default function HeroSection() {
     const { replace } = useRouter();
     const searchParams = useSearchParams();
     const pathName = usePathname();
+
+    // Fetch banner data
+    const { data: banners, isLoading: isBannerLoading } = useQuery({
+        queryKey: ['banners'],
+        queryFn: getBannerUtils,
+    });
+
+    // Get the first banner or use default
+    const currentBanner = banners?.[0] || {
+        image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        title: "Find Your Next Event"
+    };
 
     //handle search
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,10 +87,11 @@ export default function HeroSection() {
     <div className="relative h-[350px] xs:h-[400px] sm:h-[500px] lg:h-[600px] mb-6 xs:mb-8 sm:mb-16">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
-            alt="Events background"
+            src={currentBanner.image}
+            alt={currentBanner.title}
             fill
             className="w-full h-full object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         </div>
@@ -84,10 +99,10 @@ export default function HeroSection() {
         <div className="relative h-full max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
           <div className="h-full flex flex-col items-center justify-center pt-16 xs:pt-20 sm:pt-24">
             <span className="hidden xs:inline-block px-2 xs:px-3 sm:px-4 py-1 bg-indigo-600/90 text-white text-xs sm:text-sm font-medium rounded-full mb-3 xs:mb-4 sm:mb-6">
-              Find Your Next Event
+              {currentBanner.title}
             </span>
             <h1 className="text-xl xs:text-2xl sm:text-4xl lg:text-6xl font-bold text-white text-center mb-3 xs:mb-4 sm:mb-8 max-w-4xl leading-tight mt-6 xs:mt-8 sm:mt-0">
-              Find Your Next Experience
+              {currentBanner.title}
             </h1>
             <p className="text-sm xs:text-base sm:text-lg lg:text-xl text-white/90 text-center max-w-2xl leading-relaxed mb-6 xs:mb-8 sm:mb-12 px-3 xs:px-4">
               Discover amazing events happening around you
