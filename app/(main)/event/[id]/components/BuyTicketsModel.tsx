@@ -1,19 +1,28 @@
 "use client";
 
+import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Minus, Plus, Ticket, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getTicketsDiscount } from "@/lib/actions/orders";
+import { toast } from "sonner";
 
 interface BuyTicketsModelProps {
   eventId: string;
   eventTitle: string;
   eventImage?: string;
+  tickets: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    currency: string;
+    discountValue?: number;
+    discountType?: string;
+  }>;
   onClose: () => void;
-  ticketCounts: {
-    general: number;
-    vip: number;
-  };
-  setTicketCounts: (counts: { general: number; vip: number }) => void;
+  ticketCounts: Record<string, number>;
+  setTicketCounts: (counts: Record<string, number>) => void;
   onProceedToCheckout: () => void;
 }
 
@@ -21,13 +30,17 @@ export function BuyTicketsModel({
   eventId,
   eventTitle, 
   eventImage,
+  tickets,
   onClose,
   ticketCounts,
   setTicketCounts,
   onProceedToCheckout
 }: BuyTicketsModelProps) {
   const router = useRouter();
-  const updateCount = (type: 'general' | 'vip', increment: boolean) => {
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
+
+  const updateCount = (type: string, increment: boolean) => {
     setTicketCounts({
       ...ticketCounts,
       [type]: increment ? ticketCounts[type] + 1 : Math.max(ticketCounts[type] - 1, 0)
@@ -39,6 +52,24 @@ export function BuyTicketsModel({
 
   const handleCheckout = () => {
     router.push(`/event/${eventId}/checkout?general=${ticketCounts.general}&vip=${ticketCounts.vip}`);
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    try {
+      setIsApplying(true);
+      const response = await getTicketsDiscount({ coupon: couponCode.trim() });
+      toast.success(response.message);
+      // Handle successful coupon application here
+    } catch (error) {
+      toast.error('Invalid coupon code');
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   return (
@@ -82,15 +113,22 @@ export function BuyTicketsModel({
                 </div>
               </div>
 
-              {/* Promo Code */}
+              {/* Coupon Code */}
               <div className="flex items-center gap-3">
                 <Input 
-                  placeholder="Enter promo code" 
+                  placeholder="Enter coupon code" 
                   className="flex-1 text-sm h-10"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
                 />
-                <button className="h-10 px-6 text-sm font-medium text-primaryColor hover:bg-primaryColor/5 
-                  rounded-lg transition-colors border border-primaryColor">
-                  Apply
+                <button 
+                  onClick={handleApplyCoupon}
+                  disabled={isApplying}
+                  className="h-10 px-6 text-sm font-medium text-primaryColor hover:bg-primaryColor/5 
+                    rounded-lg transition-colors border border-primaryColor disabled:opacity-50 
+                    disabled:cursor-not-allowed"
+                >
+                  {isApplying ? 'Applying...' : 'Apply'}
                 </button>
               </div>
 
@@ -98,90 +136,50 @@ export function BuyTicketsModel({
               <div className="space-y-4">
                 <h4 className="font-semibold text-gray-900">Available Tickets</h4>
                 
-                {/* General Admission */}
-                <div className="group bg-white rounded-xl border border-gray-200 p-5 transition-all 
-                  hover:border-primaryColor hover:shadow-md">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <Ticket className="w-5 h-5 text-primaryColor" />
-                        <div>
-                          <h5 className="text-base font-semibold text-gray-900">General Admission</h5>
-                          <p className="text-sm text-gray-600">Regular seating • 20 remaining</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-500">
-                        Access to all general areas and standard amenities
-                      </p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <p className="text-lg font-bold text-primaryColor">GHS 30</p>
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => updateCount('general', false)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                            hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                          disabled={ticketCounts.general === 0}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="w-8 text-center font-medium text-lg">{ticketCounts.general}</span>
-                        <button 
-                          onClick={() => updateCount('general', true)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                            hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* VIP Admission */}
-                <div className="group bg-white rounded-xl border border-gray-200 p-5 transition-all 
-                  hover:border-primaryColor hover:shadow-md">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <Ticket className="w-5 h-5 text-primaryColor" />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h5 className="text-base font-semibold text-gray-900">VIP Admission</h5>
-                            <span className="px-2 py-0.5 text-xs font-medium bg-indigo-50 text-primaryColor rounded-full">
-                              BEST VALUE
-                            </span>
+                {tickets.map((ticket) => (
+                  <div 
+                    key={ticket.id}
+                    className="group bg-white rounded-xl border border-gray-200 p-5 transition-all hover:border-primaryColor hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-3">
+                          <Ticket className="w-5 h-5 text-primaryColor" />
+                          <div>
+                            <h5 className="text-base font-semibold text-gray-900">{ticket.name}</h5>
+                            <p className="text-sm text-gray-600">{ticket.quantity} remaining</p>
                           </div>
-                          <p className="text-sm text-gray-600">Premium seating • 10 remaining</p>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-500">
-                        Premium seating, exclusive access, and complimentary refreshments
-                      </p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <p className="text-lg font-bold text-primaryColor">GHS 50</p>
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => updateCount('vip', false)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                            hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                          disabled={ticketCounts.vip === 0}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="w-8 text-center font-medium text-lg">{ticketCounts.vip}</span>
-                        <button 
-                          onClick={() => updateCount('vip', true)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                            hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+                      <div className="text-right space-y-2">
+                        <p className="text-lg font-bold text-primaryColor">
+                          {ticket.currency} {ticket.price}
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => updateCount(ticket.id, false)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
+                              hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
+                            disabled={ticketCounts[ticket.id] === 0}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="w-8 text-center font-medium text-lg">
+                            {ticketCounts[ticket.id] || 0}
+                          </span>
+                          <button 
+                            onClick={() => updateCount(ticket.id, true)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
+                              hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
+                            disabled={ticket.quantity > 0 && ticketCounts[ticket.id] >= ticket.quantity}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

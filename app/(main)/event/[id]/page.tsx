@@ -73,7 +73,7 @@ export default function EventPage() {
   const [showSearchInNav, setShowSearchInNav] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [ticketCounts, setTicketCounts] = useState({ general: 0, vip: 0 });
+  const [ticketCounts, setTicketCounts] = useState<Record<string, number>>({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data: event, isLoading } = useQuery({
@@ -416,29 +416,20 @@ export default function EventPage() {
                 
                 {/* Ticket types */}
                 <div className="space-y-4">
-                  {/* Afro Nation Ticket */}
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
-                    <div>
-                      <h4 className="font-medium text-gray-900">Afro Nation</h4>
-                      <p className="text-sm text-gray-600">20 remaining</p>
+                  {event.tickets && event.tickets.map((ticket) => (
+                    <div 
+                      key={ticket.id}
+                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors"
+                    >
+                      <div>
+                        <h4 className="font-medium text-gray-900">{ticket.name}</h4>
+                        <p className="text-sm text-gray-600">{ticket.quantity} remaining</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900">{ticket.currency} {ticket.price}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">GHS30</p>
-                      
-                    </div>
-                  </div>
-
-                  {/* Promo 2024 Ticket */}
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primaryColor transition-colors">
-                    <div>
-                      <h4 className="font-medium text-gray-900">Promo 2024</h4>
-                      <p className="text-sm text-gray-600">10 remaining</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">GHS10</p>
-                      
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Get Tickets Button */}
@@ -604,6 +595,7 @@ export default function EventPage() {
           eventId={params.id as string}
           eventTitle={event.title}
           eventImage={event.images[0]}
+          tickets={event.tickets}
           onClose={handleCloseBuyModal}
           ticketCounts={ticketCounts}
           setTicketCounts={setTicketCounts}

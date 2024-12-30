@@ -18,11 +18,13 @@ export default function HeroSection() {
         queryFn: getBannerUtils,
     });
 
-    // Get the first banner or use default
-    const currentBanner = banners?.[0] || {
-        image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
-        title: "Find Your Next Event"
-    };
+    // Remove default banner fallback
+    const currentBanner = banners?.[0];
+
+    // Add loading state handling
+    if (isBannerLoading || !currentBanner) {
+        return <div className="h-[350px] xs:h-[400px] sm:h-[500px] lg:h-[600px] bg-gray-100 animate-pulse" />;
+    }
 
     //handle search
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

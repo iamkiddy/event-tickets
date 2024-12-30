@@ -162,4 +162,13 @@ export default class APIUrls {
     // get organised event
     static readonly getOrganisedEvent = `${APIUrls.BASE_URL}/api/v1/main/organizer-events`;
 
+    /*
+
+        TICKET API URLS
+    
+    */
+
+    // get tickets discount
+    static readonly getTicketsDiscount = `${APIUrls.BASE_URL}/api/v1/orders/apply-discount`;
+
 }
