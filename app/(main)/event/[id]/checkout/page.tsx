@@ -7,7 +7,6 @@ import {
   Receipt, 
   Shield, 
   ArrowLeft, 
-  Check,
   Ticket
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -18,13 +17,39 @@ import { cn } from "@/lib/utils";
 
 type PaymentMethod = 'card' | 'mobile';
 
+interface TicketCount {
+  id: string;
+  count: number;
+  price: number;
+  name: string;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const generalCount = parseInt(searchParams.get('general') || '0');
-  const vipCount = parseInt(searchParams.get('vip') || '0');
+  const [tickets, setTickets] = useState<TicketCount[]>([]);
   
+  useEffect(() => {
+    // Parse ticket counts from URL parameters
+    const ticketCounts: TicketCount[] = [];
+    searchParams.forEach((value, key) => {
+      const count = parseInt(value || '0');
+      if (count > 0) {
+        ticketCounts.push({
+          id: key,
+          count,
+          price: getTicketPrice(key), // You'll need to implement this
+          name: getTicketName(key)    // You'll need to implement this
+        });
+      }
+    });
+    setTickets(ticketCounts);
+  }, [searchParams]);
+
+  // Calculate totals
+  const total = tickets.reduce((sum, ticket) => sum + (ticket.count * ticket.price), 0);
+  const fees = total * 0.1;
+
   const [isAtTop, setIsAtTop] = useState(true);
 
   useEffect(() => {
@@ -38,10 +63,7 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate totals
-  const total = (generalCount * 30) + (vipCount * 50);
-  const fees = total * 0.1;
-
+  // eslint-disable-next-line
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [cardData, setCardData] = useState({
     cardNumber: "",
@@ -351,30 +373,18 @@ export default function CheckoutPage() {
                   </div>
                   
                   <div className="space-y-4">
-                    {generalCount > 0 && (
-                      <div className="flex justify-between items-center py-2">
+                    {tickets.map(ticket => (
+                      <div key={ticket.id} className="flex justify-between items-center py-2">
                         <div className="flex items-start gap-3">
                           <Ticket className="w-5 h-5 text-gray-400 mt-0.5" />
                           <div>
-                            <span className="text-gray-900 font-medium">General Admission</span>
-                            <p className="text-sm text-gray-500">× {generalCount}</p>
+                            <span className="text-gray-900 font-medium">{ticket.name}</span>
+                            <p className="text-sm text-gray-500">× {ticket.count}</p>
                           </div>
                         </div>
-                        <span className="font-medium">GHS {generalCount * 30}</span>
+                        <span className="font-medium">GHS {ticket.count * ticket.price}</span>
                       </div>
-                    )}
-                    {vipCount > 0 && (
-                      <div className="flex justify-between items-center py-2">
-                        <div className="flex items-start gap-3">
-                          <Ticket className="w-5 h-5 text-gray-400 mt-0.5" />
-                          <div>
-                            <span className="text-gray-900 font-medium">VIP Admission</span>
-                            <p className="text-sm text-gray-500">× {vipCount}</p>
-                          </div>
-                        </div>
-                        <span className="font-medium">GHS {vipCount * 50}</span>
-                      </div>
-                    )}
+                    ))}
                     
                     <div className="pt-4 border-t border-dashed">
                       <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
@@ -421,3 +431,20 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+// Helper functions to get ticket details
+const getTicketPrice = (ticketId: string): number => {
+  // Implement your ticket price lookup logic here
+  const prices: Record<string, number> = {
+    // Add your ticket prices here
+  };
+  return prices[ticketId] || 0;
+};
+
+const getTicketName = (ticketId: string): string => {
+  // Implement your ticket name lookup logic here
+  const names: Record<string, string> = {
+    // Add your ticket names here
+  };
+  return names[ticketId] || 'Unknown Ticket';
+};

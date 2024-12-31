@@ -23,7 +23,6 @@ interface BuyTicketsModelProps {
   onClose: () => void;
   ticketCounts: Record<string, number>;
   setTicketCounts: (counts: Record<string, number>) => void;
-  onProceedToCheckout: () => void;
 }
 
 export function BuyTicketsModel({ 
@@ -33,12 +32,26 @@ export function BuyTicketsModel({
   tickets,
   onClose,
   ticketCounts,
-  setTicketCounts,
-  onProceedToCheckout
+  setTicketCounts
 }: BuyTicketsModelProps) {
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const [discount, setDiscount] = useState<{
+    type?: 'percentage' | 'fixed';
+    value?: number;
+    message?: string;
+  }>({});
+
+  const calculateDiscountedPrice = (price: number) => {
+    if (!discount.value || !discount.type) return price;
+    
+    if (discount.type === 'percentage') {
+      return price * (1 - discount.value / 100);
+    } else {
+      return Math.max(0, price - discount.value);
+    }
+  };
 
   const updateCount = (type: string, increment: boolean) => {
     setTicketCounts({
@@ -47,11 +60,12 @@ export function BuyTicketsModel({
     });
   };
 
-  const total = (ticketCounts.general * 30) + (ticketCounts.vip * 50);
-  const fees = total * 0.1; // 10% service fee
-
   const handleCheckout = () => {
-    router.push(`/event/${eventId}/checkout?general=${ticketCounts.general}&vip=${ticketCounts.vip}`);
+    const ticketParams = tickets.map(ticket => 
+      `${ticket.id}=${ticketCounts[ticket.id] || 0}`
+    ).join('&');
+    
+    router.push(`/event/${eventId}/checkout?${ticketParams}`);
   };
 
   const handleApplyCoupon = async () => {
@@ -63,14 +77,37 @@ export function BuyTicketsModel({
     try {
       setIsApplying(true);
       const response = await getTicketsDiscount({ coupon: couponCode.trim() });
+      
+      setDiscount({
+        type: response.discountType,
+        value: response.discountValue,
+        message: response.message
+      });
+      
       toast.success(response.message);
-      // Handle successful coupon application here
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error(error);
       toast.error('Invalid coupon code');
+      setDiscount({});
     } finally {
       setIsApplying(false);
     }
   };
+
+  // Calculate totals with discounts
+  const calculateTotal = () => {
+    let subtotal = 0;
+    tickets.forEach(ticket => {
+      const count = ticketCounts[ticket.id] || 0;
+      const originalPrice = ticket.price;
+      const discountedPrice = calculateDiscountedPrice(originalPrice);
+      subtotal += count * discountedPrice;
+    });
+    return subtotal;
+  };
+
+  const total = calculateTotal();
+  const fees = total * 0.1; // 10% service fee
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -136,50 +173,121 @@ export function BuyTicketsModel({
               <div className="space-y-4">
                 <h4 className="font-semibold text-gray-900">Available Tickets</h4>
                 
-                {tickets.map((ticket) => (
-                  <div 
-                    key={ticket.id}
-                    className="group bg-white rounded-xl border border-gray-200 p-5 transition-all hover:border-primaryColor hover:shadow-md"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-3">
-                          <Ticket className="w-5 h-5 text-primaryColor" />
+                {tickets.map((ticket) => {
+                  const originalPrice = ticket.price;
+                  const discountedPrice = calculateDiscountedPrice(originalPrice);
+                  const hasDiscount = discountedPrice < originalPrice;
+
+                  return (
+                    <div 
+                      key={ticket.id}
+                      className="group bg-white rounded-xl border border-gray-200 p-5 
+                        transition-all hover:border-primaryColor hover:shadow-md"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <Ticket className="w-5 h-5 text-primaryColor" />
+                            <div>
+                              <h5 className="text-base font-semibold text-gray-900">
+                                {ticket.name}
+                              </h5>
+                              <p className="text-sm text-gray-600">
+                                {ticket.quantity} remaining
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right space-y-2">
                           <div>
-                            <h5 className="text-base font-semibold text-gray-900">{ticket.name}</h5>
-                            <p className="text-sm text-gray-600">{ticket.quantity} remaining</p>
+                            {hasDiscount && (
+                              <p className="text-sm line-through text-gray-400">
+                                {ticket.currency} {originalPrice}
+                              </p>
+                            )}
+                            <p className="text-lg font-bold text-primaryColor">
+                              {ticket.currency} {discountedPrice.toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => updateCount(ticket.id, false)}
+                              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
+                                hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
+                              disabled={ticketCounts[ticket.id] === 0}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="w-8 text-center font-medium text-lg">
+                              {ticketCounts[ticket.id] || 0}
+                            </span>
+                            <button 
+                              onClick={() => updateCount(ticket.id, true)}
+                              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
+                                hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
+                              disabled={ticket.quantity > 0 && ticketCounts[ticket.id] >= ticket.quantity}
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <div className="text-right space-y-2">
-                        <p className="text-lg font-bold text-primaryColor">
-                          {ticket.currency} {ticket.price}
-                        </p>
-                        <div className="flex items-center gap-3">
-                          <button 
-                            onClick={() => updateCount(ticket.id, false)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                              hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                            disabled={ticketCounts[ticket.id] === 0}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-8 text-center font-medium text-lg">
-                            {ticketCounts[ticket.id] || 0}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Order Summary */}
+              <div className="space-y-3 text-sm">
+                {tickets.map(ticket => {
+                  const count = ticketCounts[ticket.id] || 0;
+                  if (count === 0) return null;
+                  
+                  const originalPrice = ticket.price;
+                  const discountedPrice = calculateDiscountedPrice(originalPrice);
+                  const hasDiscount = discountedPrice < originalPrice;
+                  
+                  return (
+                    <div key={ticket.id} className="flex justify-between">
+                      <span className="text-gray-600">
+                        {ticket.name} × {count}
+                      </span>
+                      <div className="text-right">
+                        {hasDiscount && (
+                          <span className="line-through text-gray-400 mr-2">
+                            {ticket.currency} {(count * originalPrice).toFixed(2)}
                           </span>
-                          <button 
-                            onClick={() => updateCount(ticket.id, true)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 
-                              hover:bg-primaryColor/10 text-gray-600 hover:text-primaryColor transition-colors"
-                            disabled={ticket.quantity > 0 && ticketCounts[ticket.id] >= ticket.quantity}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
+                        )}
+                        <span className="font-medium">
+                          {ticket.currency} {(count * discountedPrice).toFixed(2)}
+                        </span>
                       </div>
                     </div>
+                  );
+                })}
+                
+                {discount.value && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount Applied</span>
+                    <span>
+                      {discount.type === 'percentage' ? `-${discount.value}%` : 
+                        `${tickets[0]?.currency} -${discount.value}`}
+                    </span>
                   </div>
-                ))}
+                )}
+                
+                {total > 0 && (
+                  <>
+                    <div className="flex justify-between text-gray-600 pt-2 border-t">
+                      <span>Service Fee</span>
+                      <span>GHS {fees.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
+                      <span>Total</span>
+                      <span>GHS {(total + fees).toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

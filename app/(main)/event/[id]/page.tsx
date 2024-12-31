@@ -72,7 +72,6 @@ export default function EventPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearchInNav, setShowSearchInNav] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [ticketCounts, setTicketCounts] = useState<Record<string, number>>({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -94,23 +93,12 @@ export default function EventPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const total = (ticketCounts.general * 30) + (ticketCounts.vip * 50);
-  const fees = total * 0.1;
-
   const handleOpenBuyModal = () => {
     setIsBuyModalOpen(true);
   };
 
   const handleCloseBuyModal = () => {
     setIsBuyModalOpen(false);
-  };
-
-  const handleOpenCheckout = () => {
-    setIsCheckoutOpen(true);
-  };
-
-  const handleCloseCheckout = () => {
-    setIsCheckoutOpen(false);
   };
 
   const nextImage = () => {
@@ -599,7 +587,6 @@ export default function EventPage() {
           onClose={handleCloseBuyModal}
           ticketCounts={ticketCounts}
           setTicketCounts={setTicketCounts}
-          onProceedToCheckout={handleOpenCheckout}
         />
       )}
 

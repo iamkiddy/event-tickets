@@ -59,24 +59,6 @@ export default function HeroSection() {
         replace(`${pathName}?${params.toString()}`);
     }
 
-    const clearSearch = () => {
-        const params = new URLSearchParams(searchParams);
-        params.delete("search");
-        replace(`${pathName}?${params.toString()}`);
-    }
-
-    const clearWhere = () => {
-        const params = new URLSearchParams(searchParams);
-        params.delete("where");
-        replace(`${pathName}?${params.toString()}`);
-    }
-
-    const clearDate = () => {
-        const params = new URLSearchParams(searchParams);
-        params.delete("date");
-        replace(`${pathName}?${params.toString()}`);
-    }
-
     const clearAllFilters = () => {
         const params = new URLSearchParams(searchParams);
         params.delete("search");

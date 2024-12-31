@@ -4,13 +4,19 @@ import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import { TicketDiscountRequest, TicketDiscountResponse } from "../models/_orders_models";
+import { cookies } from 'next/headers';
 
 export const getTicketsDiscount = async (request: TicketDiscountRequest): Promise<TicketDiscountResponse> => {
     try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
         const response = await apiController<TicketDiscountResponse>({
             method: 'POST',
             url: APIUrls.getTicketsDiscount,
             data: { coupon: request.coupon },
+            token,
             contentType: 'application/json',
         });
 
