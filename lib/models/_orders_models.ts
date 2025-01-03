@@ -1,8 +1,7 @@
 export interface TicketDiscountResponse {
-    message: string;
-    discountType: 'percentage' | 'fixed';
-    discountValue: number;
-    isValid: boolean;
+    id: string;
+    discountType: 'amount' | 'percentage';
+    discountAmount: number;
 }
 
 export interface TicketDiscountRequest {

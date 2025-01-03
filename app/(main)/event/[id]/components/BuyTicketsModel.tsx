@@ -41,9 +41,10 @@ export function BuyTicketsModel({
     type?: 'percentage' | 'fixed';
     value?: number;
     message?: string;
+    id?: string;
   }>({});
 
-  const calculateDiscountedPrice = (price: number) => {
+  const calculateDiscountedPrice = (price: number): number => {
     if (!discount.value || !discount.type) return price;
     
     if (discount.type === 'percentage') {
@@ -53,10 +54,24 @@ export function BuyTicketsModel({
     }
   };
 
-  const updateCount = (type: string, increment: boolean) => {
+  const updateCount = (ticketId: string, increment: boolean) => {
+    const currentCount = ticketCounts[ticketId] || 0;
+    const ticket = tickets.find(t => t.id === ticketId);
+    
+    if (!ticket) return;
+    
+    let newCount;
+    if (increment) {
+      // Don't exceed available quantity
+      newCount = Math.min(currentCount + 1, ticket.quantity);
+    } else {
+      // Don't go below 0
+      newCount = Math.max(currentCount - 1, 0);
+    }
+
     setTicketCounts({
       ...ticketCounts,
-      [type]: increment ? ticketCounts[type] + 1 : Math.max(ticketCounts[type] - 1, 0)
+      [ticketId]: newCount
     });
   };
 
@@ -79,12 +94,13 @@ export function BuyTicketsModel({
       const response = await getTicketsDiscount({ coupon: couponCode.trim() });
       
       setDiscount({
-        type: response.discountType,
-        value: response.discountValue,
-        message: response.message
+        id: response.id,
+        type: response.discountType === 'amount' ? 'fixed' : 'percentage',
+        value: response.discountAmount,
+        message: 'Coupon applied successfully!'
       });
       
-      toast.success(response.message);
+      toast.success('Coupon applied successfully!');
     } catch (error: unknown) {
       console.error(error);
       toast.error('Invalid coupon code');
@@ -97,17 +113,23 @@ export function BuyTicketsModel({
   // Calculate totals with discounts
   const calculateTotal = () => {
     let subtotal = 0;
+    let hasTickets = false;
+    
     tickets.forEach(ticket => {
       const count = ticketCounts[ticket.id] || 0;
-      const originalPrice = ticket.price;
-      const discountedPrice = calculateDiscountedPrice(originalPrice);
-      subtotal += count * discountedPrice;
+      if (count > 0) {
+        hasTickets = true;
+        const originalPrice = ticket.price;
+        const discountedPrice = calculateDiscountedPrice(originalPrice);
+        subtotal += count * discountedPrice;
+      }
     });
-    return subtotal;
+    
+    return { subtotal, hasTickets };
   };
 
-  const total = calculateTotal();
-  const fees = total * 0.1; // 10% service fee
+  const { subtotal, hasTickets } = calculateTotal();
+  const fees = subtotal * 0.1; // 10% service fee
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -245,23 +267,11 @@ export function BuyTicketsModel({
                   
                   const originalPrice = ticket.price;
                   const discountedPrice = calculateDiscountedPrice(originalPrice);
-                  const hasDiscount = discountedPrice < originalPrice;
                   
                   return (
                     <div key={ticket.id} className="flex justify-between">
-                      <span className="text-gray-600">
-                        {ticket.name} × {count}
-                      </span>
-                      <div className="text-right">
-                        {hasDiscount && (
-                          <span className="line-through text-gray-400 mr-2">
-                            {ticket.currency} {(count * originalPrice).toFixed(2)}
-                          </span>
-                        )}
-                        <span className="font-medium">
-                          {ticket.currency} {(count * discountedPrice).toFixed(2)}
-                        </span>
-                      </div>
+                      <span className="text-gray-600">{ticket.name} x {count}</span>
+                      <span className="font-medium">{ticket.currency} {(count * discountedPrice).toFixed(2)}</span>
                     </div>
                   );
                 })}
@@ -276,7 +286,7 @@ export function BuyTicketsModel({
                   </div>
                 )}
                 
-                {total > 0 && (
+                {hasTickets && (
                   <>
                     <div className="flex justify-between text-gray-600 pt-2 border-t">
                       <span>Service Fee</span>
@@ -284,7 +294,7 @@ export function BuyTicketsModel({
                     </div>
                     <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
                       <span>Total</span>
-                      <span>GHS {(total + fees).toFixed(2)}</span>
+                      <span>GHS {(subtotal + fees).toFixed(2)}</span>
                     </div>
                   </>
                 )}
@@ -312,6 +322,21 @@ export function BuyTicketsModel({
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-4">Order Summary</h4>
                   <div className="space-y-3 text-sm">
+                    {tickets.map(ticket => {
+                      const count = ticketCounts[ticket.id] || 0;
+                      if (count === 0) return null;
+                      
+                      const originalPrice = ticket.price;
+                      const discountedPrice = calculateDiscountedPrice(originalPrice);
+                      
+                      return (
+                        <div key={ticket.id} className="flex justify-between">
+                          <span className="text-gray-600">{ticket.name} x {count}</span>
+                          <span className="font-medium">{ticket.currency} {(count * discountedPrice).toFixed(2)}</span>
+                        </div>
+                      );
+                    })}
+                    
                     {ticketCounts.general > 0 && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">General Admission x {ticketCounts.general}</span>
@@ -332,24 +357,27 @@ export function BuyTicketsModel({
                         </div>
                         <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
                           <span>Total</span>
-                          <span>GHS {(total + fees).toFixed(2)}</span>
+                          <span>GHS {(subtotal + fees).toFixed(2)}</span>
                         </div>
                       </>
                     )}
                   </div>
                 </div>
 
-                {(ticketCounts.general > 0 || ticketCounts.vip > 0) ? (
+                {hasTickets ? (
                   <button
                     onClick={handleCheckout}
                     className="w-full bg-primaryColor text-white font-medium rounded-xl py-4 
                       hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] 
                       shadow-lg hover:shadow-indigo-200"
                   >
-                    Proceed to Checkout
+                    Proceed to Checkout ({tickets[0]?.currency} {(subtotal + fees).toFixed(2)})
                   </button>
                 ) : (
-                  <button className="w-full bg-gray-100 text-gray-400 font-medium rounded-xl py-4 cursor-not-allowed">
+                  <button 
+                    className="w-full bg-gray-100 text-gray-400 font-medium rounded-xl py-4 cursor-not-allowed"
+                    disabled
+                  >
                     Select Tickets to Continue
                   </button>
                 )}
