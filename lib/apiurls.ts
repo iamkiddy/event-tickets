@@ -171,4 +171,7 @@ export default class APIUrls {
     // get tickets discount
     static readonly getTicketsDiscount = `${APIUrls.BASE_URL}/api/v1/orders/apply-discount`;
 
+    // get tickets checkout
+    static readonly getTicketsCheckout = `${APIUrls.BASE_URL}/api/v1/orders/check-out`;
+
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useState, useEffect } from 'react';
 
 interface NavLinkProps {
   label: string;
@@ -20,6 +21,19 @@ export const NavLink: React.FC<NavLinkProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check window width after component mounts
+    setIsMobile(window.innerWidth < 640);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleClick = () => {
     if (isCreate) {
@@ -64,7 +78,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
         transition-colors whitespace-nowrap
       `}
     >
-      {isCreate ? (window.innerWidth < 640 ? 'Create' : 'Create Event') : label}
+      {isCreate ? (isMobile ? 'Create' : 'Create Event') : label}
     </button>
   );
 };

@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Minus, Plus, Ticket, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getTicketsDiscount } from "@/lib/actions/orders";
+import { getTicketsDiscount, getTicketsCheckout } from "@/lib/actions/orders";
 import { toast } from "sonner";
+import { TicketCheckoutRequest } from "@/lib/models/_orders_models";
 
 interface BuyTicketsModelProps {
   eventId: string;
@@ -43,6 +44,7 @@ export function BuyTicketsModel({
     message?: string;
     id?: string;
   }>({});
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const calculateDiscountedPrice = (price: number): number => {
     if (!discount.value || !discount.type) return price;
@@ -75,12 +77,55 @@ export function BuyTicketsModel({
     });
   };
 
-  const handleCheckout = () => {
-    const ticketParams = tickets.map(ticket => 
-      `${ticket.id}=${ticketCounts[ticket.id] || 0}`
-    ).join('&');
-    
-    router.push(`/event/${eventId}/checkout?${ticketParams}`);
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    try {
+      // Prepare the ticket items array - ensure it's not empty
+      const ticketItems = tickets
+        .filter(ticket => (ticketCounts[ticket.id] || 0) > 0)
+        .map(ticket => ({
+          ticket: ticket.id,
+          quantity: ticketCounts[ticket.id]
+        }));
+
+      if (ticketItems.length === 0) {
+        toast.error('Please select at least one ticket');
+        return;
+      }
+
+      // Prepare the checkout request according to API schema
+      const checkoutRequest: TicketCheckoutRequest = {
+        event: eventId,
+        tickets: ticketItems,
+        ...(discount.id ? { coupon: discount.id } : {}) // Only include coupon if it exists
+      };
+
+      // Call the checkout API
+      const response = await getTicketsCheckout(checkoutRequest);
+      
+      if (response.orderCode) {
+        // Show success message with order code
+        toast.success(`Order initiated! Order Code: ${response.orderCode}`);
+        
+        // Construct URL with ticket parameters
+        const ticketParams = tickets
+          .filter(ticket => ticketCounts[ticket.id] > 0)
+          .map(ticket => `${ticket.id}=${ticketCounts[ticket.id]}`)
+          .join('&');
+        
+        // Navigate to checkout page with parameters
+        router.push(`/event/${eventId}/checkout?${ticketParams}`);
+      } else {
+        throw new Error('No order code received');
+      }
+    } catch (error: unknown) {
+      // Show specific error message if available
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process checkout. Please try again.';
+      toast.error(errorMessage);
+      console.error('Checkout error:', error);
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const handleApplyCoupon = async () => {
@@ -125,7 +170,7 @@ export function BuyTicketsModel({
       }
     });
     
-    return { subtotal, hasTickets };
+    return { subtotal, hasTickets }; 
   };
 
   const { subtotal, hasTickets } = calculateTotal();
@@ -367,11 +412,16 @@ export function BuyTicketsModel({
                 {hasTickets ? (
                   <button
                     onClick={handleCheckout}
+                    disabled={isCheckingOut}
                     className="w-full bg-primaryColor text-white font-medium rounded-xl py-4 
                       hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] 
-                      shadow-lg hover:shadow-indigo-200"
+                      shadow-lg hover:shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Proceed to Checkout ({tickets[0]?.currency} {(subtotal + fees).toFixed(2)})
+                    {isCheckingOut ? (
+                      "Processing..."
+                    ) : (
+                      `Proceed to Checkout (${tickets[0]?.currency} ${(subtotal + fees).toFixed(2)})`
+                    )}
                   </button>
                 ) : (
                   <button 
