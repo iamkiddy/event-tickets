@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/context/AuthContext';
 
 const footerSections = {
   useEventick: [
     { label: 'Create Events', href: '/create-events' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Event Marketing Platform', href: '/marketing' },
-
   ],
   planEvents: [
     { label: 'Business & Professional', href: '/category/business' },
@@ -15,13 +16,13 @@ const footerSections = {
     { label: 'Fashion & Beauty', href: '/category/fashion' },
     { label: 'Food & Drinks', href: '/category/food' },
   ],
-  locations: [
-    { label: 'Greater Accra', href: '/location/accra' },
-    { label: 'Kumasi', href: '/location/kumasi' },
-    { label: 'Ghana', href: '/location/ghana' },
-    { label: 'Nigeria', href: '/location/nigeria' },
-    { label: 'Kenya', href: '/location/kenya' },
-    { label: 'Uganda', href: '/location/uganda' },
+    locations: [
+      { label: 'Greater Accra', href: null },
+    { label: 'Kumasi', href: null },
+    { label: 'Ghana', href: null },
+    { label: 'Nigeria', href: null },
+    { label: 'Kenya', href: null },
+    { label: 'Uganda', href: null },
   ],
   support: [
     { label: 'FAQs', href: '/faqs' },
@@ -41,6 +42,19 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  const handleCreateEventClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      router.push('/events/create');
+    } else {
+      sessionStorage.setItem('previousPath', window.location.pathname);
+      router.push('/auth');
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300 mt-3 xs:mt-5">
       <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-8 xs:py-10 sm:py-12">
@@ -50,9 +64,19 @@ export const Footer = () => {
             <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.useEventick.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="hover:text-white transition-colors">
-                    {item.label}
-                  </Link>
+                  {item.label === 'Create Events' ? (
+                    <Link 
+                      href="/events/create"
+                      onClick={handleCreateEventClick}
+                      className="hover:text-white transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <Link href={item.href} className="hover:text-white transition-colors">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -76,9 +100,13 @@ export const Footer = () => {
             <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm">
               {footerSections.locations.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="hover:text-white transition-colors">
-                    {item.label}
-                  </Link>
+                  {item.href ? (
+                    <Link href={item.href} className="hover:text-white transition-colors">
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
                 </li>
               ))}
             </ul>
