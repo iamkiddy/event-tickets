@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from 'react';
@@ -12,6 +14,8 @@ interface BuyTicketsModelProps {
   eventId: string;
   eventTitle: string;
   eventImage?: string;
+  startDate: string;
+  startTime: string;
   tickets: Array<{
     id: string;
     name: string;
@@ -30,6 +34,8 @@ export function BuyTicketsModel({
   eventId,
   eventTitle, 
   eventImage,
+  startDate,
+  startTime,
   tickets,
   onClose,
   ticketCounts,
@@ -45,7 +51,6 @@ export function BuyTicketsModel({
     id?: string;
   }>({});
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-
   const calculateDiscountedPrice = (price: number): number => {
     if (!discount.value || !discount.type) return price;
     
@@ -89,7 +94,7 @@ export function BuyTicketsModel({
         }));
 
       if (ticketItems.length === 0) {
-        toast.error('Please select at least one ticket');
+        toast.error('Please select at least one ticket', {position: 'top-center'});
         return;
       }
 
@@ -105,7 +110,7 @@ export function BuyTicketsModel({
       
       if (response.orderCode) {
         // Show success message with order code
-        toast.success(`Order initiated! Order Code: ${response.orderCode}`);
+        toast.success(`Order initiated! Order Code: ${response.orderCode}`, {position: 'top-center'});
         
         // Construct URL with ticket parameters
         const ticketParams = tickets
@@ -121,8 +126,8 @@ export function BuyTicketsModel({
     } catch (error: unknown) {
       // Show specific error message if available
       const errorMessage = error instanceof Error ? error.message : 'Failed to process checkout. Please try again.';
-      toast.error(errorMessage);
-      console.error('Checkout error:', error);
+      toast.error(errorMessage, {position: 'top-center'});
+      console.log(errorMessage)
     } finally {
       setIsCheckingOut(false);
     }
@@ -130,7 +135,7 @@ export function BuyTicketsModel({
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.error('Please enter a coupon code');
+      toast.error('Please enter a coupon code', {position: 'top-center'});
       return;
     }
 
@@ -145,10 +150,9 @@ export function BuyTicketsModel({
         message: 'Coupon applied successfully!'
       });
       
-      toast.success('Coupon applied successfully!');
-    } catch (error: unknown) {
-      console.error(error);
-      toast.error('Invalid coupon code');
+      toast.success('Coupon applied successfully!', {position: 'top-center'});
+    } catch (error: any) {
+      toast.error(error.message, {position: 'top-center'});
       setDiscount({});
     } finally {
       setIsApplying(false);
@@ -174,7 +178,6 @@ export function BuyTicketsModel({
   };
 
   const { subtotal, hasTickets } = calculateTotal();
-  const fees = subtotal * 0.1; // 10% service fee
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -208,11 +211,11 @@ export function BuyTicketsModel({
                 <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primaryColor" />
-                    <span>Sunday, January 5, 2025</span>
+                    <span>{startDate}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-primaryColor" />
-                    <span>10:00 PM GMT</span>
+                    <span>{startTime}</span>
                   </div>
                 </div>
               </div>
@@ -227,7 +230,7 @@ export function BuyTicketsModel({
                 />
                 <button 
                   onClick={handleApplyCoupon}
-                  disabled={isApplying}
+                  disabled={isApplying || isCheckingOut}
                   className="h-10 px-6 text-sm font-medium text-primaryColor hover:bg-primaryColor/5 
                     rounded-lg transition-colors border border-primaryColor disabled:opacity-50 
                     disabled:cursor-not-allowed"
@@ -332,16 +335,10 @@ export function BuyTicketsModel({
                 )}
                 
                 {hasTickets && (
-                  <>
-                    <div className="flex justify-between text-gray-600 pt-2 border-t">
-                      <span>Service Fee</span>
-                      <span>GHS {fees.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
-                      <span>Total</span>
-                      <span>GHS {(subtotal + fees).toFixed(2)}</span>
-                    </div>
-                  </>
+                  <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
+                    <span>Total</span>
+                    <span>GHS {(subtotal).toFixed(2)}</span>
+                  </div>
                 )}
               </div>
             </div>
@@ -396,13 +393,9 @@ export function BuyTicketsModel({
                     )}
                     {(ticketCounts.general > 0 || ticketCounts.vip > 0) && (
                       <>
-                        <div className="flex justify-between text-gray-600 pt-2 border-t">
-                          <span>Service Fee</span>
-                          <span>GHS {fees.toFixed(2)}</span>
-                        </div>
                         <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
                           <span>Total</span>
-                          <span>GHS {(subtotal + fees).toFixed(2)}</span>
+                          <span>GHS {(subtotal).toFixed(2)}</span>
                         </div>
                       </>
                     )}
@@ -420,7 +413,7 @@ export function BuyTicketsModel({
                     {isCheckingOut ? (
                       "Processing..."
                     ) : (
-                      `Proceed to Checkout (${tickets[0]?.currency} ${(subtotal + fees).toFixed(2)})`
+                      `Proceed to Checkout (${tickets[0]?.currency} ${(subtotal).toFixed(2)})`
                     )}
                   </button>
                 ) : (

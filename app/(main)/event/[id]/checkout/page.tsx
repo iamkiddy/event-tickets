@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/ui/input";
 import { 
-  CreditCard, 
   Phone, 
   Receipt, 
   Shield, 
@@ -10,12 +9,12 @@ import {
   Ticket
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
+import { usePaystackPayment } from 'react-paystack';
+import { getServerSession } from "@/lib/actions/auth";
 
-type PaymentMethod = 'card' | 'mobile';
 
 interface TicketCount {
   id: string;
@@ -27,9 +26,15 @@ interface TicketCount {
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [userEmailData, setUserEmailData] = useState({email: ''})
   const [tickets, setTickets] = useState<TicketCount[]>([]);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  // Calculate totals
+  const total = tickets.reduce((sum, ticket) => sum + (ticket.count * ticket.price), 0);
   
   useEffect(() => {
+    getServerSession().then((data)=>setUserEmailData({ email: data?.userProfileModel?.email || '' }))
     // Parse ticket counts from URL parameters
     const ticketCounts: TicketCount[] = [];
     searchParams.forEach((value, key) => {
@@ -45,12 +50,7 @@ export default function CheckoutPage() {
     });
     setTickets(ticketCounts);
   }, [searchParams]);
-
-  // Calculate totals
-  const total = tickets.reduce((sum, ticket) => sum + (ticket.count * ticket.price), 0);
-  const fees = total * 0.1;
-
-  const [isAtTop, setIsAtTop] = useState(true);
+  
 
   useEffect(() => {
     setIsAtTop(window.scrollY < 10);
@@ -62,27 +62,15 @@ export default function CheckoutPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
 
-  // eslint-disable-next-line
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
-  const [cardData, setCardData] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    name: "",
-    email: "",
-  });
   const [mobileData, setMobileData] = useState({
     phoneNumber: "",
     network: "mtn",
-    email: "",
+    email: userEmailData || '',
   });
 
-  const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCardData(prev => ({ ...prev, [name]: value }));
-  };
-
+  
   const handleMobileInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setMobileData(prev => ({ ...prev, [name]: value }));
@@ -121,121 +109,18 @@ export default function CheckoutPage() {
             {/* Left Column - Payment Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Payment Method Selection */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-              >
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h3>
-                <Tabs 
-                  defaultValue="card" 
-                  className="w-full"
-                  onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
-                >
-                  <TabsList className="grid w-full grid-cols-2 gap-4 p-1 mb-8 bg-gray-50 rounded-xl">
-                    <TabsTrigger 
-                      value="card" 
-                      className="flex items-center gap-2.5 py-4 px-6 data-[state=active]:bg-white 
-                        data-[state=active]:text-primaryColor data-[state=active]:shadow-sm rounded-lg transition-all
-                        hover:bg-gray-100 data-[state=active]:hover:bg-white"
-                    >
-                      <div className={cn(
-                        "p-2 rounded-md transition-colors",
-                        "data-[state=active]:bg-primary-50",
-                        "bg-white shadow-sm"
-                      )}>
-                        <CreditCard className="w-5 h-5 text-primaryColor" />
-                      </div>
-                      <div className="flex flex-col items-start">
-                        <span className="font-semibold">Card Payment</span>
-                        <span className="text-xs text-gray-500">Pay with Visa or Mastercard</span>
-                      </div>
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="mobile" 
-                      className="flex items-center gap-2.5 py-4 px-6 data-[state=active]:bg-white 
-                        data-[state=active]:text-primaryColor data-[state=active]:shadow-sm rounded-lg transition-all
-                        hover:bg-gray-100 data-[state=active]:hover:bg-white"
-                    >
-                      <div className={cn(
-                        "p-2 rounded-md transition-colors",
-                        "data-[state=active]:bg-primary-50",
-                        "bg-white shadow-sm"
-                      )}>
-                        <Phone className="w-5 h-5 text-primaryColor" />
-                      </div>
-                      <div className="flex flex-col items-start">
-                        <span className="font-semibold">Mobile Money</span>
-                        <span className="text-xs text-gray-500">Pay with Mobile Money</span>
-                      </div>
-                    </TabsTrigger>
-                  </TabsList>
+                <div className="flex gap-2 items-center">
+                  <Phone className="w-5 h-5 text-primaryColor" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold">Mobile Money</span>
+                    <span className="text-xs text-gray-500">Pay with Mobile Money</span>
+                  </div>
+                </div>
+                
 
-                  <TabsContent 
-                    value="card" 
-                    className="space-y-6 mt-4 animate-in fade-in-50 duration-500"
-                  >
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                    >
-                      <div className="col-span-2 space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Card Number</label>
-                        <Input
-                          name="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          value={cardData.cardNumber}
-                          onChange={handleCardInputChange}
-                          className="h-12 px-4 rounded-lg border-gray-200 focus:border-primaryColor 
-                            focus:ring-primaryColor/20 transition-all"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Expiry Date</label>
-                        <Input
-                          name="expiryDate"
-                          placeholder="MM/YY"
-                          value={cardData.expiryDate}
-                          onChange={handleCardInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">CVV</label>
-                        <Input
-                          name="cvv"
-                          placeholder="123"
-                          value={cardData.cvv}
-                          onChange={handleCardInputChange}
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Cardholder Name</label>
-                        <Input
-                          name="name"
-                          placeholder="John Doe"
-                          value={cardData.name}
-                          onChange={handleCardInputChange}
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Email Address</label>
-                        <Input
-                          name="email"
-                          type="email"
-                          placeholder="john@example.com"
-                          value={cardData.email}
-                          onChange={handleCardInputChange}
-                        />
-                      </div>
-                    </motion.div>
-                  </TabsContent>
-
-                  <TabsContent 
-                    value="mobile" 
-                    className="space-y-6 mt-4 animate-in fade-in-50 duration-500"
-                  >
+                <div className="space-y-6 mt-4 animate-in fade-in-50 duration-500">
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -334,9 +219,8 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     </motion.div>
-                  </TabsContent>
-                </Tabs>
-              </motion.div>
+                  </div>
+              </div>
 
               {/* Security Badge */}
               <motion.div 
@@ -391,14 +275,10 @@ export default function CheckoutPage() {
                         <span>Subtotal</span>
                         <span>GHS {total.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
-                        <span>Service Fee</span>
-                        <span>GHS {fees.toFixed(2)}</span>
-                      </div>
                       <div className="flex justify-between items-center pt-3 border-t">
                         <span className="font-semibold text-gray-900">Total</span>
                         <span className="font-bold text-lg text-gray-900">
-                          GHS {(total + fees).toFixed(2)}
+                          GHS {(total).toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -416,7 +296,7 @@ export default function CheckoutPage() {
                   onClick={handleSubmit}
                 >
                   <Shield className="w-5 h-5" />
-                  Pay GHS {(total + fees).toFixed(2)}
+                  Pay GHS {(total).toFixed(2)}
                 </motion.button>
 
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500">

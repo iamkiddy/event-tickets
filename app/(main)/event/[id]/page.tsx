@@ -11,60 +11,12 @@ import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { AccordionTrigger } from '@radix-ui/react-accordion';
-import { BuyTicketsModel } from './components/BuyTicketsModel';
+import { BuyTicketsModel } from './_components/BuyTicketsModel';
+import { formatDate2, formatTime, formatTimeRange } from '@/lib/utils';
 
-interface FormattedDate {
-  fullDate: string;
-  month: string;
-  day: string;
-}
 
-const formatTime = (timeString: string | undefined): string => {
-  if (!timeString) return '';
-  
-  // Parse the time string
-  const [hours, minutes] = timeString.split(':');
-  const hourNum = parseInt(hours);
-  
-  // Convert to 12-hour format
-  const period = hourNum >= 12 ? 'PM' : 'AM';
-  const displayHours = hourNum % 12 || 12;
-  
-  return `${displayHours}:${minutes} ${period}`;
-};
 
-const formatTimeRange = (startTime: string, endTime: string): string => {
-  return `${formatTime(startTime)} - ${formatTime(endTime)}`;
-};
 
-const formatDate = (dateString: string | undefined): FormattedDate => {
-  if (!dateString) {
-    return {
-      fullDate: '',
-      month: '',
-      day: '',
-    };
-  }
-  
-  try {
-    const date = new Date(dateString);
-    return {
-      fullDate: date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      month: date.toLocaleDateString('en-US', { month: 'short' }),
-      day: date.toLocaleDateString('en-US', { day: 'numeric' }),
-    };
-  } catch {
-    return {
-      fullDate: '',
-      month: '',
-      day: '',
-    };
-  }
-};
 
 export default function EventPage() {
   const params = useParams();
@@ -222,7 +174,7 @@ export default function EventPage() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
                 <div className="flex items-center gap-2 text-white/90 mb-2 sm:mb-3 lg:mb-4 text-xs sm:text-sm">
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>{formatDate(event.startDate).fullDate}</span>
+                  <span>{formatDate2(event.startDate).fullDate}</span>
                   <span className="mx-2">•</span>
                   <span>{formatTimeRange(event.startTime, event.endTime)}</span>
                   {event.locationType === 'online' && (
@@ -293,7 +245,7 @@ export default function EventPage() {
                     <span className="text-lg">Date and time</span>
                   </div>
                   <div className="space-y-3 text-gray-600">
-                    <p className="text-base">{formatDate(event.startDate).fullDate}</p>
+                    <p className="text-base">{formatDate2(event.startDate).fullDate}</p>
                     <p className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-primaryColor" />
                       {formatTimeRange(event.startTime, event.endTime)}
@@ -431,9 +383,11 @@ export default function EventPage() {
                 </button>
 
                 {/* Refund Policy */}
-                <p className="mt-4 text-sm text-gray-600 text-center">
-                  Refundable up to 7 days before the event
-                </p>
+                {event.isRefundable && (
+                  <p className="mt-4 text-sm text-gray-600 text-center">
+                    Refundable up to {event.refundDaysBefore} days before the event
+                  </p>
+                )}
               </div>
 
               {/* Organizer Section */}
@@ -547,7 +501,7 @@ export default function EventPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                    {formatDate(event.startDate).fullDate}
+                    {formatDate2(event.startDate).fullDate}
                   </span>
                 </div>
                 
@@ -588,6 +542,8 @@ export default function EventPage() {
           onClose={handleCloseBuyModal}
           ticketCounts={ticketCounts}
           setTicketCounts={setTicketCounts}
+          startDate={formatDate2(event.startDate).fullDate}
+          startTime={formatTimeRange(event.startTime, event.endTime)}
         />
       )}
 
