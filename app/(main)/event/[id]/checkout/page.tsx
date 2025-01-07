@@ -6,7 +6,8 @@ import {
   Receipt, 
   Shield, 
   ArrowLeft, 
-  Ticket
+  Ticket,
+  CreditCard
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -14,6 +15,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { usePaystackPayment } from 'react-paystack';
 import { getServerSession } from "@/lib/actions/auth";
+import { toast } from 'react-hot-toast';
+import { PaystackButton } from 'react-paystack';
 
 
 interface TicketCount {
@@ -26,15 +29,52 @@ interface TicketCount {
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [userEmailData, setUserEmailData] = useState({email: ''})
+  const [userEmailData, setUserEmailData] = useState('')
   const [tickets, setTickets] = useState<TicketCount[]>([]);
   const [isAtTop, setIsAtTop] = useState(true);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mobile' | 'card'>('mobile');
+  const [cardData, setCardData] = useState({
+    email: userEmailData || '',
+    name: '',
+  });
 
   // Calculate totals
   const total = tickets.reduce((sum, ticket) => sum + (ticket.count * ticket.price), 0);
-  
+
+  // Initialize Paystack with config after total is calculated
+  const config = {
+    reference: `tx-${Date.now()}`,
+    email: cardData.email,
+    amount: total * 100,
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '',
+    currency: 'GHS',
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Customer Name",
+          variable_name: "customer_name",
+          value: cardData.name
+        }
+      ]
+    }
+  };
+
+  const initializePayment = usePaystackPayment(config);
+
+  // Handle successful payment
+  const onSuccess = (reference: any) => {
+    toast.success('Payment successful!');
+    // Add your success logic here
+    router.push(`/tickets?reference=${reference.reference}`);
+  };
+
+  // Handle payment error
+  const onClose = () => {
+    toast.error('Payment cancelled');
+  };
+
   useEffect(() => {
-    getServerSession().then((data)=>setUserEmailData({ email: data?.userProfileModel?.email || '' }))
+    getServerSession().then((data)=>setUserEmailData(data?.userProfileModel?.email || ''))
     // Parse ticket counts from URL parameters
     const ticketCounts: TicketCount[] = [];
     searchParams.forEach((value, key) => {
@@ -78,7 +118,10 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Add your payment processing logic here
+    
+    if (selectedPaymentMethod === 'mobile') {
+      // Your existing mobile money logic
+    }
   };
 
   return (
@@ -111,16 +154,45 @@ export default function CheckoutPage() {
               {/* Payment Method Selection */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h3>
-                <div className="flex gap-2 items-center">
-                  <Phone className="w-5 h-5 text-primaryColor" />
-                  <div className="flex flex-col items-start">
-                    <span className="font-semibold">Mobile Money</span>
-                    <span className="text-xs text-gray-500">Pay with Mobile Money</span>
+                
+                {/* Payment Method Tabs */}
+                <div className="bg-gray-50/50 p-2 rounded-2xl mb-6">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPaymentMethod('mobile')}
+                      className={cn(
+                        "flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-medium transition-all duration-300",
+                        "text-lg hover:text-primaryColor/80",
+                        selectedPaymentMethod === 'mobile' 
+                          ? "bg-white text-primaryColor shadow-lg scale-[1.02]" 
+                          : "text-gray-600"
+                      )}
+                    >
+                      <Phone className="w-5 h-5" />
+                      Mobile Money
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPaymentMethod('card')}
+                      className={cn(
+                        "flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-medium transition-all duration-300",
+                        "text-lg hover:text-primaryColor/80",
+                        selectedPaymentMethod === 'card' 
+                          ? "bg-white text-primaryColor shadow-lg scale-[1.02]" 
+                          : "text-gray-600"
+                      )}
+                    >
+                      <CreditCard className="w-5 h-5" />
+                      Credit Card
+                    </button>
                   </div>
                 </div>
-                
 
+                {/* Payment Forms */}
                 <div className="space-y-6 mt-4 animate-in fade-in-50 duration-500">
+                  {selectedPaymentMethod === 'mobile' ? (
+                    // Existing Mobile Money Form
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -219,7 +291,72 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     </motion.div>
-                  </div>
+                  ) : (
+                    // New Card Payment Form
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="grid grid-cols-1 gap-6"
+                    >
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Email Address</label>
+                        <Input
+                          type="email"
+                          value={cardData.email}
+                          onChange={(e) => setCardData(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="john@example.com"
+                          className="h-12 px-4 rounded-lg border-gray-200 focus:border-primaryColor 
+                            focus:ring-primaryColor/20 transition-all text-base"
+                        />
+                        <p className="text-xs text-gray-500">Payment receipt will be sent to this email</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Full Name</label>
+                        <Input
+                          value={cardData.name}
+                          onChange={(e) => setCardData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="John Doe"
+                          className="h-12 px-4 rounded-lg border-gray-200 focus:border-primaryColor 
+                            focus:ring-primaryColor/20 transition-all text-base"
+                        />
+                      </div>
+
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-100 mt-4">
+                        <div className="flex items-center gap-3">
+                          <Shield className="w-5 h-5 text-green-600" />
+                          <div>
+                            <h5 className="font-medium text-green-800">Secure Card Payment</h5>
+                            <p className="text-sm text-green-700 mt-0.5">
+                              Your payment will be processed securely via Paystack
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <PaystackButton
+                        {...{
+                          ...config,
+                          text: 'Pay with Paystack',
+                          className: "w-full bg-[#0BA4DB] text-white font-medium rounded-xl h-14 hover:bg-[#0994c6] transition-colors shadow-lg hover:shadow-blue-200/50 flex items-center justify-center gap-2",
+                          onSuccess: (reference: any) => {
+                            toast.success('Payment successful!');
+                            router.push(`/tickets?reference=${reference.reference}`);
+                          },
+                          onClose: () => {
+                            toast.error('Payment cancelled');
+                          }
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <CreditCard className="w-5 h-5" />
+                          Pay GHS {(total).toFixed(2)}
+                        </div>
+                      </PaystackButton>
+                    </motion.div>
+                  )}
+                </div>
               </div>
 
               {/* Security Badge */}
