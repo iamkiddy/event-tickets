@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Minus, Plus, Ticket, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getTicketsDiscount, getTicketsCheckout } from "@/lib/actions/orders";
+import { getTicketsDiscount, initCheckout } from "@/lib/actions/orders";
 import { toast } from "sonner";
 import { TicketCheckoutRequest } from "@/lib/models/_orders_models";
 
@@ -106,20 +106,13 @@ export function BuyTicketsModel({
       };
 
       // Call the checkout API
-      const response = await getTicketsCheckout(checkoutRequest);
+      const response = await initCheckout(checkoutRequest);
       
       if (response.orderCode) {
         // Show success message with order code
         toast.success(`Order initiated! Order Code: ${response.orderCode}`, {position: 'top-center'});
-        
-        // Construct URL with ticket parameters
-        const ticketParams = tickets
-          .filter(ticket => ticketCounts[ticket.id] > 0)
-          .map(ticket => `${ticket.id}=${ticketCounts[ticket.id]}`)
-          .join('&');
-        
         // Navigate to checkout page with parameters
-        router.push(`/event/${eventId}/checkout?${ticketParams}`);
+        router.push(`/event/${eventId}/checkout?code=${response.orderCode}`);
       } else {
         throw new Error('No order code received');
       }

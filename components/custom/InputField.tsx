@@ -9,7 +9,7 @@ interface InputFieldProps {
     name?: string;
     placeholder?: string;
     value: string;
-    setValue: (value: string) => void;
+    setValue?: (value: string) => void;
     error?: string;
     required?: boolean;
     disabled?: boolean;
@@ -41,7 +41,7 @@ export default function InputField({
                 placeholder={placeholder} 
                 value={value} 
                 name={name}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => setValue && setValue(e.target.value)}
                 required={required}
                 disabled={disabled}
                 className={cn(

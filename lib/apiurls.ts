@@ -172,6 +172,8 @@ export default class APIUrls {
     static readonly applyDiscount = `${APIUrls.BASE_URL}/api/v1/orders/apply-discount`;
     // get tickets checkout
     static readonly initCheckout = `${APIUrls.BASE_URL}/api/v1/orders/check-out`;
+    // get checkout details
+    static readonly getCheckoutDetails = `${APIUrls.BASE_URL}/api/v1/orders/checkout-details/`;
     // init momo pay
     static readonly initMomoPay = 'https://payment-service-dxnw.onrender.com/api/v1/payment/momo-pay';
     // momo otp code

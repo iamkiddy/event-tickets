@@ -26,8 +26,28 @@ export interface TicketCheckoutRequest {
 export interface TicketCheckoutResponse {
     message: string;
     orderCode: string;
+}
+
+
+// checkout details
+export interface CheckoutDetailResponse {
+    email:        string;
+    tickets:      CheckoutTicket[];
+    total:        number;
+    subtotal:     number;
+    paymentTotal: number;
+    currency:     string;
+    coupon?:      number;
+    couponType?:  string;
+}
+
+export interface CheckoutTicket {
+    ticketName: string;
+    quantity:   number;
     totalPrice: number;
 }
+
+
 
 // momo form pay
 export interface MomoPayForm {

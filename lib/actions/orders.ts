@@ -3,7 +3,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse } from "../models/_orders_models";
+import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse } from "../models/_orders_models";
 import { cookies } from 'next/headers';
 
 
@@ -32,7 +32,7 @@ export const getTicketsDiscount = async (request: TicketDiscountRequest): Promis
 };
 
 // check 
-export const getTicketsCheckout = async (request: TicketCheckoutRequest): Promise<TicketCheckoutResponse> => {
+export const initCheckout = async (request: TicketCheckoutRequest): Promise<TicketCheckoutResponse> => {
     try {
         const cookieStore = await cookies();
         const token = cookieStore.get('token')?.value;
@@ -53,6 +53,30 @@ export const getTicketsCheckout = async (request: TicketCheckoutRequest): Promis
         throw new Error(errorMessage);
     }
 };
+
+
+// get checkout details
+export const getCheckoutDetails = async (orderCode: string): Promise<CheckoutDetailResponse> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        const response = await apiController<CheckoutDetailResponse>({
+            method: 'GET',
+            url: `${APIUrls.getCheckoutDetails}${orderCode}`,
+            token,
+            contentType: 'application/json',
+        });
+
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to get checkout details";
+        throw new Error(errorMessage);
+    }
+};
+
 
 
 // init momo pay
