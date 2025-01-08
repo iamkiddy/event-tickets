@@ -16,6 +16,7 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
   const { logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const isProfilePage = pathname.startsWith('/profile');
   
   // Check if current route is a dashboard route
   const isDashboardRoute = pathname.startsWith('/dashboard') || 
@@ -37,7 +38,7 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-        <UserRoundCheck className={`w-6 h-6 ${isScrolled ? 'text-gray-700' : 'text-white'}`} />
+        <UserRoundCheck className={`w-6 h-6 ${isScrolled || isProfilePage ? 'text-gray-700' : 'text-white'}`} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-white border border-gray-200 mt-4">
         {!isDashboardRoute && (

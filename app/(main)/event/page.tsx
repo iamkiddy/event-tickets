@@ -14,6 +14,8 @@ import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
 import { EventCard } from '../codepass/components/EventCard';
 import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EventCardSkeleton } from '../codepass/components/skeletons';
 
 
 export default function EventsPage() {
@@ -71,7 +73,32 @@ export default function EventsPage() {
       {/* Hero Section with Search */}
       <HeroSection/>
       
-      {(isMainLoading && isLoading ) ? (<div>...loading</div>): (
+      {(isMainLoading && isLoading ) ? (
+        <>
+          {/* Enhanced Filters Section Skeleton */}
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm pb-2 overflow-x-auto">
+            <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+              <div className="flex flex-nowrap items-center gap-2 sm:gap-3 md:gap-4 py-2 md:justify-center">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton 
+                    key={i}
+                    className="h-9 w-32 rounded-full bg-gray-200" 
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Events Grid Skeleton */}
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <EventCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
         <>
           {/* Enhanced Filters Section - Made more responsive */}
           <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm pb-2 overflow-x-auto">

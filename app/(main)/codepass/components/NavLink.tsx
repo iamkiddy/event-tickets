@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useState, useEffect } from 'react';
 
@@ -21,6 +21,8 @@ export const NavLink: React.FC<NavLinkProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const isProfilePage = pathname.startsWith('/profile');
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -71,10 +73,10 @@ export const NavLink: React.FC<NavLinkProps> = ({
       className={`
         ${isButton ? 'px-2 sm:px-4 py-1 sm:py-2 rounded-full border text-xs sm:text-sm' : 'text-sm font-medium'} 
         ${isCreate ? 'px-2 sm:px-4 py-1 sm:py-2 rounded-full bg-secondaryColor text-white hover:bg-pink-700 text-xs sm:text-sm' : ''}
-        ${isButton && isScrolled ? 'border-gray-300 text-gray-700' : ''}
-        ${isButton && !isScrolled ? 'border-white text-white' : ''}
-        ${!isButton && !isCreate && isScrolled ? 'text-gray-700' : ''}
-        ${!isButton && !isCreate && !isScrolled ? 'text-white' : ''}
+        ${isButton && (isScrolled || isProfilePage) ? 'border-gray-300 text-gray-700' : ''}
+        ${isButton && !isScrolled && !isProfilePage ? 'border-white text-white' : ''}
+        ${!isButton && !isCreate && (isScrolled || isProfilePage) ? 'text-gray-700' : ''}
+        ${!isButton && !isCreate && !isScrolled && !isProfilePage ? 'text-white' : ''}
         transition-colors whitespace-nowrap
       `}
     >

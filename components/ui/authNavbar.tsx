@@ -7,6 +7,7 @@ import { SearchBar } from '@/app/(main)/codepass/components/SearchBar';
 import { UserDropdown } from '@/components/userDropdown';
 import { navLinks } from '@/app/(main)/codepass/EventickPage';
 import { LoginAlert } from '@/app/auth/_components/loginAlert';
+import { usePathname } from 'next/navigation';
 
 interface AuthenticatedNavProps {
   isScrolled?: boolean;
@@ -17,6 +18,8 @@ export const AuthenticatedNav = ({
   isScrolled = false, 
   showSearchInNav = false 
 }: AuthenticatedNavProps) => {
+  const pathname = usePathname();
+  const isProfilePage = pathname.startsWith('/profile');
   const [mounted, setMounted] = useState(false);
   const [internalIsScrolled, setInternalIsScrolled] = useState(isScrolled);
   const [internalShowSearchInNav, setInternalShowSearchInNav] = useState(showSearchInNav);
@@ -49,11 +52,11 @@ export const AuthenticatedNav = ({
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
-      ${effectiveIsScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+      ${effectiveIsScrolled || isProfilePage ? 'bg-white shadow-md' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <Link href="/home" className={`text-lg sm:text-xl font-bold ${
-            effectiveIsScrolled ? 'text-indigo-600' : 'text-white'
+            effectiveIsScrolled || isProfilePage ? 'text-indigo-600' : 'text-white'
           }`}>
             CodePass
           </Link>
@@ -70,9 +73,9 @@ export const AuthenticatedNav = ({
             <NavLink 
               label="Create Event"
               isCreate={true}
-              isScrolled={effectiveIsScrolled}
+              isScrolled={effectiveIsScrolled || isProfilePage}
             />
-            <UserDropdown isScrolled={effectiveIsScrolled} />
+            <UserDropdown isScrolled={effectiveIsScrolled || isProfilePage} />
           </div>
         </div>
       </div>

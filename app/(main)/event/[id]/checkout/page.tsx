@@ -397,14 +397,23 @@ export default function CheckoutPage() {
                       Pay {data?.currency ?? ''} {(data?.total ?? 0).toFixed(2)}
                     </motion.button>
                   ): (
-                    <motion.button type="submit" disabled={isPending} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                    <motion.button 
+                      type="submit" 
+                      disabled={isPending} 
+                      whileHover={{ scale: 1.01 }} 
+                      whileTap={{ scale: 0.98 }}
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
-                        hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-indigo-200/50
+                        hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] 
+                        shadow-lg hover:shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed
                         flex items-center justify-center gap-2"
                       onClick={() => handleMomoSubmit()}
                     >
                       <Shield className="w-5 h-5" />
-                      {isPending ? 'Loading...' : `Pay ${data?.currency ?? ''} ${(data?.total ?? 0).toFixed(2)}`}
+                      {isPending ? (
+                        <span className="opacity-50">Processing...</span>
+                      ) : (
+                        `Pay ${data?.currency ?? ''} ${(data?.total ?? 0).toFixed(2)}`
+                      )}
                     </motion.button>
                   )}
                   
