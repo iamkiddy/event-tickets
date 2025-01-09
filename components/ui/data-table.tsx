@@ -26,13 +26,19 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   isLoading?: boolean
   total: number
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading,
-  total
+  total,
+  currentPage,
+  totalPages,
+  onPageChange
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -151,45 +157,42 @@ export function DataTable<TData, TValue>({
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
         <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-          Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-            total
-          )}{" "}
+          Showing {((currentPage - 1) * 10) + 1} to{" "}
+          {Math.min(currentPage * 10, total)}{" "}
           of {total} entries
         </p>
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
             className="rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10"
           >
             <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <div className="flex items-center space-x-1">
-            {[...Array(3)].map((_, i) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <Button
-                key={i}
+                key={page}
                 variant="ghost"
                 size="sm"
-                onClick={() => table.setPageIndex(i)}
+                onClick={() => onPageChange(page)}
                 className={`rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10 text-xs sm:text-sm ${
-                  i === 0 
-                    ? "text-primaryColor"
+                  page === currentPage 
+                    ? "text-primaryColor bg-primaryColor/10"
                     : ""
                 }`}
               >
-                {i + 1}
+                {page}
               </Button>
             ))}
           </div>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
             className="rounded-full hover:bg-gray-100 h-8 w-8 sm:h-10 sm:w-10"
           >
             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />

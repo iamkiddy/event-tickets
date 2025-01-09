@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isLoading: boolean;
   userProfile: UserProfileModel | null;
   login: (token: string, profile?: UserProfileModel) => Promise<void>;
   logout: () => Promise<void>;
@@ -14,6 +15,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  isLoading: true,
   userProfile: null,
   login: async () => {},
   logout: async () => {},
@@ -21,16 +23,25 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfileModel | null>(null);
 
   useEffect(() => {
-    // Check server-side session on mount
-    getServerSession().then((session) => {
-      if (session) {
-        setIsAuthenticated(true);
-        setUserProfile(session.userProfileModel);
+    const initAuth = async () => {
+      try {
+        const session = await getServerSession();
+        if (session) {
+          setIsAuthenticated(true);
+          setUserProfile(session.userProfileModel);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setIsLoading(false);
       }
-    });
+    };
+
+    initAuth();
   }, []);
 
   const login = async (token: string, profile?: UserProfileModel) => {
@@ -77,6 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated, 
+      isLoading,
       userProfile,
       login, 
       logout,

@@ -15,6 +15,8 @@ const EventContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<Event[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchEvents = async (params?: { search?: string; category?: string; eventType?: string }) => {
@@ -63,6 +65,10 @@ const EventContent = () => {
     })
   });
 
+  const handlePageChange = (page: number) => {
+    updateFilters('page', page.toString());
+  };
+
   return (
     <>
       <SearchAndFilter 
@@ -73,26 +79,45 @@ const EventContent = () => {
         initialCategory={searchParams.get('category') || ''}
         initialEventType={searchParams.get('eventType') || ''}
       />
-
-      <DataTable 
+<DataTable 
         columns={eventColumns}
         data={events}
         isLoading={isLoading}
         total={events.length}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
     </>
   );
 };
 
 export default function EventsPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only redirect if authentication check is complete and user is not authenticated
+    if (!authLoading && !isAuthenticated) {
+      // Store the current path before redirecting
+      sessionStorage.setItem('previousPath', window.location.pathname);
       router.push('/sign-in');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primaryColor border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="p-2 sm:p-4 md:p-6">
@@ -102,7 +127,6 @@ export default function EventsPage() {
       </div>
 
       <div className="space-y-4 sm:space-y-6">
-        {/* Suspense wrapper around EventContent */}
         <Suspense fallback={<div>Loading events...</div>}>
           <EventContent />
         </Suspense>

@@ -91,16 +91,6 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
                 </div>
               </div>
             </div>
-
-            {/* View Details Button - Appears on Hover */}
-            <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primaryColor hover:text-indigo-700 transition-colors">
-                View Details
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            </div>
           </div>
         </Card>
       ))}
