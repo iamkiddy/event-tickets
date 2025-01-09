@@ -21,6 +21,7 @@ import CheckOutLoading from "../_components/CheckOutLoading";
 import InputField from "@/components/custom/InputField";
 import { MomoPayForm } from "@/lib/models/_orders_models";
 import { toast } from "sonner";
+import MomoOTPVerification from "../_components/MomoOTPVerification";
 
 
 export default function CheckoutPage() {
@@ -28,6 +29,7 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const orderCode = searchParams.get('code') || '';
   const [showOtp, setShowOtp] = useState(false);
+  const [reference, setReference] = useState('')
   const [isAtTop, setIsAtTop] = useState(true);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mobile' | 'card'>('mobile');
   const [mobileData, setMobileData] = useState({
@@ -43,7 +45,7 @@ export default function CheckoutPage() {
 
   // Initialize Paystack with config after total is calculated
   const config = {
-    reference: `${orderCode}1`,
+    reference: `${orderCode}`,
     email: data?.email,
     amount: data?.paymentTotal,
     publicKey: 'pk_test_db4e09868b49d7f59f8fe2987a46ff07379e5ab2',
@@ -70,7 +72,7 @@ export default function CheckoutPage() {
   };
 
   // Handle Momo Payment Submission
-  const { mutate: handleMomoSubmit} = useMutation({
+  const { mutate: handleMomoSubmit, isPending} = useMutation({
     mutationFn: async () => {
       const momoData: MomoPayForm = {
         amount: data?.paymentTotal || 0,
@@ -83,11 +85,13 @@ export default function CheckoutPage() {
       };
       try{
         const response = await momoPayInit(momoData);
+        console.log(response)
         if (response.data.status === 'send_otp') {
           setShowOtp(true);
+          setReference(response.data.reference)
         } else if (response.data.status !== 'send_otp') {
-          toast.success('Payment successful', {position: 'top-center'});
-          router.push(`/profile/?tab=`);
+          toast.success('Payment Init successful', {position: 'top-center'});
+          router.replace(`/event/confirm?reference=${response.data.reference}`);
         } else {
           toast.error('Failed to process momo pay. Please try again.', {position: 'top-center'});
         }
@@ -383,7 +387,7 @@ export default function CheckoutPage() {
 
                   {/* Submit Button */}
                   {selectedPaymentMethod !== 'mobile' ? (
-                    <motion.button type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                    <motion.button disabled={isPending} type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
                         hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-indigo-200/50
                         flex items-center justify-center gap-2"
@@ -393,17 +397,14 @@ export default function CheckoutPage() {
                       Pay {data?.currency ?? ''} {(data?.total ?? 0).toFixed(2)}
                     </motion.button>
                   ): (
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
+                    <motion.button type="submit" disabled={isPending} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
                         hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-indigo-200/50
                         flex items-center justify-center gap-2"
                       onClick={() => handleMomoSubmit()}
                     >
                       <Shield className="w-5 h-5" />
-                      Pay {data?.currency ?? ''} {(data?.total ?? 0).toFixed(2)}
+                      {isPending ? 'Loading...' : `Pay ${data?.currency ?? ''} ${(data?.total ?? 0).toFixed(2)}`}
                     </motion.button>
                   )}
                   
@@ -417,7 +418,12 @@ export default function CheckoutPage() {
           </div>
         </main>
       )}
+
+      <MomoOTPVerification
+        open={showOtp}
+        openChange={setShowOtp}
+        reference={reference}
+      />
     </div>
   );
 }
-

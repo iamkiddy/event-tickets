@@ -75,3 +75,16 @@ export interface MomoResponseData {
     status:       string;
     display_text: string;
 }
+
+
+// momo confirm response
+export interface MomoConfirmResponse {
+    status:  boolean;
+    message: string;
+    data:    MomoConfirmResponseData;
+}
+
+export interface MomoConfirmResponseData {
+    status:       string;
+    message:      string;
+}

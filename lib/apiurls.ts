@@ -178,4 +178,6 @@ export default class APIUrls {
     static readonly initMomoPay = 'https://payment-service-dxnw.onrender.com/api/v1/payment/momo-pay';
     // momo otp code
     static readonly momoOTPCode = 'https://payment-service-dxnw.onrender.com/api/v1/payment/confirm-otp'
+    // confirm momo payment
+    static readonly confirmMomoPayment = 'https://payment-service-dxnw.onrender.com/api/v1/payment/confirm-payment?reference=';
 }

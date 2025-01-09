@@ -55,13 +55,6 @@ export default async function <T, D = unknown>({
       }
     }
 
-    console.log('Request details:', {
-      url: `${url}?${new URLSearchParams(params).toString()}`,
-      method,
-      headers,
-      body: body instanceof FormData ? '[FormData]' : body
-    });
-
     const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {
       method,
       headers,
@@ -69,12 +62,6 @@ export default async function <T, D = unknown>({
     });
 
     const responseData = await response.json();
-    
-    console.log('Response details:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: responseData
-    });
 
     if (!response.ok) {
       throw {
@@ -87,12 +74,6 @@ export default async function <T, D = unknown>({
     return responseData as T;
   } catch (error: unknown) {
     const apiError = error as APIError;
-    console.error('API Controller Error:', {
-      error: apiError,
-      message: apiError.message,
-      status: apiError.status,
-      data: apiError.data
-    });
     throw apiError;
   }
 }

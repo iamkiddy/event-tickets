@@ -1,0 +1,5 @@
+1. Main Side - Loading issue
+2.Profile Side - Header
+3.Profile Side Design Order Card - (order id, event name, date, time, total and quantity, icon)
+4. Check out - add loading, fix button loading
+5. Confirm Page - Add more styling

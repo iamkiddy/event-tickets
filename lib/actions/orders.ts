@@ -3,7 +3,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse } from "../models/_orders_models";
+import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse } from "../models/_orders_models";
 import { cookies } from 'next/headers';
 
 
@@ -85,16 +85,76 @@ export const momoPayInit = async (form: MomoPayForm) => {
     const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
 
-    try{
-        const response = await apiController<MomoResponse>({
-            method: 'POST',
-            url: APIUrls.initMomoPay,
-            data: form,
-            token,
-            contentType: 'application/json',
-        });
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
 
-        return response;
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify(form),
+      };
+
+    try{
+        const response = await fetch(APIUrls.initMomoPay, requestOptions);
+        const responseData = await response.json();
+        return responseData as MomoResponse;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to check out tickets";
+        throw new Error(errorMessage);
+    }
+}
+
+
+
+// momo pay verification
+export const momoPayVerify = async (reference: string, otp: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({reference, otp}),
+      };
+
+    try{
+        const response = await fetch(APIUrls.momoOTPCode, requestOptions);
+        const responseData = await response.json();
+        return responseData as MomoResponse;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to check out tickets";
+        throw new Error(errorMessage);
+    }
+}
+
+
+// confirm momo payment
+export const confirmMomoPay = async (reference: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
+
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+      };
+
+    try{
+        const response = await fetch(APIUrls.confirmMomoPayment+reference, requestOptions);
+        const responseData = await response.json();
+        return responseData as MomoConfirmResponse;
     } catch (error) {
         const apiError = error as ApiError;
         const errorMessage = apiError.message || "Failed to check out tickets";
