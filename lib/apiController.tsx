@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-anonymous-default-export */
 
 // methods
@@ -14,7 +15,7 @@ export interface IController<T = unknown> {
   method?: HttpMethods;
   url: string;
   token?: string;
-  params?: Record<string, string>;
+  params?: any;
   data?: T;
   contentType?: HttpContentType;
   baseUrl?: string;
@@ -55,7 +56,8 @@ export default async function <T, D = unknown>({
       }
     }
 
-    const response = await fetch(`${url}?${new URLSearchParams(params).toString()}`, {
+    const response = await fetch(
+      url + (params ? "?" + new URLSearchParams(params).toString() : ""), {
       method,
       headers,
       body,

@@ -4,6 +4,7 @@ import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import { ApiError } from 'next/dist/server/api-utils';
 import { EventListResponse, EventDetails,OrganisedEventResponse,RelatedEventResponse } from '../models/_main_event_models';
+import { getServerSession } from "./auth";
 
 export interface GetMainEventsParams {
   search?: string;
@@ -76,11 +77,14 @@ export const getOrganisedEvents = async (organizerId: string): Promise<Organised
 };
 
 export async function getEventDetails(eventId: string): Promise<EventDetails> {
+  const user = await getServerSession()
+  
   try {
     const response = await apiController<EventDetails, void>({
       method: 'GET',
       url: `${APIUrls.getMainEventById}/${eventId}`,
-      contentType: 'application/json'
+      contentType: 'application/json',
+      params: user?.userProfileModel ? `userId=${user.userProfileModel.id}`: ''
     });
 
     return response;
