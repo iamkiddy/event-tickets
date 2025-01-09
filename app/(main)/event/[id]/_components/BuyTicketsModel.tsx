@@ -134,7 +134,7 @@ export function BuyTicketsModel({
 
     try {
       setIsApplying(true);
-      const response = await getTicketsDiscount({ coupon: couponCode.trim() });
+      const response = await getTicketsDiscount({ coupon: couponCode.trim(), event: eventId });
       
       setDiscount({
         id: response.id,

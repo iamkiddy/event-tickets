@@ -29,7 +29,6 @@ export default function MomoOTPVerification({open, openChange, reference}: MomoO
           e.preventDefault();
             try {
                 const response = await momoPayOTPVerify(reference, otp);
-                console.log(response)
                 if (response.status) {
                     toast.success('Payment Init successful', {position: 'top-center'});
                     openChange(false);
