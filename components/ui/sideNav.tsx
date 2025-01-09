@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
     House,
   CalendarDays,
-  Ticket,
+  UserSquare2,
   Landmark,
   Settings,
   HelpCircle
@@ -15,7 +15,7 @@ import {
 const navItems = [
   { icon: House, href: '/home', label: 'Dashboard' },
   { icon: CalendarDays, href: '/events', label: 'Events' },
-  { icon: Ticket, href: '/orders', label: 'Orders' },
+  { icon: UserSquare2, href: '/teams', label: 'Teams' },
   { icon: Landmark, href: '/finance', label: 'Finance' },
   { icon: Settings, href: '/settings', label: 'Settings' },
   { icon: HelpCircle, href: '/help', label: 'Help' },

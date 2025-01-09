@@ -174,6 +174,10 @@ export default class APIUrls {
     static readonly initCheckout = `${APIUrls.BASE_URL}/api/v1/orders/check-out`;
     // get checkout details
     static readonly getCheckoutDetails = `${APIUrls.BASE_URL}/api/v1/orders/checkout-details/`;
+
+    // get all tickets
+    static readonly getAllOrdersTickets = `${APIUrls.BASE_URL}/api/v1/orders/view-tickets`;
+
     // payement init reference
     static readonly paymentInit = `${APIUrls.BASE_URL}/api/v1/orders/payment-init`;
     // init momo pay
