@@ -183,6 +183,8 @@ export default class APIUrls {
 
     // payement init reference
     static readonly paymentInit = `${APIUrls.BASE_URL}/api/v1/orders/payment-init`;
+    // card wrapper callback
+    static readonly paymentCardWrapperCallback = `${APIUrls.BASE_URL}api/v1/orders/payment-card-wrapper`;
     // init momo pay
     static readonly PAYMENT_API_URL_TEST = 'https://payment-service-development.onrender.com/'
 

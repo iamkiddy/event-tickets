@@ -16,7 +16,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { usePaystackPayment } from 'react-paystack';
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getCheckoutDetails, paymentInit, momoPayInit } from "@/lib/actions/orders";
+import { getCheckoutDetails, paymentInit, momoPayInit, paymentCardWrapper } from "@/lib/actions/orders";
 import CheckOutLoading from "../_components/CheckOutLoading";
 import InputField from "@/components/custom/InputField";
 import { MomoPayForm } from "@/lib/models/_orders_models";
@@ -55,9 +55,15 @@ export default function CheckoutPage() {
   const initializePayment = usePaystackPayment(config);
 
   // you can call this function anything
-  const onSuccess = (reference: string) => {
-    console.log(reference);
-    router.replace('/profile?tab=tickets');
+  const onSuccess = async (reference: any) => {
+    await paymentCardWrapper(reference.reference).then(() => {
+      router.replace('/profile?tab=tickets');
+    }).catch((error) => {
+      // Show specific error message if available
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
+      toast.error(errorMessage, {position: 'top-center'});
+      console.log(error)
+    });
   };
 
   // you can call this function anything
@@ -70,7 +76,7 @@ export default function CheckoutPage() {
     setMobileData(prev => ({ ...prev, [name]: value }));
   };
 
-  //payement init with reference
+  //payment init with reference
   const { mutate: initOrderPayment } = useMutation({
     mutationFn: async (reference: string) => {
       await paymentInit(orderCode, reference).catch((error)=>{

@@ -5,6 +5,7 @@ import apiController from "../apiController";
 import APIUrls from "../apiurls";
 import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById } from "../models/_orders_models";
 import { cookies } from 'next/headers';
+import { ResponseModel } from "../models/_util_models";
 
 
 // apply coupon
@@ -79,22 +80,43 @@ export const getCheckoutDetails = async (orderCode: string): Promise<CheckoutDet
 
 
 // init payment with reference
-export const paymentInit = async (orderCode: string, reference: string) => {
+export const paymentInit = async (orderCode: string, reference: string): Promise<ResponseModel> => {
     try {
         const cookieStore = await cookies();
         const token = cookieStore.get('token')?.value;
         if (!token) throw new Error('Authentication required');
-
-        await apiController({
+        const response = await apiController<ResponseModel>({
             method: 'POST',
             url: APIUrls.paymentInit,
             data: { orderCode, reference },
             token,
             contentType: 'application/json',
         });
+        return response;
     } catch (error) {
         const apiError = error as ApiError;
         const errorMessage = apiError.message || "Failed to init payment";
+        throw new Error(errorMessage);
+    }
+};
+
+// init payment with reference
+export const paymentCardWrapper = async (reference: string): Promise<ResponseModel> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+        const response = await apiController<ResponseModel>({
+            method: 'POST',
+            url: APIUrls.paymentCardWrapperCallback,
+            data: { reference },
+            token,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to callback payment";
         throw new Error(errorMessage);
     }
 };
