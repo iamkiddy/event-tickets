@@ -17,7 +17,7 @@ export const getTicketsDiscount = async (request: TicketDiscountRequest): Promis
         const response = await apiController<TicketDiscountResponse>({
             method: 'POST',
             url: APIUrls.applyDiscount,
-            data: { coupon: request.coupon },
+            data: { coupon: request.coupon, event: request.event },
             token,
             contentType: 'application/json',
         });
@@ -108,7 +108,7 @@ export const momoPayInit = async (form: MomoPayForm) => {
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY_TEST || '');
 
     const requestOptions = {
         method: "POST",
@@ -137,7 +137,7 @@ export const momoPayOTPVerify = async (reference: string, otp: string) => {
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY_TEST || '');
 
     const requestOptions = {
         method: "POST",
@@ -165,7 +165,7 @@ export const confirmMomoPay = async (reference: string) => {
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY || '');
+    myHeaders.append("api-key", process.env.NEXT_PUBLIC_PAYMENT_KEY_TEST || '');
 
     const requestOptions = {
         method: "GET",

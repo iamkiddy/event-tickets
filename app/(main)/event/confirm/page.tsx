@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 import { confirmMomoPay } from '@/lib/actions/orders';
 import { useQuery } from '@tanstack/react-query';
@@ -110,7 +111,7 @@ export default function MomoConfirmPage() {
               statusConfig.borderColor
             )}>
               <p className={cn("text-sm", statusConfig.textColor)}>
-                {data?.data.message}
+                {data?.data.message || 'Your payment has been processed successfully'} 
               </p>
             </div>
 
@@ -157,7 +158,7 @@ export default function MomoConfirmPage() {
 
             {data?.data.status === 'success' && (
               <p className="text-sm text-gray-500 mt-4">
-                A confirmation email has been sent to your inbox
+                Your order detail has been sent to your inbox
               </p>
             )}
           </div>

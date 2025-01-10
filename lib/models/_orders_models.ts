@@ -6,6 +6,7 @@ export interface TicketDiscountResponse {
 
 
 export interface TicketDiscountRequest {
+    event: string;
     coupon: string;
 }
 
