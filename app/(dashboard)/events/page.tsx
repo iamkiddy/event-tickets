@@ -15,9 +15,9 @@ const EventContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<Event[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage] = useState(1);
+  const [totalPages] = useState(1);
 
   const fetchEvents = async (params?: { search?: string; category?: string; eventType?: string }) => {
     try {
@@ -79,7 +79,7 @@ const EventContent = () => {
         initialCategory={searchParams.get('category') || ''}
         initialEventType={searchParams.get('eventType') || ''}
       />
-<DataTable 
+      <DataTable 
         columns={eventColumns}
         data={events}
         isLoading={isLoading}

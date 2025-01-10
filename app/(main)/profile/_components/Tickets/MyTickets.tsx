@@ -121,7 +121,7 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold text-gray-900">No Tickets Found</h3>
                 <p className="text-sm text-gray-600 leading-relaxed max-w-sm mx-auto">
-                  You haven't purchased any tickets yet. Browse our events to find something you'll love!
+                  You haven&apos;t purchased any tickets yet. Browse our events to find something you&apos;ll love!
                 </p>
               </div>
               <button className="inline-flex items-center gap-2 px-5 py-2 bg-primaryColor text-white text-sm rounded-full font-medium hover:bg-indigo-700 transition-colors">

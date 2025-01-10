@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -123,7 +123,7 @@ export default function FAQsPage() {
         {/* Contact Support */}
         <div className="mt-12 text-center">
           <p className="text-gray-600">
-            Can't find what you're looking for?{' '}
+            Can&apos;t find what you&apos;re looking for?{' '}
             <a href="/help" className="text-primaryColor hover:text-primaryColor/90 font-medium">
               Contact our support team
             </a>

@@ -139,7 +139,7 @@ export default function MarketingPage() {
             <div className="absolute inset-0 bg-grid-white/[0.1] -z-0" />
             <div className="relative z-10 text-center max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold text-white mb-6">
-                Ready to boost your event's visibility?
+                Ready to boost your event&apos;s visibility?
               </h2>
               <p className="text-lg text-white/90 mb-8">
                 Join thousands of event organizers who are growing their audiences with our marketing platform

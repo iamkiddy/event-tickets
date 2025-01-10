@@ -79,7 +79,7 @@ export default function RefundPage() {
             <p>
               We offer a full refund for cancellations made at least 7 days before the event date. 
               Cancellations made within 7 days of the event may be eligible for a partial refund, 
-              subject to the event organizer's policy.
+              subject to the event organizer&apos;s policy.
             </p>
 
             <h3>Refund Process</h3>
@@ -93,7 +93,7 @@ export default function RefundPage() {
             <p>
               In case of event cancellation by the organizer, all tickets will be automatically 
               refunded in full. For postponed events, tickets will remain valid for the new date, 
-              but refunds can be requested if the new date doesn't work for you.
+              but refunds can be requested if the new date doesn&apos;t work for you.
             </p>
           </div>
         </div>
