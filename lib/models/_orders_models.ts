@@ -108,3 +108,32 @@ export interface OrderData {
     totalPrice: number;
     numberOfTickets: number;
 }
+
+export interface OrderDataById {
+    qrCode: string;
+    orderCode: string;
+    eventId: string;
+    event: string;
+    eventImage: string;
+    eventDate: string;
+    eventTime: string;
+    eventEndTime: string;
+    currency: string;
+    total: number;
+    finalTotal: number;
+    isPaid: boolean;
+    isRefunded: boolean;
+    tickets: OrderTicket[];
+}
+
+export interface OrderTicket {
+    id: string;
+    ticketName: string;
+    ticketPrice: number;
+    ticketNumber: string;
+    discountType: string;
+    discountAmount: number;
+    paidAmount: number;
+    isUsed: boolean;
+    isUsedAt: string;
+}

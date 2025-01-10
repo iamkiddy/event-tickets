@@ -5,6 +5,7 @@ import { Calendar, Clock, Tag, Ticket } from 'lucide-react';
 import { format } from 'date-fns';
 import { getAllOrdersTickets } from '@/lib/actions/orders';
 import { OrderData } from '@/lib/models/_orders_models';
+import { TicketDetailsSheet } from './TicketDetailsSheet';
 
 interface MyTicketsProps {
   query: string;
@@ -15,6 +16,8 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
   const [tickets, setTickets] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<OrderData | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -32,6 +35,11 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
     fetchTickets();
   }, [query, page]);
 
+  const handleTicketClick = (ticket: OrderData) => {
+    setSelectedTicket(ticket);
+    setIsDetailsOpen(true);
+  };
+
   if (loading) {
     return <div className="w-full text-center py-8">Loading...</div>;
   }
@@ -45,7 +53,8 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
       {tickets.map((ticket) => (
         <Card 
           key={ticket.id}
-          className="group hover:shadow-xl transition-all duration-300 border-indigo-50/50 overflow-hidden bg-white/50 backdrop-blur-sm hover:bg-white"
+          className="group hover:shadow-xl transition-all duration-300 border-indigo-50/50 overflow-hidden bg-white/50 backdrop-blur-sm hover:bg-white cursor-pointer"
+          onClick={() => handleTicketClick(ticket)}
         >
           {/* Decorative Elements */}
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -125,6 +134,15 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
           </div>
         </div>
       )}
+
+      <TicketDetailsSheet
+        isOpen={isDetailsOpen}
+        onClose={() => {
+          setIsDetailsOpen(false);
+          setSelectedTicket(null);
+        }}
+        ticket={selectedTicket}
+      />
     </section>
   );
 }

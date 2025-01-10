@@ -3,7 +3,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse,  } from "../models/_orders_models";
+import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById } from "../models/_orders_models";
 import { cookies } from 'next/headers';
 
 
@@ -205,3 +205,23 @@ export const getAllOrdersTickets = async (): Promise<AllOrdersResponse> => {
     }
 
 }
+
+export const getOrdersTicketById = async (id: string): Promise<OrderDataById> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        const response = await apiController<OrderDataById>({
+            method: 'GET',
+            url: `${APIUrls.getAllOrdersTicketById}/${id}`,
+            token,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to get ticket by id";
+        throw new Error(errorMessage);
+    }
+}  

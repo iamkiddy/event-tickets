@@ -178,6 +178,9 @@ export default class APIUrls {
     // get all tickets
     static readonly getAllOrdersTickets = `${APIUrls.BASE_URL}/api/v1/orders/view-tickets`;
 
+    // get ticket by id
+    static readonly getAllOrdersTicketById = `${APIUrls.BASE_URL}/api/v1/orders/view-ticket`;
+
     // payement init reference
     static readonly paymentInit = `${APIUrls.BASE_URL}/api/v1/orders/payment-init`;
     // init momo pay
