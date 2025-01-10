@@ -1,41 +1,44 @@
-import React from 'react';
+'use client'
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Calendar, Clock, Tag, Ticket } from 'lucide-react';
 import { format } from 'date-fns';
+import { getAllOrdersTickets } from '@/lib/actions/orders';
+import { OrderData } from '@/lib/models/_orders_models';
 
 interface MyTicketsProps {
   query: string;
   page: number;
 }
 
-interface TicketItem {
-  id: string;
-  orderId: string;
-  eventName: string;
-  eventDate: string;
-  eventTime: string;
-  quantity: number;
-  price: number;
-  currency: string;
-  status: 'active' | 'used' | 'expired';
-}
-
 export default function MyTickets({ query, page }: MyTicketsProps) {
-  // Mock data - replace with actual API call
-  const tickets: TicketItem[] = [
-    {
-      id: '1',
-      orderId: 'ORD-2024-001',
-      eventName: 'Summer Music Festival 2024',
-      eventDate: '2024-07-15',
-      eventTime: '18:00',
-      quantity: 2,
-      price: 150,
-      currency: 'GHS',
-      status: 'active'
-    },
-    // Add more mock tickets as needed
-  ];
+  const [tickets, setTickets] = useState<OrderData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllOrdersTickets();
+        setTickets(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch tickets');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTickets();
+  }, [query, page]);
+
+  if (loading) {
+    return <div className="w-full text-center py-8">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="w-full text-center py-8 text-red-500">{error}</div>;
+  }
 
   return (
     <section className='w-full flex flex-col gap-6 mt-5'>
@@ -56,7 +59,7 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
                 <div className="space-y-2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-primaryColor text-xs">
                     <Tag className="w-3 h-3" />
-                    <span>#{ticket.orderId}</span>
+                    <span>#{ticket.orderCode}</span>
                   </div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-primaryColor transition-colors">
                     {ticket.eventName}
@@ -84,10 +87,10 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
               <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-xs text-primaryColor">
                   <Ticket className="w-3 h-3" />
-                  <span>×{ticket.quantity}</span>
+                  <span>×{ticket.numberOfTickets}</span>
                 </div>
                 <div className="text-sm sm:text-base font-bold text-gray-900">
-                  {ticket.currency} {(ticket.price * ticket.quantity).toFixed(2)}
+                  GHS {ticket.totalPrice.toFixed(2)}
                 </div>
               </div>
             </div>

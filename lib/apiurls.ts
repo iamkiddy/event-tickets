@@ -182,7 +182,9 @@ export default class APIUrls {
     static readonly paymentInit = `${APIUrls.BASE_URL}/api/v1/orders/payment-init`;
     // init momo pay
     static readonly PAYMENT_API_URL_TEST = 'https://payment-service-development.onrender.com/'
+
     static readonly PAYMENT_API_URL_PROD = 'https://payment-service-dxnw.onrender.com/'
+    
     static readonly initMomoPay = `${APIUrls.PAYMENT_API_URL_TEST}api/v1/payment/momo-pay`;
     // momo otp code
     static readonly momoOTPCode = `${APIUrls.PAYMENT_API_URL_TEST}api/v1/payment/confirm-otp`;

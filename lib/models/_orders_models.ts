@@ -89,3 +89,22 @@ export interface MomoConfirmResponseData {
     status:       string;
     message:      string;
 }
+
+
+// all orders response
+export interface AllOrdersResponse {
+    page: number;
+    total: number;
+    limit: number;
+    data: OrderData[];
+}
+
+export interface OrderData {
+    id: string;
+    eventName: string;
+    eventDate: string;
+    eventTime: string;
+    orderCode: string;
+    totalPrice: number;
+    numberOfTickets: number;
+}

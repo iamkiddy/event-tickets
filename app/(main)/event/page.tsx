@@ -2,13 +2,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Tag, Layout, Dice3 } from 'lucide-react';
+import { Tag, Layout, Dice3, Calendar, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar';
 import { getAllMainEvents } from '@/lib/actions/mainEvent';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useQuery } from '@tanstack/react-query';
 import HeroSection from './_components/HeroSection';
+
 import EventFilterCard, { EventFilterList } from './_components/EventFilter';
 import { getCategoryUtils,getEventTypeUtils } from '@/lib/actions/main';
 import { eventFilterTime } from '@/lib/constants';
@@ -16,7 +17,16 @@ import { EventCard } from '../codepass/components/EventCard';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EventCardSkeleton } from '../codepass/components/skeletons';
+import { getBannerUtils } from '@/lib/actions/main';
+import { GetBannerUtilsResponse } from '@/lib/models/_main_models';
+import Link from 'next/link';
 
+// Add banner type definition
+interface BannerData {
+  id: string;
+  image: string;
+  title: string;
+}
 
 export default function EventsPage() {
   const { isAuthenticated } = useAuth();
@@ -50,6 +60,11 @@ export default function EventsPage() {
     queryFn: getEventTypeUtils,
   });
 
+  // Update the banner query to use the correct type
+  const { data: bannerData } = useQuery<GetBannerUtilsResponse[]>({
+    queryKey: ['banner'],
+    queryFn: getBannerUtils,
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,6 +88,67 @@ export default function EventsPage() {
       {/* Hero Section with Search */}
       <HeroSection/>
       
+      {/* Banner Section */}
+      {bannerData && bannerData[0] && (
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 mb-4 sm:mb-6 lg:mb-8">
+          <Link 
+            href={`/event/${bannerData[0].id}`}
+            className="block transition-transform hover:scale-[1.01] duration-300"
+          >
+            <div 
+              className="relative h-[200px] sm:h-[300px] lg:h-[400px] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100"
+            >
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
+                style={{
+                  backgroundImage: `url(${bannerData[0].image})`,
+                }}
+              />
+              
+              {/* Gradient Overlays - Enhanced for better text visibility */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+
+              {/* Content Container */}
+              <div className="relative h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
+                {/* Featured Tag */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="px-3 py-1 bg-primaryColor rounded-full">
+                    <span className="text-xs sm:text-sm font-medium text-white">
+                      Featured Event
+                    </span>
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 
+                  line-clamp-2">
+                  {bannerData[0].title}
+                </h2>
+
+                {/* Call to Action */}
+                <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                    View Event Details
+                  </span>
+                  <span className="text-white/60">•</span>
+                  <span className="inline-flex items-center text-primaryColor font-medium group">
+                    Book Now
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+
+              {/* Hover Effect Overlay */}
+              <div className="absolute inset-0 bg-primaryColor/10 opacity-0 hover:opacity-100 
+                transition-opacity duration-300" />
+            </div>
+          </Link>
+        </div>
+      )}
+
       {(isMainLoading && isLoading ) ? (
         <>
           {/* Enhanced Filters Section Skeleton */}
