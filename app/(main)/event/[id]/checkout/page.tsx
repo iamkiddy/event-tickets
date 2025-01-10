@@ -16,7 +16,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { usePaystackPayment } from 'react-paystack';
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getCheckoutDetails, momoPayInit } from "@/lib/actions/orders";
+import { getCheckoutDetails, paymentInit, momoPayInit } from "@/lib/actions/orders";
 import CheckOutLoading from "../_components/CheckOutLoading";
 import InputField from "@/components/custom/InputField";
 import { MomoPayForm } from "@/lib/models/_orders_models";
@@ -40,7 +40,7 @@ export default function CheckoutPage() {
   // get checkout details
   const { data, isLoading } = useQuery({
     queryKey: ['checkout-details', orderCode],
-    queryFn: async () => await getCheckoutDetails(orderCode),
+    queryFn: async () => await getCheckoutDetails(orderCode)
   });
 
   // Initialize Paystack with config after total is calculated
@@ -56,20 +56,31 @@ export default function CheckoutPage() {
 
   // you can call this function anything
   const onSuccess = (reference: string) => {
-    // Implementation for whatever you want to do when the Paystack dialog closed
     console.log(reference);
+    router.replace('/profile?tab=tickets');
   };
 
   // you can call this function anything
   const onClose = () => {
-    // implementation for  whatever you want to do when the Paystack dialog closed.
-    console.log('closed')
+    toast.error('Payment Cancelled', {position: 'top-center'});
   }
 
   const handleMobileInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setMobileData(prev => ({ ...prev, [name]: value }));
   };
+
+  //payement init with reference
+  const { mutate: initOrderPayment } = useMutation({
+    mutationFn: async (reference: string) => {
+      await paymentInit(orderCode, reference).catch((error)=>{
+        // Show specific error message if available
+        const errorMessage = error instanceof Error ? error.message : 'Failed to process init. Please try again.';
+        toast.error(errorMessage, {position: 'top-center'});
+        console.log(error)
+      });
+    }
+  });
 
   // Handle Momo Payment Submission
   const { mutate: handleMomoSubmit, isPending} = useMutation({
@@ -85,11 +96,12 @@ export default function CheckoutPage() {
       };
       try{
         const response = await momoPayInit(momoData);
-        console.log(response)
         if (response.data.status === 'send_otp') {
+          initOrderPayment(response.data.reference)
           setShowOtp(true);
           setReference(response.data.reference)
         } else if (response.data.status !== 'send_otp') {
+          initOrderPayment(response.data.reference)
           toast.success('Payment Init successful', {position: 'top-center'});
           router.replace(`/event/confirm?reference=${response.data.reference}`);
         } else {
@@ -391,7 +403,10 @@ export default function CheckoutPage() {
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
                         hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-indigo-200/50
                         flex items-center justify-center gap-2"
-                      onClick={() => initializePayment({onSuccess, onClose})}
+                      onClick={() => {
+                        initOrderPayment(orderCode)
+                        initializePayment({onSuccess, onClose})
+                      }}
                     >
                       <CreditCard className="w-5 h-5" />
                       Pay {data?.currency ?? ''} {(data?.total ?? 0).toFixed(2)}

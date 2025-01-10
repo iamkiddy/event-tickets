@@ -78,6 +78,27 @@ export const getCheckoutDetails = async (orderCode: string): Promise<CheckoutDet
 };
 
 
+// init payment with reference
+export const paymentInit = async (orderCode: string, reference: string) => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        await apiController({
+            method: 'POST',
+            url: APIUrls.paymentInit,
+            data: { orderCode, reference },
+            token,
+            contentType: 'application/json',
+        });
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to init payment";
+        throw new Error(errorMessage);
+    }
+};
+
 
 // init momo pay
 export const momoPayInit = async (form: MomoPayForm) => {
