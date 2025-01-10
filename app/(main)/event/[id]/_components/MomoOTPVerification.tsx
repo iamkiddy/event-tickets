@@ -1,4 +1,5 @@
-import { momoPayVerify } from '@/lib/actions/orders';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { momoPayOTPVerify } from '@/lib/actions/orders';
 import {
     InputOTP,
     InputOTPGroup,
@@ -24,9 +25,11 @@ export default function MomoOTPVerification({open, openChange, reference}: MomoO
     const [otp, setOtp] = React.useState('');
 
     const {mutate, isPending} = useMutation({
-        onMutate: async () => {
+        onMutate: async (e: any) => {
+          e.preventDefault();
             try {
-                const response = await momoPayVerify(reference, otp);
+                const response = await momoPayOTPVerify(reference, otp);
+                console.log(response)
                 if (response.status) {
                     toast.success('Payment Init successful', {position: 'top-center'});
                     openChange(false);
@@ -66,7 +69,7 @@ export default function MomoOTPVerification({open, openChange, reference}: MomoO
           </Button>
         </div>
 
-        <form onSubmit={()=>mutate()} className="space-y-4">
+        <form onSubmit={(e)=>mutate(e)} className="space-y-4">
           <InputOTP maxLength={6} 
             className="w-full"
             onChange={(value) => setOtp(value)}

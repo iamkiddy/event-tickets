@@ -130,7 +130,7 @@ export const momoPayInit = async (form: MomoPayForm) => {
 
 
 // momo pay verification
-export const momoPayVerify = async (reference: string, otp: string) => {
+export const momoPayOTPVerify = async (reference: string, otp: string) => {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     if (!token) throw new Error('Authentication required');
