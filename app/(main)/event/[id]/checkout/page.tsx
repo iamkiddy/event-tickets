@@ -58,6 +58,11 @@ export default function CheckoutPage() {
   const onSuccess = async (reference: any) => {
     await paymentCardWrapper(reference.reference).then(() => {
       router.replace('/profile?tab=tickets');
+    }).catch((error) => {
+      // Show specific error message if available
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
+      toast.error(errorMessage, {position: 'top-center'});
+      console.log(error)
     });
   };
 
