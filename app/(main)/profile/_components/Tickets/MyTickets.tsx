@@ -81,13 +81,12 @@ export default function MyTickets({ query, page }: MyTicketsProps) {
                     <div className="p-1.5 rounded-full bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
                       <Calendar className="w-3 h-3 text-primaryColor" />
                     </div>
-                    <span>{format(new Date(ticket.eventDate), 'PPP')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-full bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
-                      <Clock className="w-3 h-3 text-primaryColor" />
-                    </div>
-                    <span>{ticket.eventTime}</span>
+                    <span>
+                      {format(
+                        new Date(`${ticket.eventDate} ${ticket.eventTime}`),
+                        'EEEE dd MMMM yyyy h:mm a'
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
