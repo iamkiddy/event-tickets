@@ -1,13 +1,14 @@
 'use client';
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Calendar, Clock,  Ticket, CheckCircle, XCircle, CreditCard } from 'lucide-react';
+import { Calendar, Clock,  Ticket, CheckCircle, XCircle, CreditCard, Eye } from 'lucide-react';
 import { OrderData, OrderDataById } from '@/lib/models/_orders_models';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { getOrdersTicketById } from '@/lib/actions/orders';
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from 'next/image';
 
 interface TicketDetailsSheetProps {
   isOpen: boolean;
@@ -79,7 +80,24 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              {/* Payment Status Banner */}
+              {/* Event Image and Basic Info */}
+              <div className="relative w-full h-48 rounded-xl overflow-hidden">
+                <Image
+                  src={detailedTicket.eventImage}
+                  alt={detailedTicket.event}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-lg font-semibold text-white">{detailedTicket.event}</h3>
+                  <div className="text-white/80 text-sm">
+                    <span>Order #{detailedTicket.orderCode}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Status */}
               <div className={`p-4 rounded-xl flex items-center justify-between ${
                 detailedTicket.isPaid 
                   ? 'bg-green-50 border border-green-100' 
@@ -95,44 +113,43 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
                     }`}>
                       {detailedTicket.isPaid ? 'Payment Completed' : 'Payment Pending'}
                     </p>
-                    <p className="text-sm text-gray-600">
-                      Order #{detailedTicket.orderCode}
-                    </p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-gray-600">Total: {detailedTicket.currency} {detailedTicket.total.toFixed(2)}</span>
+                      {detailedTicket.total !== detailedTicket.finalTotal && (
+                        <>
+                          <span className="text-gray-400">→</span>
+                          <span className="text-green-600 font-medium">
+                            Final: {detailedTicket.currency} {detailedTicket.finalTotal.toFixed(2)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">
-                    {detailedTicket.currency} {detailedTicket.finalTotal.toFixed(2)}
-                  </p>
-                  {detailedTicket.isRefunded && (
+                {detailedTicket.isRefunded && (
+                  <div className="px-3 py-1 bg-red-50 rounded-full">
                     <span className="text-xs font-medium text-red-600">Refunded</span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
-              {/* Event Details */}
-              <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-                <h3 className="text-xl font-bold text-gray-900">{detailedTicket.event}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-indigo-50">
-                      <Calendar className="w-4 h-4 text-primaryColor" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Date</p>
-                      <p className="font-medium">
-                        {format(new Date(detailedTicket.eventDate), 'PPP')}
-                      </p>
-                    </div>
+              {/* Event Date and Time */}
+              <div className="bg-white rounded-xl border border-gray-100 p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-50">
+                    <Calendar className="w-4 h-4 text-primaryColor" />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-indigo-50">
-                      <Clock className="w-4 h-4 text-primaryColor" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Time</p>
-                      <p className="font-medium">{detailedTicket.eventTime}</p>
-                    </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Event Schedule</p>
+                    <p className="font-medium">
+                      {format(new Date(`${detailedTicket.eventDate} ${detailedTicket.eventTime}`), 
+                        'EEEE, MMMM d, yyyy')}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {format(new Date(`${detailedTicket.eventDate} ${detailedTicket.eventTime}`), 'h:mm a')} 
+                      {' - '}
+                      {format(new Date(`${detailedTicket.eventDate} ${detailedTicket.eventEndTime}`), 'h:mm a')}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -147,34 +164,58 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
                   >
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-lg bg-indigo-50">
-                          <Ticket className="w-5 h-5 text-primaryColor" />
+                    <div className="flex flex-col gap-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            ticketItem.isUsed ? 'bg-green-50' : 'bg-indigo-50'
+                          }`}>
+                            <Ticket className={`w-5 h-5 ${
+                              ticketItem.isUsed ? 'text-green-600' : 'text-primaryColor'
+                            }`} />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="font-medium text-gray-900">{ticketItem.ticketName}</p>
+                            <p className="text-sm text-gray-500">#{ticketItem.ticketNumber}</p>
+                            <p className="text-sm text-gray-500">
+                              Original Price: {detailedTicket.currency} {ticketItem.ticketPrice.toFixed(2)}
+                            </p>
+                            {ticketItem.isUsed ? (
+                              <div className="flex items-center gap-1.5 text-xs text-green-600">
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                <span>Used on {format(new Date(ticketItem.isUsedAt), 'PPp')}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 text-xs text-blue-600">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>Not used yet</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <p className="font-medium text-gray-900">{ticketItem.ticketName}</p>
-                          <p className="text-sm text-gray-500">#{ticketItem.ticketNumber}</p>
-                          {ticketItem.isUsed && (
-                            <div className="flex items-center gap-1.5 text-xs text-green-600">
-                              <CheckCircle className="w-3.5 h-3.5" />
-                              <span>Used on {format(new Date(ticketItem.isUsedAt), 'PPp')}</span>
-                            </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900">
+                            {detailedTicket.currency} {ticketItem.paidAmount.toFixed(2)}
+                          </p>
+                          {ticketItem.discountAmount > 0 && (
+                            <p className="text-xs font-medium text-green-600">
+                              {ticketItem.discountType === 'percentage' 
+                                ? `${ticketItem.discountAmount}% off`
+                                : `${detailedTicket.currency} ${ticketItem.discountAmount} off`}
+                            </p>
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-900">
-                          {detailedTicket.currency} {ticketItem.paidAmount.toFixed(2)}
-                        </p>
-                        {ticketItem.discountAmount > 0 && (
-                          <p className="text-xs font-medium text-green-600">
-                            {ticketItem.discountType === 'percentage' 
-                              ? `${ticketItem.discountAmount}% off`
-                              : `${detailedTicket.currency} ${ticketItem.discountAmount} off`}
-                          </p>
-                        )}
-                      </div>
+                      
+                      <button
+                        onClick={() => window.open(`/ticket/${ticketItem.id}`, '_blank')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 
+                          bg-indigo-50 rounded-lg text-sm font-medium text-primaryColor
+                          hover:bg-indigo-100 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Ticket Details
+                      </button>
                     </div>
                   </motion.div>
                 ))}
