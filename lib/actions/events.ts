@@ -10,7 +10,8 @@ import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesR
    UpdateEventTicketPromotionRequest, DeleteEventTicketPromotionResponse, getTicketsByIdResponse,
   getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,
   GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse,
-  DeleteEventResponse
+  DeleteEventResponse,UpdateEventResponse,
+  UpdateEvent
 } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
@@ -91,6 +92,26 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
 
     // For other errors
     throw new Error(error.message || 'An unexpected error occurred');
+  }
+};
+
+export const updateEvent = async (data: UpdateEvent): Promise<UpdateEventResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<UpdateEventResponse>({
+      method: 'PUT',
+      url: APIUrls.updateEvent,
+      data,
+      token,
+      contentType: 'application/json',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error updating event:', error);
+    throw new Error('Failed to update event');
   }
 };
 

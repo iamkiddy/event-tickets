@@ -397,3 +397,26 @@ export interface DeleteEventImageResponse {
 export interface DeleteEventVideoResponse {
     message: string;
 }
+
+export interface UpdateEventResponse {
+    message: string;
+}
+
+export interface UpdateEvent {
+    title: string;
+    summary: string;
+    overview: string;
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    totalCapacity: number;
+    tags: string[];
+    locationType: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+}
