@@ -3,7 +3,7 @@
 
 import { useParams } from 'next/navigation';
 import { EventForm } from '@/app/(dashboard)/events/[id]/_components/eventForm';
-import { updateEventFAQ, updateEventAgenda, getEventById } from '@/lib/actions/events';
+import { updateEventFAQ, updateEventAgenda, getEventById, updateEvent } from '@/lib/actions/events';
 import { toast } from 'sonner';
 import { Check, Image as ImageIcon, Info, Tag, Users, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import { TicketList } from './_components/TicketList';
 import { PublishingList } from './_components/PublishingList';
 import { DashboardOverview } from './_components/DashboardOverview';
 import { OrderList } from './_components/OrderList';
+import { useRouter } from 'next/navigation';
 
 interface StepProps {
   icon: React.ElementType;
@@ -69,6 +70,7 @@ export default function EditEventPage() {
   const [event, setEvent] = useState<GetEventByIdResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeForm, setActiveForm] = useState<ActiveForm>('tickets');
+  const router = useRouter();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -88,6 +90,31 @@ export default function EditEventPage() {
 
   const handleSubmit = async (data: any) => {
     try {
+      setIsLoading(true);
+      
+      // First update the main event data
+      const eventUpdateData = {
+        title: data.title,
+        summary: data.summary,
+        overview: data.overview,
+        startDate: data.startDate,
+        startTime: data.startTime,
+        endDate: data.endDate,
+        endTime: data.endTime,
+        totalCapacity: data.totalCapacity,
+        tags: data.tags,
+        locationType: data.locationType,
+        address1: data.address1,
+        address2: data.address2,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        postalCode: data.postalCode,
+      };
+
+      // Update the main event
+      await updateEvent(eventId, eventUpdateData);
+
       // Update FAQs
       if (data.eventFAQ && data.eventFAQ.length > 0) {
         const faqPromises = data.eventFAQ.map((faq: any) => 
@@ -118,9 +145,12 @@ export default function EditEventPage() {
       }
 
       toast.success('Event updated successfully');
+      router.refresh(); // Refresh the page to show updated data
     } catch (error: any) {
       toast.error(error.message || 'Failed to update event');
       console.error('Error updating event:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

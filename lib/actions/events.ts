@@ -95,7 +95,7 @@ export const createEvent = async (data: CreateEvent): Promise<CreateEventRespons
   }
 };
 
-export const updateEvent = async (data: UpdateEvent): Promise<UpdateEventResponse> => {
+export const updateEvent = async (eventId: string, data: UpdateEvent): Promise<UpdateEventResponse> => {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -103,15 +103,18 @@ export const updateEvent = async (data: UpdateEvent): Promise<UpdateEventRespons
 
     const response = await apiController<UpdateEventResponse>({
       method: 'PUT',
-      url: APIUrls.updateEvent,
-      data,
+      url: `${APIUrls.updateEvent}/${eventId}`,
       token,
+      data,
       contentType: 'application/json',
     });
+
     return response;
   } catch (error) {
     console.error('Error updating event:', error);
-    throw new Error('Failed to update event');
+    const apiError = error as ApiError;
+    const errorMessage = apiError.message || "Failed to update event";
+    throw new Error(errorMessage);
   }
 };
 
