@@ -55,16 +55,18 @@ export default function CheckoutPage() {
   const initializePayment = usePaystackPayment(config);
 
   // you can call this function anything
-  const onSuccess = async (reference: any) => {
-    await paymentCardWrapper(reference.reference).then(() => {
-      router.replace('/profile?tab=tickets');
-    }).catch((error) => {
-      // Show specific error message if available
-      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
-      toast.error(errorMessage, {position: 'top-center'});
-      console.log(error)
-    });
-  };
+  const { mutate: onSuccess, isPending: cardLoading} = useMutation({
+    mutationFn: async (reference: any) => {
+      await paymentCardWrapper(reference.reference).then(() => {
+        toast.success('Payment successful', {position: 'top-center'});
+        router.replace('/profile?tab=tickets');
+      }).catch((error)=>{
+        // Show specific error message if available
+        const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
+        toast.error(errorMessage, {position: 'top-center'});
+      });
+    }
+  });
 
   // you can call this function anything
   const onClose = () => {
@@ -79,7 +81,10 @@ export default function CheckoutPage() {
   //payment init with reference
   const { mutate: initOrderPayment } = useMutation({
     mutationFn: async (reference: string) => {
-      await paymentInit(orderCode, reference).catch((error)=>{
+      await paymentInit(orderCode, reference).then(() => {
+        toast.success('Payment Init successful', {position: 'top-center'});
+      })
+      .catch((error)=>{
         // Show specific error message if available
         const errorMessage = error instanceof Error ? error.message : 'Failed to process init. Please try again.';
         toast.error(errorMessage, {position: 'top-center'});
@@ -405,9 +410,13 @@ export default function CheckoutPage() {
 
                   {/* Submit Button */}
                   {selectedPaymentMethod !== 'mobile' ? (
-                    <motion.button disabled={isPending} type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                    <motion.button 
+                      disabled={isPending || cardLoading} 
+                      type="submit" 
+                      whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
-                        hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-indigo-200/50
+                        hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] 
+                        shadow-lg hover:shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed
                         flex items-center justify-center gap-2"
                       onClick={() => {
                         initOrderPayment(orderCode)
@@ -415,12 +424,16 @@ export default function CheckoutPage() {
                       }}
                     >
                       <CreditCard className="w-5 h-5" />
-                      Pay {data?.currency ?? ''} {(data?.total ?? 0).toFixed(2)}
+                      {(isPending || cardLoading) ? (
+                        <span className="opacity-50">Processing...</span>
+                      ) : (
+                        `Pay ${data?.currency ?? ''} ${(data?.total ?? 0).toFixed(2)}`
+                      )}
                     </motion.button>
                   ): (
                     <motion.button 
                       type="submit" 
-                      disabled={isPending} 
+                      disabled={isPending || cardLoading} 
                       whileHover={{ scale: 1.01 }} 
                       whileTap={{ scale: 0.98 }}
                       className="w-full bg-primaryColor text-white font-medium rounded-xl h-14
@@ -430,7 +443,7 @@ export default function CheckoutPage() {
                       onClick={() => handleMomoSubmit()}
                     >
                       <Shield className="w-5 h-5" />
-                      {isPending ? (
+                      {(isPending || cardLoading) ? (
                         <span className="opacity-50">Processing...</span>
                       ) : (
                         `Pay ${data?.currency ?? ''} ${(data?.total ?? 0).toFixed(2)}`

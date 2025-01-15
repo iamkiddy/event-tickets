@@ -85,6 +85,7 @@ export const paymentInit = async (orderCode: string, reference: string): Promise
         const cookieStore = await cookies();
         const token = cookieStore.get('token')?.value;
         if (!token) throw new Error('Authentication required');
+
         const response = await apiController<ResponseModel>({
             method: 'POST',
             url: APIUrls.paymentInit,
@@ -108,10 +109,8 @@ export const paymentCardWrapper = async (reference: string): Promise<ResponseMod
         if (!token) throw new Error('Authentication required');
         const response = await apiController<ResponseModel>({
             method: 'POST',
-            url: APIUrls.paymentCardWrapperCallback,
-            data: { reference },
+            url: `${APIUrls.paymentCardWrapperCallback}${reference}`,
             token,
-            contentType: 'application/json',
         });
         return response;
     } catch (error) {
