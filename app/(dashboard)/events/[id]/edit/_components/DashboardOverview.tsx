@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -12,19 +12,23 @@ import {
   ArrowDownRight,
   CheckCircle,
   ShieldCheck,
-  BanknoteIcon
+  BanknoteIcon,
+  Loader2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getDashboardOrders } from '@/lib/actions/events';
+import { toast } from 'sonner';
 
 interface DashboardStats {
+  totalOrders: number;
   totalSales: number;
-  ticketsSold: number;
+  ticketSold: number;
   totalViews: number;
-  revenue: number;
+  recentWithdraw: [];
 }
 
 interface DashboardOverviewProps {
-  initialStats?: DashboardStats;
+  eventId: string;
 }
 
 interface ActivityItemProps {
@@ -33,59 +37,68 @@ interface ActivityItemProps {
   time: string;
 }
 
-export function DashboardOverview({ initialStats }: DashboardOverviewProps) {
-  const [stats] = useState<DashboardStats>(initialStats || {
-    totalSales: 0,
-    ticketsSold: 0,
-    totalViews: 0,  
-    revenue: 0
-  });
-
+export function DashboardOverview({ eventId }: DashboardOverviewProps) {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const statsCards = [
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        if (!eventId) {
+          throw new Error('Event ID is required');
+        }
+        const response = await getDashboardOrders(eventId);
+        setStats(response);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to load dashboard data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [eventId]);
+
+  const statsCards = stats ? [
     {
-      title: 'Total Sales',
-      value: stats.totalSales,
+      title: 'Total Orders',
+      value: stats.totalOrders,
       icon: DollarSign,
-      change: 12.5,
-      trend: 'up',
-      description: 'Total sales this month'
+      trend: 'up'
     },
     {
       title: 'Tickets Sold',
-      value: stats.ticketsSold,
+      value: stats.ticketSold,
       icon: Ticket,
-      change: 8.2,
-      trend: 'up',
-      description: 'Tickets sold this month'
+      trend: 'up'
     },
     {
       title: 'Total Views',
       value: stats.totalViews,
       icon: Users,
-      change: -2.4,
-      trend: 'down',
-      description: 'Page views this month'
+      trend: 'down'
     },
     {
-      title: 'Revenue',
-      value: `$${stats.revenue.toLocaleString()}`,
+      title: 'Total Sales',
+      value: `$${stats.totalSales.toLocaleString()}`,
       icon: TrendingUp,
-      change: 15.3,
-      trend: 'up',
-      description: 'Revenue this month'
+      trend: 'up'
     }
-  ];
+  ] : [];
 
-  const handleVerifyEvent = async () => {
-    try {
-      // TODO: Implement event verification 
-      console.log('Verifying event');
-      // Add API call here
-    } catch (error) {
-      console.error('Error verifying event:', error);
-    }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primaryColor" />
+      </div>
+    );
+  }
+
+  const handleVerifyEvent = () => {
+    router.push(`/events/${eventId}/edit/verify`);
   };
 
   const event = {
@@ -137,25 +150,24 @@ export function DashboardOverview({ initialStats }: DashboardOverviewProps) {
           const TrendIcon = isPositive ? ArrowUpRight : ArrowDownRight;
           
           return (
-            <Card key={stat.title} className="relative overflow-hidden">
+            <Card 
+              key={stat.title} 
+              className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-2 bg-indigo-50 rounded-lg">
-                    <Icon className="w-5 h-5 text-primaryColor" />
-                  </div>
-                  <div className={`flex items-center gap-1 text-sm font-medium ${
-                    isPositive ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    <TrendIcon className="w-4 h-4" />
-                    {Math.abs(stat.change)}%
+                  <div className="p-3 bg-indigo-50 rounded-xl transition-colors duration-200 hover:bg-indigo-100">
+                    <Icon className="w-6 h-6 text-primaryColor" />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-medium text-gray-500">{stat.title}</h3>
-                  <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                  <p className="text-xs text-gray-500">{stat.description}</p>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-600">{stat.title}</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
               </div>
+              <div className={`absolute bottom-0 left-0 h-1 w-full ${
+                isPositive ? 'bg-green-500' : 'bg-red-500'
+              }`} />
             </Card>
           );
         })}
@@ -169,24 +181,20 @@ export function DashboardOverview({ initialStats }: DashboardOverviewProps) {
               <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
               <p className="text-sm text-gray-500">Latest updates and transactions</p>
             </div>
-            <Button variant="outline" size="sm">View All</Button>
           </div>
           <div className="space-y-4">
-            <ActivityItem
-              title="New Order"
-              description="John Doe purchased 2 VIP tickets"
-              time="5 minutes ago"
-            />
-            <ActivityItem
-              title="Ticket Update"
-              description="Early Bird tickets are now sold out"
-              time="2 hours ago"
-            />
-            <ActivityItem
-              title="Event View"
-              description="Your event was viewed 50 times today"
-              time="5 hours ago"
-            />
+            {stats?.recentWithdraw.length ? (
+              stats.recentWithdraw.map((activity, index) => (
+                <ActivityItem
+                  key={index}
+                  title="Withdrawal"
+                  description={`Withdrawal processed`}
+                  time="Just now"
+                />
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+            )}
           </div>
         </div>
       </Card>

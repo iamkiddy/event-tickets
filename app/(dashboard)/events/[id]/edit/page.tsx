@@ -257,7 +257,7 @@ export default function EditEventPage() {
             
             <div className="space-y-4 lg:space-y-8">
               {activeForm === 'dashboard' ? (
-                <DashboardOverview />
+                <DashboardOverview eventId={eventId} />
               ) : activeForm === 'orders' ? (
                 <OrderList />
               ) : activeForm === 'publishing' ? (

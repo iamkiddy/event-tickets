@@ -420,3 +420,28 @@ export interface UpdateEvent {
     country: string;
     postalCode: string;
 }
+
+
+export interface DashboardResponse {
+  totalOrders: number;
+  totalSales: number;
+  ticketSold: number;
+  totalViews: number;
+  recentWithdraw: [];
+}
+
+
+export interface GetEventOrdersResponse {
+  page: number;
+  total: number;
+  limit: number;
+  data: {
+    id: string;
+    orderCode: string;
+    status: string;
+    totalAmount: number;
+    totalQuantity: number;
+    orderDate: string;
+    customerName: string;
+  }[];
+}

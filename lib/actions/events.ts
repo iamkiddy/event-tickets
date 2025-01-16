@@ -11,7 +11,7 @@ import { AllEventsResponse, CreateEvent, CreateEventResponse, UpdateEventImagesR
   getEventTicketPromotionByIdResponse, GetEventFinalStage,PublishEventRequest,PublishEventResponse,
   GetOrganizerUtils ,GetEventUtils,DeleteEventImageResponse,DeleteEventVideoResponse,
   DeleteEventResponse,UpdateEventResponse,
-  UpdateEvent
+  UpdateEvent, DashboardResponse, GetEventOrdersResponse
 } from '../models/_events_models';
 import apiController from '../apiController';
 import APIUrls from '../apiurls';
@@ -791,4 +791,76 @@ export const getEventsUtils = async (): Promise<GetEventUtils> => {
     throw new Error(errorMessage);
   }
 
+}
+
+
+export const getDashboardOrders = async (eventId: string): Promise<DashboardResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<DashboardResponse>({
+      method: 'GET',
+      url: `${APIUrls.getDashboardOrders}/${eventId}`,
+      token,
+      contentType: 'application/json',
+    });
+
+    // Validate response data
+    if (!response || typeof response !== 'object') {
+      throw new Error('Invalid response format');
+    }
+
+    return {
+      totalOrders: response.totalOrders || 0,
+      totalSales: response.totalSales || 0,
+      ticketSold: response.ticketSold || 0,
+      totalViews: response.totalViews || 0,
+      recentWithdraw: response.recentWithdraw || []
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard orders:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch dashboard orders: ${error.message}`);
+    }
+    throw new Error('Failed to fetch dashboard orders');
+  }
+}
+
+export const getEventOrders = async (eventId: string, page = 1): Promise<GetEventOrdersResponse> => {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) throw new Error('Authentication required');
+
+    const response = await apiController<GetEventOrdersResponse>({
+      method: 'GET',
+      url: `${APIUrls.getEventOrders}/${eventId}?page=${page}`,
+      token,
+      contentType: 'application/json',
+    });
+
+    // Validate response structure
+    if (!response || typeof response !== 'object') {
+      throw new Error('Invalid response format');
+    }
+
+    // Ensure the response matches expected structure
+    return {
+      page: response.page || 1,
+      total: response.total || 0,
+      limit: response.limit || 10,
+      data: Array.isArray(response.data) ? response.data : []
+    };
+  } catch (error) {
+    console.error('Error fetching event orders:', error);
+    // Return a valid empty response instead of throwing
+    return {
+      page: 1,
+      total: 0,
+      limit: 10,
+      data: []
+    };
+  }
 }

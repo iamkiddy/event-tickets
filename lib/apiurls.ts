@@ -198,4 +198,11 @@ export default class APIUrls {
     static readonly momoOTPCode = `${APIUrls.PAYMENT_API_URL_TEST}api/v1/payment/confirm-otp`;
     // confirm momo payment
     static readonly confirmMomoPayment = `${APIUrls.PAYMENT_API_URL_TEST}api/v1/payment/confirm-payment?reference=`;
+
+    // get dashboard orders
+    static readonly getDashboardOrders = `${APIUrls.BASE_URL_ORG}/api/v1/orders/dashboard`;
+
+    // get event orders
+    static readonly getEventOrders = `${APIUrls.BASE_URL_ORG}/api/v1/orders`;
+
 }
