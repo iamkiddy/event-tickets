@@ -10,7 +10,14 @@ interface OrderListProps {
   eventId: string;
 }
 
-
+interface Order {
+  orderCode: string;
+  customerName: string;
+  totalQuantity: number;
+  totalAmount: number;
+  status: string;
+  orderDate: string;
+}
 
 export function OrderList({ eventId }: OrderListProps) {
   const [orders, setOrders] = useState<GetEventOrdersResponse['data']>([]);
@@ -51,7 +58,7 @@ export function OrderList({ eventId }: OrderListProps) {
     }
   };
 
-  const columns: ColumnDef<any, any>[] = [
+  const columns: ColumnDef<Order>[] = [
     {
       header: "Order Code",
       accessorKey: "orderCode",

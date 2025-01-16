@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function VerifyPage({ params }: { params: { id: string } }) {
+export default function VerifyPage() {
   const [ticketCode, setTicketCode] = useState('');
   const router = useRouter();
 

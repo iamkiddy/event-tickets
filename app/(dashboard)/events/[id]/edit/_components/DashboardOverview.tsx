@@ -8,8 +8,6 @@ import {
   DollarSign, 
   Users, 
   TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
   CheckCircle,
   ShieldCheck,
   BanknoteIcon,
@@ -147,7 +145,6 @@ export function DashboardOverview({ eventId }: DashboardOverviewProps) {
         {statsCards.map((stat) => {
           const Icon = stat.icon;
           const isPositive = stat.trend === 'up';
-          const TrendIcon = isPositive ? ArrowUpRight : ArrowDownRight;
           
           return (
             <Card 

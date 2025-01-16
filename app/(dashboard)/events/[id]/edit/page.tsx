@@ -259,7 +259,7 @@ export default function EditEventPage() {
               {activeForm === 'dashboard' ? (
                 <DashboardOverview eventId={eventId} />
               ) : activeForm === 'orders' ? (
-                <OrderList />
+                <OrderList eventId={eventId} />
               ) : activeForm === 'publishing' ? (
                 <PublishingList eventId={eventId} currentStatus={event.status} />
               ) : activeForm === 'tickets' ? (
