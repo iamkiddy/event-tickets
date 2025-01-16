@@ -37,12 +37,6 @@ export default function SettingsSelector({ activeTab }: SettingsSelectorProps) {
               tab='organization'
               onSelect={handleTabChange}
           />
-          <LineTabSelectorCard 
-              title='All Roles'
-              active={tab === 'roles'}
-              tab='roles'
-              onSelect={handleTabChange}
-          />
         <LineTabSelectorCard 
             title='Team Members'
             active={tab === 'team'}
