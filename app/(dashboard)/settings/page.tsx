@@ -3,6 +3,7 @@ import React from 'react'
 import SettingsSelector from './_components/SettingsSelector';
 import OrganizerPageTab from './_components/OrganizerPage/OrganizerPageTab';
 import { getServerSession, getUserProfile } from '@/lib/actions/auth';
+import TeamPageTab from './_components/TeamPage/TeamPageTab';
 
 interface TabSelectorProps {
   searchParams: Promise<{
@@ -35,12 +36,8 @@ export default async function SettingsPage({ searchParams }: TabSelectorProps) {
             <OrganizerPageTab/>
           )}
 
-          {activeTab === 'roles' && (
-            <div>RolePageTab</div>
-          )}
-
           {activeTab === 'teams' && (
-            <div>TeamsPageTab</div>
+            <TeamPageTab/>
           )}
           
         </div>
