@@ -157,9 +157,17 @@ export const createColumns = ({ onRefresh }: EventsTableProps): ColumnDef<Event>
     accessorKey: 'totalGross',
     header: 'Total Gross',
     cell: ({ row }) => {
+      const amount = row.original.totalGross;
+      // Format as GHS with comma separators and 2 decimal places
+      const formattedAmount = new Intl.NumberFormat('en-GH', {
+        style: 'currency',
+        currency: 'GHS',
+        minimumFractionDigits: 2,
+      }).format(amount);
+
       return (
         <span className="text-sm font-medium text-gray-900">
-          ${row.original.totalGross.toLocaleString()}
+          {formattedAmount}
         </span>
       );
     },

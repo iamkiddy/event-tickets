@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getEventFinalStage, publishEvent, getOrganiserUtils, getUtilsCategories, getUtilsEventTypes } from '@/lib/actions/events';
 import { GetOrganizerUtils, UtilsCategoriesResponse, UtilsEventTypesResponse } from '@/lib/models/_events_models';
+import { Switch } from "@/components/ui/switch";
 
 interface PublishingListProps {
   eventId: string;
@@ -149,18 +150,17 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
     try {
       const dataToPublish = {
         ...publishData,
-        isPublished: true,
         subcategory: subCategories.length === 0 ? '' : publishData.subcategory
       };
       
-      console.log('Publishing event with data:', dataToPublish);
+      console.log('Updating event with data:', dataToPublish);
 
       const response = await publishEvent(eventId, dataToPublish);
       
-      setStatus('published');
-      toast.success(response.message || 'Event published successfully');
+      setStatus(publishData.isPublished ? 'published' : 'draft');
+      toast.success(response.message || 'Event updated successfully');
     } catch (error) {
-      let errorMessage = 'Failed to publish event';
+      let errorMessage = 'Failed to update event';
       
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -310,10 +310,50 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
                 <Globe className="w-5 h-5 text-green-500" />
               )}
             </div>
-            <div>
-              <h3 className="font-medium text-gray-900">
-                {status === 'draft' ? 'Draft' : 'Published'}
-              </h3>
+            <div className="flex-grow">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-gray-900">
+                  {status === 'draft' ? 'Draft' : 'Published'}
+                </h3>
+                <Switch
+                  checked={status === 'published'}
+                  onCheckedChange={async (checked) => {
+                    try {
+                      setIsSubmitting(true);
+                      const dataToUpdate = {
+                        ...publishData,
+                        isPublished: checked,
+                        subcategory: subCategories.length === 0 ? '' : publishData.subcategory
+                      };
+                      
+                      console.log('Updating publish status with data:', dataToUpdate);
+                      
+                      const response = await publishEvent(eventId, dataToUpdate);
+                      
+                      setStatus(checked ? 'published' : 'draft');
+                      setPublishData({ ...publishData, isPublished: checked });
+                      toast.success(response.message || 'Status updated successfully');
+                    } catch (error) {
+                      let errorMessage = 'Failed to update status';
+                      
+                      if (error instanceof Error) {
+                        errorMessage = error.message;
+                      } else if (typeof error === 'object' && error !== null) {
+                        console.error('API Error details:', error);
+                        const apiError = error as { message?: string };
+                        errorMessage = apiError.message || errorMessage;
+                      }
+                      
+                      toast.error(errorMessage);
+                      // Revert the UI state on error
+                      setStatus(publishData.isPublished ? 'published' : 'draft');
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                />
+              </div>
               <p className="text-sm text-gray-600 mt-1">
                 {status === 'draft' ? 
                   'Your event is not visible to the public yet.' :
@@ -328,7 +368,7 @@ export function PublishingList({ eventId, currentStatus = 'draft' }: PublishingL
               disabled={isSubmitting}
               className="w-full bg-primaryColor hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105"
             >
-              {isSubmitting ? 'Publishing...' : 'Publish Event'}
+              {isSubmitting ? 'Updating...' : 'Update Event'}
             </Button>
           </div>
         </div>

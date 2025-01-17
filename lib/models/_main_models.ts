@@ -59,6 +59,11 @@ export interface GetHomepageUtilsResponse {
         author: string;
         date: string;
     }[];
+    banners: {
+        image: string;
+        title: string;
+        event: string;
+    }[];
 }
 
 export interface EventOrganizer {

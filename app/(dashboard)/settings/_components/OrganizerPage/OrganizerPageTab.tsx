@@ -23,7 +23,7 @@ export default function OrganizerPageTab() {
     <section className='w-full flex flex-col gap-4'>
         <Sheet>
           <SheetTrigger asChild className='ml-auto'>
-            <Button className='h-[40px] md:px-5 rounded-md w-full md:w-fit'>
+            <Button className='h-[40px] md:px-5 rounded-md w-full md:w-fit bg-primaryColor text-white hover:bg-indigo-700'>
               Add organizer profile
             </Button>
           </SheetTrigger>

@@ -152,28 +152,6 @@ export function ViewPromotionSheet({ isOpen, onClose, promotionId }: ViewPromoti
                   </div>
                 </div>
               </div>
-
-              {/* Applied Tickets Section */}
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">
-                  Applied Tickets
-                </h3>
-                {promotion.tickets && promotion.tickets.length > 0 ? (
-                  <div className="space-y-2">
-                    {promotion.tickets.map((ticketId) => (
-                      <div
-                        key={ticketId}
-                        className="px-4 py-3 bg-gray-50 rounded-lg text-sm text-gray-700 
-                          hover:bg-gray-100 transition-colors"
-                      >
-                        {ticketId}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 italic">No tickets applied</p>
-                )}
-              </div>
             </div>
           ) : (
             <div className="text-center py-6">

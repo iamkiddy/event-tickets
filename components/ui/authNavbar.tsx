@@ -55,7 +55,7 @@ export const AuthenticatedNav = ({
       ${effectiveIsScrolled || isProfilePage ? 'bg-white shadow-md' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
-          <Link href="/home" className={`text-lg sm:text-xl font-bold ${
+          <Link href="/" className={`text-lg sm:text-xl font-bold ${
             effectiveIsScrolled || isProfilePage ? 'text-indigo-600' : 'text-white'
           }`}>
             CodePass
@@ -70,11 +70,6 @@ export const AuthenticatedNav = ({
           </div>
 
           <div className="flex items-center gap-4">
-            <NavLink 
-              label="Create Event"
-              isCreate={true}
-              isScrolled={effectiveIsScrolled || isProfilePage}
-            />
             <UserDropdown isScrolled={effectiveIsScrolled || isProfilePage} />
           </div>
         </div>
@@ -92,7 +87,7 @@ export const UnauthenticatedNav = ({ isScrolled }: { isScrolled: boolean }) => {
         ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
-            <Link href="/home" className={`text-lg sm:text-xl font-bold ${
+            <Link href="/" className={`text-lg sm:text-xl font-bold ${
               isScrolled ? 'text-indigo-600' : 'text-white'
             }`}>
               CodePass
@@ -110,11 +105,6 @@ export const UnauthenticatedNav = ({ isScrolled }: { isScrolled: boolean }) => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
-              <NavLink 
-                label="Create Event"
-                isCreate={true}
-                isScrolled={isScrolled}
-              />
               <NavLink 
                 label="Login"
                 isButton={true}

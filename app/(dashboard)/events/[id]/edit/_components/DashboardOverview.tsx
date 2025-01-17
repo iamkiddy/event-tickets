@@ -81,7 +81,7 @@ export function DashboardOverview({ eventId }: DashboardOverviewProps) {
     },
     {
       title: 'Total Sales',
-      value: `$${stats.totalSales.toLocaleString()}`,
+      value: `GHS ${stats.totalSales.toLocaleString()}`,
       icon: TrendingUp,
       trend: 'up'
     }

@@ -117,7 +117,6 @@ export function UpdatePromotionModal({
                 label='Discount Type'
                 value={formData.valueType}
                 setValue={(value) => setFormData({ ...formData, valueType: value as 'percentage' | 'amount' })}
-
               >
                 <SelectItem value="percentage">Percentage</SelectItem>
                 <SelectItem value="amount">Fixed Amount</SelectItem>
@@ -141,55 +140,6 @@ export function UpdatePromotionModal({
               type="number"
               disabled={isSubmitting}
             />
-
-            <div className='w-full flex flex-col gap-4 mb-4'>
-              <SelectField
-                label='Apply to Tickets'
-                value={formData.tickets[0] || ''}
-                setValue={(value) => {
-                  const selectedTickets = [...formData.tickets];
-                  if (selectedTickets.includes(value)) {
-                    const index = selectedTickets.indexOf(value);
-                    selectedTickets.splice(index, 1);
-                  } else {
-                    selectedTickets.push(value);
-                  }
-                  setFormData({ ...formData, tickets: selectedTickets });
-                }}
-              >
-                {availableTickets.map(ticket => (
-                  <SelectItem key={ticket.id} value={ticket.id}>
-                    {ticket.name}
-                  </SelectItem>
-                ))}
-              </SelectField>
-
-              {formData.tickets.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {formData.tickets.map(ticketId => {
-                    const ticket = availableTickets.find(t => t.id === ticketId);
-                    return ticket ? (
-                      <span
-                        key={ticket.id}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded"
-                      >
-                        {ticket.name}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updatedTickets = formData.tickets.filter(id => id !== ticketId);
-                            setFormData({ ...formData, tickets: updatedTickets });
-                          }}
-                          className="hover:text-primary/80"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ) : null;
-                  })}
-                </div>
-              )}
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

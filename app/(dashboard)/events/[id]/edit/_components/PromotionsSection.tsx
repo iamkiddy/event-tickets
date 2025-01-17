@@ -141,7 +141,9 @@ export function PromotionsSection({
                             ${isExpired 
                               ? 'bg-gray-100 text-gray-600' 
                               : 'bg-green-50 text-green-600'}`}>
-                            {promotion.valueType === 'percentage' ? `${promotion.value}% OFF` : `$${promotion.value} OFF`}
+                            {promotion.valueType === 'percentage' 
+                              ? `${promotion.value}% OFF` 
+                              : `GHS ${promotion.value} OFF`}
                           </span>
                           {isExpired && (
                             <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">

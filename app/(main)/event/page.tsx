@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Tag, Layout, Dice3, Calendar, ChevronRight } from 'lucide-react';
+import { Tag, Layout, Dice3, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { AuthenticatedNav, UnauthenticatedNav } from '@/components/ui/authNavbar';
 import { getAllMainEvents } from '@/lib/actions/mainEvent';
@@ -32,6 +32,7 @@ export default function EventsPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const searchParams = useSearchParams();
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
   // params
   const category = searchParams.get('category') || '';
@@ -76,6 +77,17 @@ export default function EventsPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const nextBanner = () => {
+    if (bannerData) {
+      setCurrentBannerIndex((prev) => (prev + 1) % bannerData.length);
+    }
+  };
+
+  const previousBanner = () => {
+    if (bannerData) {
+      setCurrentBannerIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,10 +101,10 @@ export default function EventsPage() {
       <HeroSection/>
       
       {/* Banner Section */}
-      {bannerData && bannerData[0] && (
+      {bannerData && bannerData.length > 0 && (
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 mb-4 sm:mb-6 lg:mb-8">
           <Link 
-            href={`/event/${bannerData[0].id}`}
+            href={`/event/${bannerData[currentBannerIndex].id}`}
             className="block transition-transform hover:scale-[1.01] duration-300"
           >
             <div 
@@ -102,13 +114,69 @@ export default function EventsPage() {
               <div 
                 className="absolute inset-0 bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
                 style={{
-                  backgroundImage: `url(${bannerData[0].image})`,
+                  backgroundImage: `url(${bannerData[currentBannerIndex].image})`,
                 }}
               />
               
-              {/* Gradient Overlays - Enhanced for better text visibility */}
+              {/* Gradient Overlays */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+
+              {/* Navigation arrows - only show if there are multiple banners */}
+              {bannerData.length > 1 && (
+                <>
+                  {/* Previous button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      previousBanner();
+                    }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 
+                      text-white p-2 rounded-full transition-all transform hover:scale-110 z-10"
+                    aria-label="Previous banner"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  
+                  {/* Next button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      nextBanner();
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 
+                      text-white p-2 rounded-full transition-all transform hover:scale-110 z-10"
+                    aria-label="Next banner"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+
+                  {/* Banner counter */}
+                  <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 
+                    rounded-full text-sm z-10">
+                    {currentBannerIndex + 1} / {bannerData.length}
+                  </div>
+
+                  {/* Banner dots indicator */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    {bannerData.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentBannerIndex(index);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          index === currentBannerIndex 
+                            ? 'bg-white scale-125' 
+                            : 'bg-white/50 hover:bg-white/75'
+                        }`}
+                        aria-label={`Go to banner ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               {/* Content Container */}
               <div className="relative h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
@@ -124,7 +192,7 @@ export default function EventsPage() {
                 {/* Title */}
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 
                   line-clamp-2">
-                  {bannerData[0].title}
+                  {bannerData[currentBannerIndex].title}
                 </h2>
 
                 {/* Call to Action */}
@@ -140,10 +208,6 @@ export default function EventsPage() {
                   </span>
                 </div>
               </div>
-
-              {/* Hover Effect Overlay */}
-              <div className="absolute inset-0 bg-primaryColor/10 opacity-0 hover:opacity-100 
-                transition-opacity duration-300" />
             </div>
           </Link>
         </div>

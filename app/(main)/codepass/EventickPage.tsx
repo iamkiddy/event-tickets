@@ -20,8 +20,7 @@ import FilterCard from './components/FilterCard';
 import { eventFilterTime } from '@/lib/constants';
 import Link from 'next/link';
 import { EventPageHeader } from './components/EventPageHeader';
-import { useState } from 'react';
-
+import FeaturedBanner from './components/featuredBanner';
 export const navLinks = [
   { label: 'Schedule' },
   { label: 'Speakers' },
@@ -117,58 +116,58 @@ export default function EventPage() {
 
       <Sponsors />
     
-      <div className='h-full flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16'>
-        {/* Categories Section */}
-        <Categories categories={homeData?.featuredCategories || []} />
+      {!isLoading && (
+        <div className='h-full flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16'>
+          {/* Categories Section */}
+          <Categories categories={homeData?.featuredCategories || []} />
 
-        {/* Upcoming Events Section with Filters */}
-        
-        <section className="my-8 mt-10">
-          <div className="flex gap-4 mb-5">
-            <FilterCard
-              title='Any Category'
-              prefix='category'
-              data={homeData?.featuredCategories.map((category) => category.name) || []}
-            />
-            <FilterCard
-              title='Event Type'
-              prefix='type'
-              data={eventTypes.map((type) => type.name) || []}
-            />
-            <FilterCard
-              title='Any Time'
-              prefix='time'
-              data={eventFilterTime}
-            />
-          </div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold">Upcoming Events</h2>
-            <Link 
-              href="/event" 
-              className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
-                text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
-                transition-all duration-300 group"
-            >
-              View All Events
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
+          {/* Featured Banner */}
+          <FeaturedBanner bannerData={homeData?.banners || []} />
+
+          {/* Upcoming Events Section with Filters */}
+          <section className="my-8 mt-10">
+            <div className="flex gap-4 mb-5">
+              <FilterCard
+                title='Any Category'
+                prefix='category'
+                data={homeData?.featuredCategories.map((category) => category.name) || []}
+              />
+              <FilterCard
+                title='Event Type'
+                prefix='type'
+                data={eventTypes.map((type) => type.name) || []}
+              />
+              <FilterCard
+                title='Any Time'
+                prefix='time'
+                data={eventFilterTime}
+              />
+            </div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl md:text-2xl font-bold">Upcoming Events</h2>
+              <Link 
+                href="/event" 
+                className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
+                  text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
+                  transition-all duration-300 group"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M13 7l5 5m0 0l-5 5m5-5H6" 
-                />
-              </svg>
-            </Link>
-          </div>
-          {isLoading ? (
-            <EventPageLoader />
-          ) : (
+                View All Events
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                  />
+                </svg>
+              </Link>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {homeData?.upcomingEvents.map((event) => (
                 <EventCard 
@@ -177,76 +176,72 @@ export default function EventPage() {
                 />
               ))}
             </div>
-          )}
-        </section>
+          </section>
 
-        {/* Most Viewed Events Section */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8">Most Viewed Events</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {homeData?.mostViewedEvents.map((event) => (
-              <EventCard 
-                key={event.id}
-                data={event}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Banner Section */}
-        <EventsBanner />
-
-
-        {/* Blog Section */}
-        <section className="my-16">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xl md:text-2xl font-bold">Latest Blog Posts</h2>
-            <Link 
-              href="/blog" 
-              className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
-                text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
-                transition-all duration-300 group"
-            >
-              View All Blog Posts
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M13 7l5 5m0 0l-5 5m5-5H6" 
+          {/* Most Viewed Events Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Most Viewed Events</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {homeData?.mostViewedEvents.map((event) => (
+                <EventCard 
+                  key={event.id}
+                  data={event}
                 />
-              </svg>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {homeData?.pageBlogs?.map((post) => (
-              <BlogCard 
-                key={post.id}
-                id={post.id}
-                image={post.image}
-                title={post.title}
-                description={post.summary}
-                date={post.date}
-                author={post.author}
-              />
-            )) || (
-              // Fallback content when no blogs are available
-              <div className="col-span-3 text-center py-8">
-                <p className="text-gray-500">No blog posts available at the moment.</p>
-              </div>
-            )}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
 
-        {/* Newsletter Section */}
-        <Newsletter />
-      </div>
+          {/* Banner Section */}
+          <EventsBanner />
+
+          {/* Blog Section */}
+          <section className="my-16">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl md:text-2xl font-bold">Latest Blog Posts</h2>
+              <Link 
+                href="/blog" 
+                className="inline-flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg 
+                  text-primaryColor hover:bg-primaryColor/10 font-medium text-sm md:text-base
+                  transition-all duration-300 group"
+              >
+                View All Blog Posts
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4 md:h-5 md:w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                  />
+                </svg>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {homeData?.pageBlogs?.map((post) => (
+                <BlogCard 
+                  key={post.id}
+                  id={post.id}
+                  image={post.image}
+                  title={post.title}
+                  description={post.summary}
+                  date={post.date}
+                  author={post.author}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* Newsletter Section */}
+          <Newsletter />
+        </div>
+      )}
+
+      {isLoading && <EventPageLoader />}
 
       <Footer />
     </div>

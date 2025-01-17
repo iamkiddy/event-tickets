@@ -65,11 +65,6 @@ export function EventPageHeader({ isAuthenticated, onLoginClick, navLinks }: Eve
 
           <div className="flex items-center gap-2 sm:gap-4">
             <NavLink 
-              label="Create Event"
-              isCreate={true}
-              isScrolled={isScrolled}
-            />
-            <NavLink 
               label="Login"
               isButton={true}
               isScrolled={isScrolled}

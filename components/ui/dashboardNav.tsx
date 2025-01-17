@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { UserDropdown } from '@/components/userDropdown';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -9,7 +8,6 @@ import { useState } from 'react';
 import { NavContent } from './sideNav';
 
 export const DashboardNav = () => {
-  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -30,22 +28,13 @@ export const DashboardNav = () => {
                 </div>
               </SheetContent>
             </Sheet>
-            <Link href="/home" className="text-xl font-bold text-indigo-600">
+            <Link href="/" className="text-xl font-bold text-indigo-600">
               CodePass
             </Link>
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {pathname !== '/events/create' && (
-              <Link 
-                href="/events/create" 
-                className="hidden md:block px-4 py-2 bg-secondaryColor text-white rounded-full 
-                  hover:bg-pink-700 transition-colors font-medium text-sm"
-              >
-                Create Event
-              </Link>
-            )}
             <UserDropdown isScrolled={true} />
           </div>
         </div>

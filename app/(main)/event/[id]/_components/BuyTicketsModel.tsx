@@ -191,7 +191,7 @@ export function BuyTicketsModel({
             )}
 
             <div className="sticky top-0 z-10 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">Select Tickets</h3>
+              <h3 className="text-xl font-bold text-gray-900">Buy Tickets</h3>
               <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <X className="w-5 h-5 text-gray-500" />
               </button>

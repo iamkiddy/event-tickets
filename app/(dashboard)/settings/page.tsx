@@ -36,7 +36,7 @@ export default async function SettingsPage({ searchParams }: TabSelectorProps) {
             <OrganizerPageTab/>
           )}
 
-          {activeTab === 'teams' && (
+          {activeTab === 'team' && (
             <TeamPageTab/>
           )}
           

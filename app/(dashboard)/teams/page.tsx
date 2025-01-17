@@ -1,206 +1,75 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { Calendar, Download, Filter, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from './_components/columns';
 
-interface Order {
-  id: string;
-  eventName: string;
-  orderDate: Date;
-  customer: string;
-  quantity: number;
+interface TeamResponse {
+  page: number;
   total: number;
-  status: 'completed' | 'pending' | 'cancelled';
+  limit: number;
+  data: {
+    id: string;
+    event: string;
+    name: string;
+    description: string;
+  }[];
 }
 
-const mockOrders: Order[] = [
-  {
-    id: 'ORD-001',
-    eventName: 'Summer Music Festival 2024',
-    orderDate: new Date('2024-01-15'),
-    customer: 'John Doe',
-    quantity: 2,
-    total: 150.00,
-    status: 'completed'
-  },
-  // Add more mock orders as needed
-];
+const mockTeams: TeamResponse = {
+  page: 0,
+  total: 10,
+  limit: 10,
+  data: [
+    {
+      id: "TEAM-001",
+      event: "Summer Music Festival 2024",
+      name: "Event Staff Team",
+      description: "Main event coordination team"
+    },
+    // Add more mock data as needed
+  ]
+};
 
-export default function OrdersPage() {
+export default function TeamsPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const getStatusColor = (status: Order['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400';
-    }
-  };
+  // Filter teams based on search term
+  const filteredTeams = mockTeams.data.filter(team => 
+    team.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="p-2 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
+    <div className="p-2 sm:p-4 lg:p-6 space-y-4">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Orders</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your event ticket orders</p>
-        </div>
-        <Button className="w-full sm:w-auto bg-primaryColor hover:bg-primaryColor/90 text-white shadow-sm">
-          <Download className="w-4 h-4 mr-2" />
-          Export Orders
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="border-primaryColor/10 shadow-sm hover:border-primaryColor/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primaryColor">1,234</div>
-            <p className="text-xs text-gray-500">+20.1% from last month</p>
-          </CardContent>
-        </Card>
-        <Card className="border-primaryColor/10 shadow-sm hover:border-primaryColor/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primaryColor">$12,345</div>
-            <p className="text-xs text-gray-500">+15% from last month</p>
-          </CardContent>
-        </Card>
-        <Card className="border-primaryColor/10 shadow-sm hover:border-primaryColor/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primaryColor">23</div>
-            <p className="text-xs text-gray-500">-5% from last month</p>
-          </CardContent>
-        </Card>
-        <Card className="border-primaryColor/10 shadow-sm hover:border-primaryColor/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cancelled Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primaryColor">12</div>
-            <p className="text-xs text-gray-500">-2% from last month</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3 flex flex-col sm:flex-row sm:space-y-0 sm:gap-4">
-        <div className="flex-1 relative">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Teams</h1>
+        
+        <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
-            placeholder="Search orders by ID, event or customer..."
+            placeholder="Search teams..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-gray-200 dark:border-gray-700 focus:border-primaryColor focus:ring-primaryColor"
+            className="pl-10 w-full"
           />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] border-gray-200 dark:border-gray-700">
-              <Filter className="w-4 h-4 mr-2 text-gray-400" />
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] border-gray-200 dark:border-gray-700">
-              <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-              <SelectValue placeholder="Filter by date" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50 dark:bg-gray-800/50">
-              <TableHead className="font-semibold whitespace-nowrap">Order ID</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Event</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Date</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Customer</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Quantity</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Total</TableHead>
-              <TableHead className="font-semibold whitespace-nowrap">Status</TableHead>
-              <TableHead className="text-right font-semibold whitespace-nowrap">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockOrders.map((order) => (
-              <TableRow key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell className="text-primaryColor hover:text-primaryColor/80">{order.eventName}</TableCell>
-                <TableCell>
-                  <div className="flex items-center text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                    {format(order.orderDate, 'MMM dd, yyyy')}
-                  </div>
-                </TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.quantity}</TableCell>
-                <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Badge className={`${getStatusColor(order.status)} px-2 py-1`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="hover:bg-primaryColor hover:text-white transition-colors"
-                  >
-                    View Details
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={filteredTeams}
+        isLoading={false}
+        total={filteredTeams.length}
+        currentPage={currentPage}
+        totalPages={Math.ceil(filteredTeams.length / mockTeams.limit)}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

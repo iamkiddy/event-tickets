@@ -353,7 +353,7 @@ export default function EventPage() {
             <div className="sticky top-20 space-y-6">
               {/* Tickets Section */}
               <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-6">Select Tickets</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">Buy Tickets</h3>
                 
                 {/* Ticket types */}
                 <div className="space-y-4">
@@ -469,10 +469,13 @@ export default function EventPage() {
               {/* Video Container with Gradient Overlay */}
               <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900 shadow-sm max-w-3xl mx-auto">
                 <video
+                  playsInline
                   controls
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.01]"
+                  controlsList="nodownload"
+                  className="w-full h-full object-contain"
                   poster={event.images?.[0]}
                   preload="metadata"
+                  id="eventVideo"
                 >
                   <source 
                     src={event.videoUrl} 
@@ -480,14 +483,26 @@ export default function EventPage() {
                   />
                   Your browser does not support the video tag.
                 </video>
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50 transform transition-transform group-hover:scale-110">
-                    <Play className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
+
+                {/* Custom Play Button Overlay */}
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-all cursor-pointer"
+                  onClick={() => {
+                    const video = document.getElementById('eventVideo') as HTMLVideoElement;
+                    if (video) {
+                      if (video.paused) {
+                        video.play().catch(err => console.error('Error playing video:', err));
+                      } else {
+                        video.pause();
+                      }
+                    }
+                  }}
+                >
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/30 backdrop-blur-sm rounded-full 
+                    flex items-center justify-center border-2 border-white/50 
+                    transform transition-transform hover:scale-110"
+                  >
+                    <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white fill-white" />
                   </div>
                 </div>
               </div>
