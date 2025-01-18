@@ -14,6 +14,11 @@ export default function CreateEventPage() {
       console.log('Submitting event data:', data);
       const response = await createEvent(data);
       console.log('Create event response:', response);
+      
+      if (!response?.eventId) {
+        throw new Error('No event ID received from server');
+      }
+      
       toast.success('Event created successfully');
       router.push(`/events/${response.eventId}/upload`);
     } catch (error: any) {

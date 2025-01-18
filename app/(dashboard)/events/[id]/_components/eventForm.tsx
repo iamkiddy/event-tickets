@@ -145,54 +145,49 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Create a copy of formData without FAQs and Agenda for the main submit
-      const mainFormData = {
-        ...formData,
-        eventFAQ: formData.eventFAQ.filter(faq => faq.id), // Only include existing FAQs
-        eventAgenda: formData.eventAgenda.filter(agenda => agenda.id) // Only include existing agenda items
-      };
+      if (mode === 'create') {
+        // For create mode, submit all data including new FAQs and agenda items
+        await onSubmit(formData);
+      } else {
+        // For edit mode, handle existing items differently
+        const mainFormData = {
+          ...formData,
+          eventFAQ: formData.eventFAQ.filter(faq => faq.id),
+          eventAgenda: formData.eventAgenda.filter(agenda => agenda.id)
+        };
 
-      // First submit the main form data
-      await onSubmit(mainFormData);
+        await onSubmit(mainFormData);
 
-      // If we're in edit mode and have an eventId, handle FAQ and Agenda updates
-      if (mode === 'edit' && eventId) {
-        // Handle new FAQs
-        const faqPromises = formData.eventFAQ.map(async faq => {
-          if (!faq.id) { // New FAQ
-            await updateEventFAQ({
-              eventId,
-              question: faq.question,
-              answer: faq.answer
-            });
-          }
-        });
+        // Handle new FAQs and agenda items for edit mode
+        if (eventId) {
+          const faqPromises = formData.eventFAQ.map(async faq => {
+            if (!faq.id) {
+              await updateEventFAQ({
+                eventId,
+                question: faq.question,
+                answer: faq.answer
+              });
+            }
+          });
 
-        // Handle new Agenda Items
-        const agendaPromises = formData.eventAgenda.map(async agenda => {
-          if (!agenda.id) { // New Agenda Item
-            await updateEventAgenda({
-              eventId,
-              title: agenda.title,
-              description: agenda.description,
-              startTime: agenda.startTime,
-              endTime: agenda.endTime,
-              host: agenda.host || [] // Ensure host is always an array
-            });
-          }
-        });
+          const agendaPromises = formData.eventAgenda.map(async agenda => {
+            if (!agenda.id) {
+              await updateEventAgenda({
+                eventId,
+                title: agenda.title,
+                description: agenda.description,
+                startTime: agenda.startTime,
+                endTime: agenda.endTime,
+                host: agenda.host || []
+              });
+            }
+          });
 
-        // Wait for all updates to complete
-        await Promise.all([
-          ...faqPromises,
-          ...agendaPromises
-        ]);
+          await Promise.all([...faqPromises, ...agendaPromises]);
+        }
       }
 
       toast.success(`Event ${mode === 'create' ? 'created' : 'updated'} successfully`);
-      if (mode === 'create') {
-        router.push('/events');
-      }
     } catch (error: any) {
       toast.error(error.message || `Failed to ${mode} event`);
       console.error('Error submitting form:', error);
