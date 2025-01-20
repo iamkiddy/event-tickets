@@ -2,8 +2,9 @@
 
 import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { loginWithGmailPost } from '@/lib/actions/auth';
+import { loginWithGmailPost, getUserProfile } from '@/lib/actions/auth';
 import { useAuth } from '@/lib/context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 function AuthCallbackContent() {
     const router = useRouter();
@@ -15,18 +16,22 @@ function AuthCallbackContent() {
         
         if (code) {
             loginWithGmailPost(code)
-                .then((response) => {
+                .then(async (response) => {
                     if (response.token) {
                         login(response.token);
-                        router.push('/');
+                        await getUserProfile();
+                        toast.success('Successfully logged in!', {
+                            duration: 4000,
+                            position: 'top-center'
+                        });
+                        // No redirect, just close any open dialogs
+                        window.close(); // Close the popup if it's a popup
                     }
                 })
                 .catch((error) => {
                     console.error('Google login error:', error);
-                    router.push('/auth?error=google_login_failed');
+                    toast.error('Failed to login with Google');
                 });
-        } else {
-            router.push('/auth?error=no_code');
         }
     }, [searchParams, router, login]);
 

@@ -55,6 +55,10 @@ export const LoginAlert: React.FC<LoginAlertProps> = ({ open, onClose, onLoginSu
     try {
       await getUserProfile();
       onClose();
+      toast.success('Welcome back!', {
+        duration: 4000,
+        position: 'top-center'
+      });
     } catch (error) {
       toast.error('Failed to fetch user profile');
       console.error('Error fetching user profile:', error);

@@ -2,9 +2,9 @@
 
 import { useGoogleLogin } from '@react-oauth/google';
 import { Button } from "@/components/ui/button";
-import { loginWithGmailPost } from '@/lib/actions/auth';
+import { getUserProfile, loginWithGmailPost } from '@/lib/actions/auth';
 import { useAuth } from '@/lib/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 interface GoogleLoginButtonProps {
   onSuccess?: () => void;
@@ -12,29 +12,31 @@ interface GoogleLoginButtonProps {
 
 export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onSuccess }) => {
   const { login } = useAuth();
-  const router = useRouter();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        console.log('Google OAuth Response:', tokenResponse);
-        
         const response = await loginWithGmailPost(tokenResponse.access_token);
-        console.log('Backend Response:', response);
         
         if (response.token) {
           login(response.token);
-          const previousPath = sessionStorage.getItem('previousPath') || '/';
-          sessionStorage.removeItem('previousPath');
-          router.push(previousPath);
+          // Get user profile immediately after login
+          await getUserProfile();
+          // Call onSuccess callback to close the dialog
           onSuccess?.();
+          toast.success('Successfully logged in!', {
+            duration: 4000,
+            position: 'top-center'
+          });
         }
-      } catch (error) {
+      } catch (error) { 
         console.error('Google login error:', error);
+        toast.error('Failed to login with Google');
       }
     },
     onError: (error) => {
       console.error('Google OAuth error:', error);
+      toast.error('Google login failed');
     }
   });
 

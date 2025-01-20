@@ -200,26 +200,40 @@ export default function EventPage() {
       </div>
 
       {/* Sticky Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 xs:px-4">
-          <div className="flex justify-between items-center h-12 xs:h-14 sm:h-16">
-            <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-6">
-              <h2 className="text-sm xs:text-base sm:text-lg font-semibold text-gray-900 truncate max-w-[120px] xs:max-w-[150px] sm:max-w-xs">
+          <div className="flex justify-between items-center h-14 xs:h-16 sm:h-18">
+            <div className="flex items-center gap-3 xs:gap-4 sm:gap-6">
+              {/* Enhanced back button */}
+              <button
+                onClick={() => window.history.back()}
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-full 
+                  text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 
+                  transition-all duration-200"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
+                <span className="text-sm sm:text-base font-medium">Back</span>
+              </button>
+
+              <div className="h-5 w-px bg-gray-200 hidden sm:block" />
+
+              <h2 className="text-base xs:text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-[120px] xs:max-w-[150px] sm:max-w-xs">
                 {event.title}
               </h2>
               <button 
                 onClick={() => setIsLiked(!isLiked)}
-                className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${isLiked ? 'text-red-500' : 'text-gray-600'}`}
+                className={`flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base 
+                  ${isLiked ? 'text-red-500' : 'text-gray-600 hover:text-gray-900'} 
+                  transition-colors`}
               >
                 <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-current' : ''}`} />
                 <span className="hidden sm:inline">Save</span>
               </button>
-              <button className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+              <button className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base text-gray-600 hover:text-gray-900 transition-colors">
                 <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-primaryColor" />
                 <span className="hidden sm:inline">Share</span>
               </button>
             </div>
-          
           </div>
         </div>
       </div>
