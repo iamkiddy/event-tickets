@@ -12,13 +12,13 @@ import { Heart, MessageCircle, Share2, Bookmark, Eye } from 'lucide-react';
 import { LoginAlert } from '../../../auth/_components/loginAlert';
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from 'date-fns';
-import { getBlogById, likeBlog } from '@/lib/actions/blog';
+import { getBlogById, likeBlog, addBlogComment } from '@/lib/actions/blog';
 import { useParams } from 'next/navigation';
 import parser from 'html-react-parser';
 import { toast } from 'sonner';
 import {navLinks} from "@/app/(main)/codepass/EventickPage"
 
-// Type definition for blog post
+// Type definitions
 interface BlogPost {
   id: string;
   image: string;
@@ -41,8 +41,6 @@ interface Comment {
   date: string;
 }
 
-
-
 export default function BlogDetailsPage() {
   const { isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -52,7 +50,12 @@ export default function BlogDetailsPage() {
   const [isLiked, setIsLiked] = React.useState(false);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(0);
+  const [commentText, setCommentText] = React.useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = React.useState(false);
   const params = useParams();
+
+  // Action that triggered login dialog
+  const [pendingAction, setPendingAction] = React.useState<'like' | 'comment' | null>(null);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -87,6 +90,7 @@ export default function BlogDetailsPage() {
 
   const handleLike = async () => {
     if (!isAuthenticated) {
+      setPendingAction('like');
       setShowLoginDialog(true);
       return;
     }
@@ -96,11 +100,46 @@ export default function BlogDetailsPage() {
     try {
       const response = await likeBlog(blog.id);
       setIsLiked(response.success);
+      setLikeCount(prev => response.success ? prev + 1 : prev - 1);
       toast.success(response.success ? 'Added to your likes' : 'Removed from your likes');
     } catch (error) {
       console.error('Error liking blog:', error);
       toast.error('Failed to update like status');
     }
+  };
+
+  const handleComment = async () => {
+    if (!isAuthenticated) {
+      setPendingAction('comment');
+      setShowLoginDialog(true);
+      return;
+    }
+
+    if (!blog || !commentText.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      await addBlogComment(blog.id, { content: commentText.trim() });
+      setCommentText('');
+      toast.success('Comment posted successfully');
+      // Optionally refresh comments here
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      toast.error('Failed to post comment');
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginDialog(false);
+    // Execute pending action after successful login
+    if (pendingAction === 'like') {
+      handleLike();
+    } else if (pendingAction === 'comment') {
+      handleComment();
+    }
+    setPendingAction(null);
   };
 
   if (isLoading) {
@@ -164,36 +203,52 @@ export default function BlogDetailsPage() {
 
       <LoginAlert 
         open={showLoginDialog} 
-        onClose={() => setShowLoginDialog(false)}
-        onLoginSuccess={() => setShowLoginDialog(false)}
+        onClose={() => {
+          setShowLoginDialog(false);
+          setPendingAction(null);
+        }}
+        onLoginSuccess={handleLoginSuccess}
       />
 
-      <div className="relative h-[600px]">
+      <div className="relative h-[400px] sm:h-[500px] md:h-[600px]">
+        {/* Background blur effect */}
         <div className="absolute inset-0">
-          <Image
-            src={blog.image}
-            alt={blog.title}
-            fill
-            className="w-full h-full object-cover"
-            priority
+          <div 
+            className="absolute inset-0" 
+            style={{ 
+              backgroundImage: `url(${blog.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'blur(20px) brightness(0.7)',
+              transform: 'scale(1.1)'
+            }} 
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
-        
+
+        {/* Main image */}
         <div className="relative h-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-full flex flex-col items-center justify-center pt-20">
-            <div className="flex gap-2 mb-6">
+          <div className="h-full flex flex-col items-center justify-center">
+            <div className="w-full h-full relative rounded-lg overflow-hidden">
+              <Image
+                src={blog.image}
+                alt={blog.title}
+                fill
+                className="w-full h-full object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            </div>
+            
+            <div className="flex gap-2 mt-auto">
               {blog.categories.map(category => (
                 <span key={category} className="inline-block px-4 py-1 bg-indigo-600/90 text-white text-sm font-medium rounded-full">
                   {category}
                 </span>
               ))}
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-8 leading-tight">
-              {blog.title}
-            </h1>
             
-            <div className="flex items-center gap-4 text-white/90 bg-black/30 p-4 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center gap-4 text-white/90 bg-black/30 p-4 rounded-xl backdrop-blur-sm mt-4">
               <Image
                 src={`https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author)}&background=random`}
                 alt={blog.author}
@@ -265,13 +320,24 @@ export default function BlogDetailsPage() {
               <Textarea
                 placeholder="Share your thoughts..."
                 className="min-h-[100px] mb-4"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
               />
-              <Button>Post Comment</Button>
+              <Button 
+                className="bg-primaryColor text-white"
+                onClick={handleComment}
+                disabled={isSubmittingComment || !commentText.trim()}
+              >
+                {isSubmittingComment ? 'Posting...' : 'Post Comment'}
+              </Button>
             </div>
           ) : (
             <div className="bg-gray-50 rounded-xl p-6 text-center mb-8">
               <p className="text-gray-600 mb-4">Join the discussion</p>
-              <Button onClick={() => setShowLoginDialog(true)}>
+              <Button className="bg-primaryColor text-white" onClick={() => {
+                setPendingAction('comment');
+                setShowLoginDialog(true);
+              }}>
                 Log in to comment
               </Button>
             </div>

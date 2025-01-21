@@ -17,14 +17,13 @@ interface UploadedMedia {
   progress?: number;
 }
 
-
-
 export default function UploadEventMedia() {
   const params = useParams();
   const router = useRouter();
   const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -110,10 +109,19 @@ export default function UploadEventMedia() {
   // Handle file upload to server
   const uploadMediaToServer = async (media: UploadedMedia) => {
     try {
+      // Create a new Blob from the file to ensure proper binary handling
+      const fileBlob = new Blob([media.file], { type: media.file.type });
+      
+      // Create a new File instance from the Blob
+      const cleanFile = new File([fileBlob], media.file.name, { 
+        type: media.file.type,
+        lastModified: media.file.lastModified 
+      });
+
       // Use the appropriate update function based on media type
       const response = media.type === 'image' 
-        ? await updateEventImage(params.id as string, media.file)
-        : await updateEventVideo(params.id as string, media.file);
+        ? await updateEventImage(params.id as string, cleanFile)
+        : await updateEventVideo(params.id as string, cleanFile);
 
       // Update progress to complete
       setUploadedMedia(prev => 
@@ -150,7 +158,9 @@ export default function UploadEventMedia() {
       }
 
       toast.success('Media uploaded successfully');
-      router.push(`/events/${params.id}/edit`);
+      setIsSuccess(true);
+      // Clear the uploaded media after successful upload
+      setUploadedMedia([]);
     } catch (error) {
       toast.error('Failed to upload media');
       console.error('Upload error:', error);
@@ -389,37 +399,46 @@ export default function UploadEventMedia() {
 
         {/* Upload Progress and Actions */}
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
-          <Button
-            variant="secondary"
-            onClick={() => router.push(`/events/${params.id}/edit`)}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 sm:px-6 w-full sm:w-auto"
-          >
-            Skip & Continue
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={isUploading}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          {uploadedMedia.length > 0 && (
+          {isSuccess ? (
             <Button
-              onClick={handleUpload}
-              disabled={isUploading}
-              className="bg-primaryColor hover:bg-indigo-700 text-white w-full sm:w-auto"
+              onClick={() => router.push(`/events/${params.id}/edit`)}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 sm:px-6 w-full sm:w-auto"
             >
-              {isUploading ? (
-                <>
-                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                'Upload Media'
-              )}
+              Skip & Continue
+              </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={() => router.push(`/events/${params.id}/edit`)}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 sm:px-6 w-full sm:w-auto"
+            >
+              Skip & Continue
             </Button>
           )}
+          {!isSuccess && (
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isUploading}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          )}
+          <Button
+            onClick={handleUpload}
+            disabled={isUploading}
+            className="bg-primaryColor hover:bg-indigo-700 text-white w-full sm:w-auto"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              'Upload Media'
+            )}
+          </Button>
         </div>
       </div>
     </div>

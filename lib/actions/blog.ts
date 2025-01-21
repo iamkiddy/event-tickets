@@ -6,7 +6,6 @@ import {
   GetAllBlogsResponse,
   GetBlogByIdResponse,
   GetBlogCommentsResponse,
-  AddBlogCommentRequest,
   LikeBlogResponse
 } from "../models/_blogs_models";
 import { ApiError } from 'next/dist/server/api-utils';
@@ -59,7 +58,7 @@ export const getBlogComments = async (blogId: string): Promise<GetBlogCommentsRe
   }
 };
 
-export const addBlogComment = async (blogId: string, comment: AddBlogCommentRequest): Promise<void> => {
+export const addBlogComment = async (blogId: string, comment: { content: string }): Promise<void> => {
   try {
     await apiController<void>({
       method: 'POST',

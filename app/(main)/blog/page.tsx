@@ -11,6 +11,10 @@ import { getAllBlogs } from '@/lib/actions/blog';
 import { GetAllBlogsResponse } from '@/lib/models/_blogs_models';
 import { BlogCardSkeleton } from '../codepass/components/skeletons';
 import parser from 'html-react-parser';
+import { useQuery } from '@tanstack/react-query';
+import { getBannerUtils } from '@/lib/actions/main';
+import { GetBannerUtilsResponse } from '@/lib/models/_main_models';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 const BlogHeader = dynamic(
   () => import('./_components/BlogHeader').then(mod => mod.BlogHeader),
@@ -43,6 +47,24 @@ export default function BlogPage() {
   const [blogs, setBlogs] = React.useState<GetAllBlogsResponse['data']>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isClient, setIsClient] = React.useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = React.useState(0);
+
+  const { data: bannerData } = useQuery<GetBannerUtilsResponse[]>({
+    queryKey: ['banner'],
+    queryFn: getBannerUtils,
+  });
+
+  const nextBanner = () => {
+    if (bannerData) {
+      setCurrentBannerIndex((prev) => (prev + 1) % bannerData.length);
+    }
+  };
+
+  const previousBanner = () => {
+    if (bannerData) {
+      setCurrentBannerIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length);
+    }
+  };
 
   React.useEffect(() => {
     setIsClient(true);
@@ -102,6 +124,105 @@ export default function BlogPage() {
           </div>
         </div>
       </div>
+
+      {bannerData && bannerData.length > 0 && (
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 mb-4 sm:mb-6 lg:mb-8">
+          <Link 
+            href={`/event/${bannerData[currentBannerIndex].id}`}
+            className="block transition-transform hover:scale-[1.01] duration-300"
+          >
+            <div className="relative h-[200px] sm:h-[300px] lg:h-[400px] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100">
+              <div 
+                className="absolute inset-0 bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
+                style={{
+                  backgroundImage: `url(${bannerData[currentBannerIndex].image})`,
+                }}
+              />
+              
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+
+              {bannerData.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      previousBanner();
+                    }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 
+                      text-white p-2 rounded-full transition-all transform hover:scale-110 z-10"
+                    aria-label="Previous banner"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      nextBanner();
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 
+                      text-white p-2 rounded-full transition-all transform hover:scale-110 z-10"
+                    aria-label="Next banner"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+
+                  <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 
+                    rounded-full text-sm z-10">
+                    {currentBannerIndex + 1} / {bannerData.length}
+                  </div>
+
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    {bannerData.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentBannerIndex(index);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          index === currentBannerIndex 
+                            ? 'bg-white scale-125' 
+                            : 'bg-white/50 hover:bg-white/75'
+                        }`}
+                        aria-label={`Go to banner ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <div className="relative h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="px-3 py-1 bg-primaryColor rounded-full">
+                    <span className="text-xs sm:text-sm font-medium text-white">
+                      Featured Event
+                    </span>
+                  </div>
+                </div>
+
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 
+                  line-clamp-2">
+                  {bannerData[currentBannerIndex].title}
+                </h2>
+
+                <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                    View Event Details
+                  </span>
+                  <span className="text-white/60">•</span>
+                  <span className="inline-flex items-center text-primaryColor font-medium group">
+                    Book Now
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-8 sm:mb-16">

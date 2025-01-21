@@ -620,13 +620,24 @@ export function EventForm({ initialData, mode, onSubmit, eventId }: EventFormPro
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg"
                   />
                 </div>
-                <input
-                  type="text"
-                  value={item.host.join(', ')}
-                  onChange={(e) => updateAgendaItem(index, 'host', e.target.value.split(',').map(h => h.trim()))}
-                  placeholder="Host names (comma-separated)"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-                />
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={item.host.join(', ')}
+                    onChange={(e) => {
+                      const hosts = e.target.value
+                        .split(',')
+                        .map(h => h.trim())
+                        .filter(h => h.length > 0); // Remove empty entries
+                      updateAgendaItem(index, 'host', hosts);
+                    }}
+                    placeholder="Enter host names separated by commas (e.g. John Doe, Jane Smith)"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Add multiple hosts by separating names with commas
+                  </p>
+                </div>
               </div>
             </div>
           ))}

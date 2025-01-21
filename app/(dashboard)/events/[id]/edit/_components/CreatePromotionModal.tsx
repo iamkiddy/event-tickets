@@ -15,6 +15,8 @@ import InputField from '@/components/custom/InputField';
 import SelectField from '@/components/custom/SelectField';
 import { cn } from "@/lib/utils";
 import { Tag, PercentIcon } from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface CreatePromotionModalProps {
   isOpen: boolean;
@@ -35,6 +37,7 @@ export function CreatePromotionModal({
   const [eventUtils, setEventUtils] = useState<GetEventUtils[]>([]);
   const [promotionTab, setPromotionTab] = useState<'coupon' | 'discount'>('coupon');
   const [existingPromotions, setExistingPromotions] = useState<EventTicketPromotion[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [formData, setFormData] = useState<CreateEventTicketPromotionRequest>({
     code: '',
     promotionType: 'discount',
@@ -51,6 +54,7 @@ export function CreatePromotionModal({
     if (isOpen) {
       fetchEventUtils();
       fetchExistingPromotions();
+      setSelectedDate(undefined);
       setFormData({
         code: '',
         promotionType: 'discount',
@@ -64,6 +68,16 @@ export function CreatePromotionModal({
       });
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setFormData(prev => ({
+        ...prev,
+        endDate: format(selectedDate, 'yyyy-MM-dd'),
+        endTime: format(selectedDate, 'HH:mm')
+      }));
+    }
+  }, [selectedDate]);
 
   const fetchEventUtils = async () => {
     try {
@@ -154,7 +168,7 @@ export function CreatePromotionModal({
                 >
                   <div className="flex items-center justify-center gap-3">
                     <Tag className="w-5 h-5" />
-                    Promo Code
+                    Coupon Code
                   </div>
                 </button>
                 <button
@@ -192,7 +206,7 @@ export function CreatePromotionModal({
               />
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-4">
               <SelectField
                 label='Discount Type'
                 value={formData.valueType}
@@ -221,26 +235,89 @@ export function CreatePromotionModal({
               disabled={isSubmitting}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-              <div className="space-y-4 col-span-2 mt-3">
+            {promotionTab === 'discount' && (
+              <div className='w-full flex flex-col gap-4 mb-4'>
+                <SelectField
+                  label='Apply to Tickets'
+                  value={formData.tickets[0] || ''}
+                  setValue={(value) => {
+                    const selectedTickets = [...formData.tickets];
+                    if (selectedTickets.includes(value)) {
+                      const index = selectedTickets.indexOf(value);
+                      selectedTickets.splice(index, 1);
+                    } else {
+                      selectedTickets.push(value);
+                    }
+                    setFormData({ ...formData, tickets: selectedTickets });
+                  }}
+                >
+                  {availableTickets.map(ticket => (
+                    <SelectItem key={ticket.id} value={ticket.id}>
+                      {ticket.name}
+                    </SelectItem>
+                  ))}
+                </SelectField>
+
+                {formData.tickets.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.tickets.map(ticketId => {
+                      const ticket = availableTickets.find(t => t.id === ticketId);
+                      return ticket ? (
+                        <span
+                          key={ticket.id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded"
+                        >
+                          {ticket.name}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedTickets = formData.tickets.filter(id => id !== ticketId);
+                              setFormData({ ...formData, tickets: updatedTickets });
+                            }}
+                            className="hover:text-primary/80"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-4 col-span-2">
                 <DateTimePicker
                   label="End Date and Time"
-                  date={formData.endDate && formData.endTime ? 
-                    new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
+                  date={selectedDate}
                   setDate={(date) => {
-                    if (date) {
-                      const formattedDate = format(date, 'yyyy-MM-dd');
-                      const formattedTime = format(date, 'HH:mm:ss');
-                      console.log('Setting end date and time:', { formattedDate, formattedTime });
-                      setFormData({
-                        ...formData,
-                        endDate: formattedDate,
-                        endTime: formattedTime
-                      });
-                    }
+                    setSelectedDate(date);
                   }}
                 />
+                {!formData.endDate && !formData.endTime && (
+                  <p className="text-sm text-red-500">Please select an end date and time</p>
+                )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between space-x-2">
+                <Label htmlFor="isActive" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Active Status
+                </Label>
+                <Switch
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <p className="text-sm text-gray-500">
+                {formData.isActive 
+                  ? "This promotion is currently active and can be used by customers"
+                  : "This promotion is inactive and cannot be used by customers"}
+              </p>
             </div>
           </div>
 
@@ -266,4 +343,3 @@ export function CreatePromotionModal({
     </Sheet>
   );
 } 
-          

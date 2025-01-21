@@ -7,9 +7,11 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { EventTicketPromotion, UpdateEventTicketPromotionRequest, GetEventUtils } from '@/lib/models/_events_models';
 import { updateEventTicketPromotion, getEventsUtils } from '@/lib/actions/events';
-import {SelectItem} from "@/components/ui/select";
+import { SelectItem } from "@/components/ui/select";
 import InputField from '@/components/custom/InputField';
 import SelectField from '@/components/custom/SelectField';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface UpdatePromotionModalProps {
   isOpen: boolean;
@@ -78,6 +80,11 @@ export function UpdatePromotionModal({
     e.preventDefault();
     if (!promotion?.id) return;
     
+    if (!formData.endDate || !formData.endTime) {
+      toast.error('Please select an end date and time');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -141,11 +148,62 @@ export function UpdatePromotionModal({
               disabled={isSubmitting}
             />
 
+            {formData.promotionType === 'discount' && (
+              <div className='w-full flex flex-col gap-4 mb-4'>
+                <SelectField
+                  label='Apply to Tickets'
+                  value={formData.tickets[0] || ''}
+                  setValue={(value) => {
+                    const selectedTickets = [...formData.tickets];
+                    if (selectedTickets.includes(value)) {
+                      const index = selectedTickets.indexOf(value);
+                      selectedTickets.splice(index, 1);
+                    } else {
+                      selectedTickets.push(value);
+                    }
+                    setFormData({ ...formData, tickets: selectedTickets });
+                  }}
+                >
+                  {availableTickets.map(ticket => (
+                    <SelectItem key={ticket.id} value={ticket.id}>
+                      {ticket.name}
+                    </SelectItem>
+                  ))}
+                </SelectField>
+
+                {formData.tickets.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.tickets.map(ticketId => {
+                      const ticket = availableTickets.find(t => t.id === ticketId);
+                      return ticket ? (
+                        <span
+                          key={ticket.id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded"
+                        >
+                          {ticket.name}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedTickets = formData.tickets.filter(id => id !== ticketId);
+                              setFormData({ ...formData, tickets: updatedTickets });
+                            }}
+                            className="hover:text-primary/80"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                 <DateTimePicker
-                  date={formData.endDate ? new Date(formData.endDate) : undefined}
+                  date={formData.endDate ? new Date(`${formData.endDate}T${formData.endTime}`) : undefined}
                   setDate={(date) => {
                     if (date) {
                       setFormData({
@@ -157,6 +215,25 @@ export function UpdatePromotionModal({
                   }}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between space-x-2">
+                <Label htmlFor="isActive" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Active Status
+                </Label>
+                <Switch
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <p className="text-sm text-gray-500">
+                {formData.isActive 
+                  ? "This promotion is currently active and can be used by customers"
+                  : "This promotion is inactive and cannot be used by customers"}
+              </p>
             </div>
           </div>
 
