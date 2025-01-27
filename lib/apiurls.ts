@@ -205,4 +205,13 @@ export default class APIUrls {
     // get event orders
     static readonly getEventOrders = `${APIUrls.BASE_URL_ORG}/api/v1/orders`;
 
+    // verify ticket
+    static readonly verifyTicket = `${APIUrls.BASE_URL_ORG}/api/v1/orders/verify`;
+
+    // redeem single ticket
+    static readonly redeemSingleTicket = `${APIUrls.BASE_URL_ORG}/api/v1/orders/redeem/{ticket_code}/{order_code}`;
+
+    // redeem all tickets
+    static readonly redeemAllTickets = `${APIUrls.BASE_URL_ORG}/api/v1/orders/redeem/all/{order_code}/{event_id}`;
+
 }

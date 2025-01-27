@@ -137,3 +137,26 @@ export interface OrderTicket {
     isUsed: boolean;
     isUsedAt: string;
 }
+
+
+// verify ticket
+export interface VerifyTicketResponse {
+    id: string;
+    status: string;
+    totalAmount: number;
+    orderDate: string;
+    customerName: string;
+    tickets: VerifyTicket[];
+    message: string;
+    isRefunded: boolean;
+}
+
+export interface VerifyTicket {
+    id: string;
+    ticketCode: string;
+    ticketName: string;
+    quantity: number;
+    isUsed: boolean;
+    usedAt: string;
+}
+

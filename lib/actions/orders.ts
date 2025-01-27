@@ -3,7 +3,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById } from "../models/_orders_models";
+import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById, VerifyTicketResponse } from "../models/_orders_models";
 import { cookies } from 'next/headers';
 import { ResponseModel } from "../models/_util_models";
 
@@ -204,7 +204,6 @@ export const confirmMomoPay = async (reference: string) => {
     }
 }
 
-// get all orders tickets
 export const getAllOrdersTickets = async (): Promise<AllOrdersResponse> => {
     try {
         const cookieStore = await cookies();
@@ -246,3 +245,71 @@ export const getOrdersTicketById = async (id: string): Promise<OrderDataById> =>
         throw new Error(errorMessage);
     }
 }  
+
+export const verifyTicket = async (eventId: string, ticketCode: string): Promise<VerifyTicketResponse> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        const response = await apiController<VerifyTicketResponse>({
+            method: 'GET',
+            url: `${APIUrls.verifyTicket}/${eventId}/${ticketCode}`,
+            token,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to verify ticket";
+        throw new Error(errorMessage);
+    }
+}
+
+export const redeemSingleTicket = async (ticketCode: string, orderCode: string): Promise<ResponseModel> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        const url = APIUrls.redeemSingleTicket
+            .replace('{ticket_code}', ticketCode)
+            .replace('{order_code}', orderCode);
+
+        const response = await apiController<ResponseModel>({
+            method: 'POST',
+            url: url,
+            token,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to redeem ticket";
+        throw new Error(errorMessage);
+    }
+}
+
+export const redeemAllTickets = async (orderCode: string, eventId: string): Promise<ResponseModel> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) throw new Error('Authentication required');
+
+        const url = APIUrls.redeemAllTickets
+            .replace('{order_code}', orderCode)
+            .replace('{event_id}', eventId);
+
+        const response = await apiController<ResponseModel>({
+            method: 'POST',
+            url: url,
+            token,
+            contentType: 'application/json',
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to redeem all tickets";
+        throw new Error(errorMessage);
+    }
+}
