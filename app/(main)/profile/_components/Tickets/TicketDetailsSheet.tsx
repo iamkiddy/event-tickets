@@ -1,14 +1,17 @@
 'use client';
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Calendar, Clock,  Ticket, CheckCircle, XCircle, CreditCard, Eye } from 'lucide-react';
+import { Calendar, Clock,  Ticket, CheckCircle, XCircle, CreditCard, Eye, FileText } from 'lucide-react';
 import { OrderData, OrderDataById } from '@/lib/models/_orders_models';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { getOrdersTicketById } from '@/lib/actions/orders';
+import { getOrdersTicketById, viewTicketsPdf } from '@/lib/actions/orders';
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from 'next/image';
+import { PdfPreviewDialog } from './PdfPreviewDialog';
+import { toast } from 'sonner';
+import { useAuth } from '@/lib/context/AuthContext';
 
 interface TicketDetailsSheetProps {
   isOpen: boolean;
@@ -17,9 +20,12 @@ interface TicketDetailsSheetProps {
 }
 
 export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsSheetProps) {
+  const { userProfile } = useAuth();
   const [detailedTicket, setDetailedTicket] = useState<OrderDataById | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     const fetchTicketDetails = async () => {
@@ -39,6 +45,22 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
 
     fetchTicketDetails();
   }, [ticket?.id, isOpen]);
+
+  const handleViewPdf = async () => {
+    if (!detailedTicket?.orderCode || !userProfile?.id) return;
+    try {
+      setPdfLoading(true);
+      const response = await viewTicketsPdf(detailedTicket.orderCode, userProfile.id);
+      if (response) {
+        setIsPdfPreviewOpen(true);
+      }
+    } catch (error) {
+      toast.error('Failed to load PDF');
+      console.error('Error loading PDF:', error);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -95,6 +117,29 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
                     <span>Order #{detailedTicket.orderCode}</span>
                   </div>
                 </div>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => window.open(`/event/${detailedTicket.eventId}`, '_blank')}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 
+                    bg-primaryColor text-white rounded-lg text-sm font-medium
+                    hover:bg-indigo-700 transition-colors"
+                >
+                  <Eye className="w-4 h-4" />
+                  View Event
+                </button>
+                
+                <button
+                  onClick={handleViewPdf}
+                  disabled={pdfLoading}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 
+                    bg-indigo-50 text-primaryColor rounded-lg text-sm font-medium
+                    hover:bg-indigo-100 transition-colors disabled:opacity-50"
+                >
+                  <FileText className="w-4 h-4" />
+                  {pdfLoading ? 'Loading...' : 'View PDF'}
+                </button>
               </div>
 
               {/* Order Status */}
@@ -242,6 +287,12 @@ export function TicketDetailsSheet({ isOpen, onClose, ticket }: TicketDetailsShe
           )}
         </AnimatePresence>
       </SheetContent>
+      <PdfPreviewDialog
+        isOpen={isPdfPreviewOpen}
+        onClose={() => setIsPdfPreviewOpen(false)}
+        orderId={detailedTicket?.orderCode}
+        userId={userProfile?.id}
+      />
     </Sheet>
   );
 } 

@@ -3,7 +3,7 @@
 import { ApiError } from "next/dist/server/api-utils";
 import apiController from "../apiController";
 import APIUrls from "../apiurls";
-import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById, VerifyTicketResponse } from "../models/_orders_models";
+import { TicketDiscountRequest, TicketDiscountResponse, TicketCheckoutRequest, TicketCheckoutResponse, MomoPayForm, MomoResponse, CheckoutDetailResponse, MomoConfirmResponse, AllOrdersResponse, OrderDataById, VerifyTicketResponse, ViewPdfResponse } from "../models/_orders_models";
 import { cookies } from 'next/headers';
 import { ResponseModel } from "../models/_util_models";
 
@@ -310,6 +310,29 @@ export const redeemAllTickets = async (orderCode: string, eventId: string): Prom
     } catch (error) {
         const apiError = error as ApiError;
         const errorMessage = apiError.message || "Failed to redeem all tickets";
+        throw new Error(errorMessage);
+    }
+}
+
+export const viewTicketsPdf = async (orderId: string, userId: string): Promise<ViewPdfResponse> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        
+        if (!token) {
+            throw new Error('Authentication token not found');
+        }
+
+        const response = await apiController<ViewPdfResponse>({
+            method: 'GET',
+            url: `${APIUrls.viewTicketsPdf}?order_id=${orderId}&user_id=${userId}`,
+            contentType: 'application/json',
+            token: token,
+        });
+        return response;
+    } catch (error) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError.message || "Failed to view tickets pdf";
         throw new Error(errorMessage);
     }
 }

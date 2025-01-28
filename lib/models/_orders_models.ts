@@ -124,6 +124,7 @@ export interface OrderDataById {
     isPaid: boolean;
     isRefunded: boolean;
     tickets: OrderTicket[];
+    ticketPdf: string;
 }
 
 export interface OrderTicket {
@@ -159,4 +160,38 @@ export interface VerifyTicket {
     isUsed: boolean;
     usedAt: string;
 }
+
+export interface ViewPdfResponse {
+    qrCode: string;
+    orderCode: string;
+    eventId: string;
+    event: string;
+    eventImage: string;
+    eventDate: string;
+    eventTime: string;
+    eventEndTime: string;
+    currency: string;
+    total: number;
+    finalTotal: number;
+    isPaid: boolean;
+    isRefunded: boolean;
+    tickets: ViewPdfTicket[];
+    coupon?: string;
+    couponType?: string;
+    couponAmount?: number;
+}
+
+export interface ViewPdfTicket {
+    id: string;
+    ticketName: string;
+    ticketPrice: number;
+    ticketNumber: string;
+    discountType: string;
+    discountAmount: number;
+    paidAmount: number;
+    quantity: number;
+    isUsed: boolean;
+    isUsedAt: string;
+}
+
 
