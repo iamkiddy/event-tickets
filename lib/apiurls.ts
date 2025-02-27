@@ -215,5 +215,5 @@ export default class APIUrls {
     static readonly redeemAllTickets = `${APIUrls.BASE_URL_ORG}/api/v1/orders/redeem/all/{order_code}/{event_id}`;
 
     // View tickets pdf
-    static readonly viewTicketsPdf = `${APIUrls.BASE_URL_ORG}/api/v1/orders/view-ticket-pdf`;
+    static readonly viewTicketsPdf = `${APIUrls.BASE_URL}/api/v1/orders/view-ticket-pdf`;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { X, AlertCircle, CheckCircle2, Info, XCircle, AlertTriangle } from "lucide-react";
+import { X, CheckCircle2, XCircle, AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NotificationDialogProps {
@@ -16,32 +16,32 @@ interface NotificationDialogProps {
 
 const typeStyles = {
   success: {
-    bgColor: 'bg-green-100',
-    textColor: 'text-green-600',
-    bgAlert: 'bg-green-50',
-    borderColor: 'border-green-200',
-    icon: CheckCircle2
+    bg: 'bg-green-50',
+    border: 'border-green-100',
+    text: 'text-green-800',
+    icon: CheckCircle2,
+    iconColor: 'text-green-600'
   },
   error: {
-    bgColor: 'bg-red-100',
-    textColor: 'text-red-600',
-    bgAlert: 'bg-red-50',
-    borderColor: 'border-red-200',
-    icon: XCircle
+    bg: 'bg-red-50',
+    border: 'border-red-100',
+    text: 'text-red-800',
+    icon: XCircle,
+    iconColor: 'text-red-600'
   },
   warning: {
-    bgColor: 'bg-orange-100',
-    textColor: 'text-orange-600',
-    bgAlert: 'bg-orange-50',
-    borderColor: 'border-orange-200',
-    icon: AlertTriangle
+    bg: 'bg-amber-50',
+    border: 'border-amber-100',
+    text: 'text-amber-800',
+    icon: AlertTriangle,
+    iconColor: 'text-amber-600'
   },
   info: {
-    bgColor: 'bg-blue-100',
-    textColor: 'text-blue-600',
-    bgAlert: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    icon: Info
+    bg: 'bg-blue-50',
+    border: 'border-blue-100',
+    text: 'text-blue-800',
+    icon: Info,
+    iconColor: 'text-blue-600'
   }
 };
 
@@ -72,53 +72,45 @@ export function NotificationDialog({
     <AlertDialog open={isVisible}>
       <AlertDialogContent 
         className={cn(
-          "w-full max-w-md bg-white/90 backdrop-blur-sm shadow-lg border-0",
-          "p-8 rounded-2xl transition-all duration-200 ease-out",
-          "dark:bg-gray-900/90 dark:text-white",
+          "w-full max-w-md",
+          "p-4 rounded-lg",
+          "border shadow-sm",
+          styles.bg,
+          styles.border,
+          "dark:bg-gray-800 dark:border-gray-700",
           position === 'top' ? "fixed top-4 left-1/2 transform -translate-x-1/2" :
           "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         )}
       >
-        <div className="flex justify-between items-start space-x-4">
+        <div className="flex gap-3">
+          {React.createElement(styles.icon, {
+            className: cn("w-5 h-5 mt-0.5", styles.iconColor)
+          })}
+          
           <div className="flex-1">
             {title && (
-              <div className="flex items-center gap-2 mb-3">
-                {React.createElement(styles.icon, {
-                  className: cn("h-5 w-5", styles.textColor)
-                })}
-                <h2 className={cn("text-xl font-semibold tracking-tight", styles.textColor)}>
-                  {title}
-                </h2>
-              </div>
+              <h2 className={cn(
+                "text-base font-medium mb-1",
+                styles.text,
+                "dark:text-gray-100"
+              )}>
+                {title}
+              </h2>
             )}
             {description && (
-              <div className={cn(
-                "p-4 rounded-xl",
-                "border border-opacity-50 backdrop-blur-sm",
-                "transition-all duration-200",
-                styles.bgAlert,
-                styles.borderColor
-              )}>
-                <p className={cn("text-sm leading-relaxed", styles.textColor)}>
-                  {description}
-                </p>
-              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {description}
+              </p>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "rounded-full hover:bg-gray-100/50",
-              "dark:hover:bg-gray-800/50",
-              styles.textColor
-            )}
-            onClick={() => {
-              setIsVisible(false);
-              onClose();
-            }}
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose} 
+            className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <X className="h-4 w-4" />
+            <X className="w-4 h-4 text-gray-500" />
           </Button>
         </div>
       </AlertDialogContent>

@@ -9,7 +9,6 @@ import {
   UserSquare2,
   Landmark,
   Settings,
-  HelpCircle,
 } from 'lucide-react';
 
 const navItems = [
@@ -18,7 +17,6 @@ const navItems = [
   { icon: UserSquare2, href: '/teams', label: 'Teams' },
   { icon: Landmark, href: '/finance', label: 'Finance' },
   { icon: Settings, href: '/settings', label: 'Settings' },
-  { icon: HelpCircle, href: '/help', label: 'Help' },
 ];
 
 interface NavContentProps {

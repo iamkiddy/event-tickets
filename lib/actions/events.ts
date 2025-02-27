@@ -841,12 +841,10 @@ export const getEventOrders = async (eventId: string, page = 1): Promise<GetEven
       contentType: 'application/json',
     });
 
-    // Validate response structure
     if (!response || typeof response !== 'object') {
       throw new Error('Invalid response format');
     }
 
-    // Ensure the response matches expected structure
     return {
       page: response.page || 1,
       total: response.total || 0,
@@ -855,7 +853,6 @@ export const getEventOrders = async (eventId: string, page = 1): Promise<GetEven
     };
   } catch (error) {
     console.error('Error fetching event orders:', error);
-    // Return a valid empty response instead of throwing
     return {
       page: 1,
       total: 0,

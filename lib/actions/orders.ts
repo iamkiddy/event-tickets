@@ -323,14 +323,20 @@ export const viewTicketsPdf = async (orderId: string, userId: string): Promise<V
             throw new Error('Authentication token not found');
         }
 
+        console.log(`Fetching PDF for orderId: ${orderId}, userId: ${userId}`);
+
         const response = await apiController<ViewPdfResponse>({
             method: 'GET',
-            url: `${APIUrls.viewTicketsPdf}?order_id=${orderId}&user_id=${userId}`,
+            url: `${APIUrls.viewTicketsPdf}/${orderId}/${userId}`,
             contentType: 'application/json',
             token: token,
         });
+
+        console.log('PDF response:', response);
+
         return response;
     } catch (error) {
+        console.error('Error fetching PDF:', error);
         const apiError = error as ApiError;
         const errorMessage = apiError.message || "Failed to view tickets pdf";
         throw new Error(errorMessage);

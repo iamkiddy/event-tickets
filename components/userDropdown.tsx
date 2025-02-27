@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, UserRoundCheck, ArrowLeft, ArrowRight, User } from 'lucide-react';
+import { LogOut, UserRoundCheck, ArrowLeft, ArrowRight, User, HelpCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,21 +41,19 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
         <UserRoundCheck className={`w-6 h-6 ${isScrolled || isProfilePage ? 'text-gray-700' : 'text-white'}`} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-white border border-gray-200 mt-4">
+        <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
+          <Link href="/profile" className="flex items-center">
+            <User className="w-4 h-4 mr-2" />
+            My Profile
+          </Link>
+        </DropdownMenuItem>
         {!isDashboardRoute && (
-          <>
-            <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
-              <Link href="/profile" className="flex items-center">
-                <User className="w-4 h-4 mr-2" />
-                My Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
-              <Link href="/home" className="flex items-center">
-                <ArrowRight className="w-4 h-4 mr-2" />
-                Switch to organizer
-              </Link>
-            </DropdownMenuItem>
-          </>
+          <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
+            <Link href="/home" className="flex items-center">
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Switch to organizer
+            </Link>
+          </DropdownMenuItem>
         )}
         {isDashboardRoute && (
           <DropdownMenuItem 
@@ -67,6 +65,12 @@ export const UserDropdown = ({ isScrolled }: { isScrolled: boolean }) => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator className="bg-gray-200" />
+        <DropdownMenuItem asChild className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer">
+          <Link href="/help" className="flex items-center">
+            <HelpCircle className="w-4 h-4 mr-2" />
+            Help
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={handleLogout}
           className="text-gray-700 focus:bg-gray-100 focus:text-gray-900 cursor-pointer"
